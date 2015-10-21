@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import gsgp.data.ExperimentDataset;
 import gsgp.data.PropertiesManager;
-import gsgp.population.parallelizer.SGPParallelizer;
+import gsgp.population.parallelizer.GSGPParallelizer;
 
 
 /**
@@ -33,8 +33,8 @@ public class Population {
     
     public void initialize(ExperimentDataset data) throws Exception{
         ExecutorService executor = Executors.newFixedThreadPool(properties.getNumThreads());
-        SGPParallelizer[] genParallel = SGPParallelizer.getParallelizers(properties.getPopulationSize(), properties, data, this, 0);
-        for (SGPParallelizer genParallel1 : genParallel) {
+        GSGPParallelizer[] genParallel = GSGPParallelizer.getParallelizers(properties.getPopulationSize(), properties, data, this, 0);
+        for (GSGPParallelizer genParallel1 : genParallel) {
             executor.execute(genParallel1);
         }
         executor.shutdown();

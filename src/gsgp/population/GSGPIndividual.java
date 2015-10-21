@@ -15,29 +15,30 @@ import gsgp.nodes.Node;
  *
  * @author luiz
  */
-public class SGPIndividual extends Individual{
+public class GSGPIndividual extends Individual{
     private BigInteger numNodes;
     
-    protected double tr_rmse;
+    protected double[] tr_semantics;
     protected double[] ts_semantics;
+    protected double tr_rmse;
     protected double ts_rmse;
     
-    public SGPIndividual(Node tree){
+    public GSGPIndividual(Node tree){
         super(tree);
     }
     
-    public SGPIndividual(Node tree, ExperimentDataset data) {
+    public GSGPIndividual(Node tree, ExperimentDataset data) {
         this(tree, data, new BigInteger(tree.getNumNodes()+""));
     }
     
-    public SGPIndividual(Node tree, ExperimentDataset data, BigInteger numNodes) {
+    public GSGPIndividual(Node tree, ExperimentDataset data, BigInteger numNodes) {
         super(tree);
         this.numNodes = numNodes;
         tr_semantics = new double[data.training.size()];
         ts_semantics = new double[data.test.size()];
     }
     
-    public SGPIndividual(ExperimentDataset data, BigInteger numNodes) {
+    public GSGPIndividual(ExperimentDataset data, BigInteger numNodes) {
         this(null, data, numNodes);
     }
     
@@ -78,19 +79,19 @@ public class SGPIndividual extends Individual{
         return ts_rmse;
     }
     
-    @Override
-    public int compareTo(Individual o) {
-        if (getFitness() < o.getFitness()){
-            return -1;
-        }
-        if (getFitness() > o.getFitness()) {
-            return 1;
-        }
-        return 0;
-    }
+//    @Override
+//    public int compareTo(Individual o) {
+//        if (getFitness() < o.getFitness()){
+//            return -1;
+//        }
+//        if (getFitness() > o.getFitness()) {
+//            return 1;
+//        }
+//        return 0;
+//    }
     
-    public SGPIndividual clone(){
-        SGPIndividual newInd = new SGPIndividual(tree.clone(null));
+    public GSGPIndividual clone(){
+        GSGPIndividual newInd = new GSGPIndividual(tree.clone(null));
         newInd.numNodes = numNodes;
         newInd.tr_semantics = Arrays.copyOf(tr_semantics, tr_semantics.length);
         newInd.ts_semantics = Arrays.copyOf(ts_semantics, ts_semantics.length);
@@ -129,10 +130,18 @@ public class SGPIndividual extends Individual{
         return df.format(ts_rmse);
     }
     
+    public void setTrSemantics(double[] tr_semantics) {
+        this.tr_semantics = tr_semantics;
+    }
+    
     public void setTsSemantics(double[] newSemantics) {
         this.ts_semantics = newSemantics;
     }
 
+    public double[] getTrSemantics() {
+        return tr_semantics;
+    }
+    
     public double[] getTsSemantics() {
         return ts_semantics;
     }

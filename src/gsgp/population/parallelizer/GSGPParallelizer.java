@@ -17,21 +17,21 @@ import gsgp.data.Instance;
 import gsgp.data.PropertiesManager;
 import gsgp.nodes.Node;
 import gsgp.population.Individual;
-import gsgp.population.SGPIndividual;
+import gsgp.population.GSGPIndividual;
 
 /**
  *
  * @author luiz
  */
-public class SGPParallelizer extends Thread{
+public class GSGPParallelizer extends Thread{
     protected ArrayList<Individual> localPop;
     protected static PropertiesManager properties;
     protected static ExperimentDataset experimentalData;
     protected static Population population;
-    private final double mutationStep;
+    protected final double mutationStep;
     protected int size;
 
-    protected SGPParallelizer(int localPopSize,
+    protected GSGPParallelizer(int localPopSize,
                             PropertiesManager properties, 
                             ExperimentDataset dataset, 
                             Population population,
@@ -45,18 +45,18 @@ public class SGPParallelizer extends Thread{
     }
 
     
-    public static SGPParallelizer[] getParallelizers(int totalSize,
+    public static GSGPParallelizer[] getParallelizers(int totalSize,
                                                     PropertiesManager properties, 
                                                     ExperimentDataset dataset, 
                                                     Population population, 
                                                     double ms){
         int numberOfThreads = Math.min(properties.getNumThreads(), totalSize);
-        SGPParallelizer[] genParallel = new SGPParallelizer[numberOfThreads];
+        GSGPParallelizer[] genParallel = new GSGPParallelizer[numberOfThreads];
         double individualsPerThread = totalSize / (double)numberOfThreads;
         double lastThreadSize = 0;
         for(int i = 0; i <  numberOfThreads; i++){
             int size = (int)Math.round((i+1)*individualsPerThread - lastThreadSize);
-            genParallel[i] = new SGPParallelizer(size, properties, dataset, population, ms);
+            genParallel[i] = new GSGPParallelizer(size, properties, dataset, population, ms);
             lastThreadSize += size;
         }
         return genParallel;
@@ -67,7 +67,7 @@ public class SGPParallelizer extends Thread{
         localPop.clear();
         if(!population.isInitialized()){
             for(int i = 0; i < size; i++){
-                SGPIndividual newIndividual = new SGPIndividual(properties.getNewIndividualTree(), experimentalData);
+                GSGPIndividual newIndividual = new GSGPIndividual(properties.getNewIndividualTree(), experimentalData);
                 localPop.add(newIndividual);
                 evaluateNewIndividual(newIndividual, TargetType.TRAINING);
                 evaluateNewIndividual(newIndividual, TargetType.TEST);
@@ -76,23 +76,23 @@ public class SGPParallelizer extends Thread{
         else{
             for(int i = 0; i < size; i++){
                 double floatDice = properties.getMersennePRNG().nextDouble();
-                SGPIndividual newIndividual;
+                GSGPIndividual newIndividual;
                 if(floatDice < properties.getXoverProb()){
                     newIndividual = semanticXover();
                 }
                 else if(floatDice < properties.getXoverProb() + properties.getMutProb()){
-                    newIndividual = (SGPIndividual)properties.selectIndividual(population);
+                    newIndividual = (GSGPIndividual)properties.selectIndividual(population);
                     newIndividual = semanticMutation(newIndividual);
                 }
                 else{
-                    newIndividual = (SGPIndividual)properties.selectIndividual(population);
+                    newIndividual = (GSGPIndividual)properties.selectIndividual(population);
                 }
                 localPop.add(newIndividual);
             }
         }
     }
 
-    protected void evaluateNewIndividual(SGPIndividual individual, TargetType target) {
+    protected void evaluateNewIndividual(GSGPIndividual individual, TargetType target) {
         Dataset data;
         if(target == TargetType.TRAINING) data = experimentalData.training;
         else data = experimentalData.test;
@@ -116,10 +116,10 @@ public class SGPParallelizer extends Thread{
         }
     }
 
-    private SGPIndividual semanticXover() {
-        SGPIndividual p1 = (SGPIndividual)properties.selectIndividual(population);
-        SGPIndividual p2 = (SGPIndividual)properties.selectIndividual(population);
-        while(p1.equals(p2)) p2 = (SGPIndividual)properties.selectIndividual(population);
+    protected GSGPIndividual semanticXover() {
+        GSGPIndividual p1 = (GSGPIndividual)properties.selectIndividual(population);
+        GSGPIndividual p2 = (GSGPIndividual)properties.selectIndividual(population);
+        while(p1.equals(p2)) p2 = (GSGPIndividual)properties.selectIndividual(population);
         Node rt = properties.getRandomTree();
         
 //        Function newTree = new SGXover();
@@ -127,15 +127,19 @@ public class SGPParallelizer extends Thread{
 //        newTree.addNode(p1.getTree(), 1);
 //        newTree.addNode(p2.getTree(), 2);
 
+        // Compute the (training/test) semantics of generated random tree
         double[] rtTrSemantics = Utils.getSemantics(experimentalData.training, rt);
         double[] rtTsSemantics = Utils.getSemantics(experimentalData.test, rt);
         
+        // These two arrays are used to store the new semantics (training/test) of
+        // the resulting individual
         double[] newTrSemantics = new double[experimentalData.training.size()];
         double[] newTsSemantics = new double[experimentalData.test.size()];
         
         double trSS_res = 0;
         double tsSS_res = 0;
         
+        // Compute the (training) semantics of the new individual
         for(int i = 0; i < experimentalData.training.size(); i++){
             double r = Utils.sigmoid(rtTrSemantics[i]);
             newTrSemantics[i] = r*p1.getTrSemantics()[i] + (1-r)*p2.getTrSemantics()[i];
@@ -143,8 +147,7 @@ public class SGPParallelizer extends Thread{
             double temp = newTrSemantics[i] - experimentalData.training.get(i).output;
             trSS_res += temp * temp;
         }
-        
-        
+        // Compute the (test) semantics of the new individual
         for(int i = 0; i < experimentalData.test.size(); i++){
             double r = Utils.sigmoid(rtTsSemantics[i]);
             newTsSemantics[i] = r*p1.getTsSemantics()[i] + (1-r)*p2.getTsSemantics()[i];
@@ -153,7 +156,7 @@ public class SGPParallelizer extends Thread{
             tsSS_res += temp * temp;
         }
 
-        SGPIndividual newInd = new SGPIndividual(experimentalData, p1.getNumNodes().add(p2.getNumNodes()).add(new BigInteger(rt.getNumNodes() + "")).add(BigInteger.ONE));
+        GSGPIndividual newInd = new GSGPIndividual(experimentalData, p1.getNumNodes().add(p2.getNumNodes()).add(new BigInteger(rt.getNumNodes() + "")).add(BigInteger.ONE));
         newInd.setTrSemantics(newTrSemantics);
         newInd.setTsSemantics(newTsSemantics);
         
@@ -163,7 +166,7 @@ public class SGPParallelizer extends Thread{
         return newInd;
     }
 
-    private SGPIndividual semanticMutation(SGPIndividual individual) {
+    protected GSGPIndividual semanticMutation(GSGPIndividual individual) {
         Node rt1 = properties.getRandomTree();
         Node rt2 = properties.getRandomTree();
 
@@ -171,19 +174,23 @@ public class SGPParallelizer extends Thread{
 //        newTree.addNode(rt1, 0);
 //        newTree.addNode(rt2, 1);
 //        newTree.addNode(individual.getTree(), 2);
-
+        
+        // Compute the (training/test) semantics of generated random trees
         double[] rt1TrSemantics = Utils.getSemantics(experimentalData.training, rt1);
         double[] rt1TsSemantics = Utils.getSemantics(experimentalData.test, rt1);
         
         double[] rt2TrSemantics = Utils.getSemantics(experimentalData.training, rt2);
         double[] rt2TsSemantics = Utils.getSemantics(experimentalData.test, rt2);
        
+        // These two arrays are used to store the new semantics (training/test) of
+        // the resulting individual
         double[] newTrSemantics = new double[experimentalData.training.size()];
         double[] newTsSemantics = new double[experimentalData.test.size()];
         
         double trSS_res = 0;
         double tsSS_res = 0;
         
+        // Compute the (training) semantics of the new individual
         for(int i = 0; i < experimentalData.training.size(); i++){
             double r = Utils.sigmoid(rt1TrSemantics[i]);
             r -=  Utils.sigmoid(rt2TrSemantics[i]);
@@ -192,6 +199,7 @@ public class SGPParallelizer extends Thread{
             double temp = newTrSemantics[i] - experimentalData.training.get(i).output;
             trSS_res += temp * temp;
         }
+        // Compute the (test) semantics of the new individual
         for(int i = 0; i < experimentalData.test.size(); i++){
             double r = Utils.sigmoid(rt1TsSemantics[i]);
             r -=  Utils.sigmoid(rt2TsSemantics[i]);
@@ -201,7 +209,7 @@ public class SGPParallelizer extends Thread{
             tsSS_res += temp * temp;
         }
 
-        SGPIndividual newInd = new SGPIndividual(experimentalData, 
+        GSGPIndividual newInd = new GSGPIndividual(experimentalData, 
                                                  individual.getNumNodes().add(new BigInteger(rt1.getNumNodes()+"")).
                                                             add(new BigInteger(rt2.getNumNodes()+"")).add(BigInteger.ONE));
         newInd.setTrSemantics(newTrSemantics);

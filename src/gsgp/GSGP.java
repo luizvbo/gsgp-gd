@@ -15,19 +15,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import gsgp.data.PropertiesManager;
-import gsgp.population.parallelizer.SGPParallelizer;
+import gsgp.population.parallelizer.GSGPParallelizer;
 
 /**
  *
  * @author luiz
  */
-public class SGP {
+public class GSGP {
     private final PropertiesManager properties;
     private final ExperimentDataset dataset;
     private final Statistics statistics;
     private final Population population;
 
-    public SGP(ExperimentDataset dataset, PropertiesManager properties) throws Exception{
+    public GSGP(ExperimentDataset dataset, PropertiesManager properties) throws Exception{
         this.dataset = dataset;
         this.properties = properties;
         population = new Population(properties);
@@ -43,7 +43,7 @@ public class SGP {
         population.initialize(dataset);
         
         // One member of the population is took from the previous one (elitism). That is why we subtract one
-        SGPParallelizer[] parallelizers = SGPParallelizer.getParallelizers(properties.getPopulationSize()-1, properties, dataset, population, mutationStep);
+        GSGPParallelizer[] parallelizers = GSGPParallelizer.getParallelizers(properties.getPopulationSize()-1, properties, dataset, population, mutationStep);
         
         ExecutorService executor;
         
@@ -54,7 +54,7 @@ public class SGP {
             System.out.println("Generation " + (i+1) + ":");
             executor = Executors.newFixedThreadPool(properties.getNumThreads());
             
-            for (SGPParallelizer parallelizer : parallelizers) {
+            for (GSGPParallelizer parallelizer : parallelizers) {
                 executor.execute(parallelizer);
             }
             executor.shutdown();

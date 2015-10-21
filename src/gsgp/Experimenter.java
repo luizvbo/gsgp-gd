@@ -41,7 +41,7 @@ public class Experimenter {
             for(int execution = 0; execution < parameters.getNumExperiments(); execution++){
                 System.out.println("Execution " + (execution+1) + ":");
                 ExperimentDataset data = parameters.getDataProducer().getExperimentDataset();
-                SGP sgp = new SGP(data, parameters);
+                GSGP sgp = new GSGP(data, parameters);
                 sgp.evolve();
                 stats[execution] = sgp.getStatistics();
             

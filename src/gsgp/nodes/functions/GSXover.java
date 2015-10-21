@@ -6,24 +6,21 @@
 
 package gsgp.nodes.functions;
 
-import gsgp.Utils;
 import gsgp.nodes.Node;
 
 /**
  *
  * @author luiz
  */
-public class SGMutation implements Function{
+public class GSXover implements Function{
     private final Node[] arguments;
-    private double ms;
     private Node parent = null;
-    private int parentArgPosition;
+    private int parentArgPosition;  
     
     private final int arity = 3;
-    
-    public SGMutation(double ms) {
+
+    public GSXover() {
         arguments = new Node[arity];
-        this.ms = ms;
     }
     
     @Override
@@ -31,30 +28,31 @@ public class SGMutation implements Function{
 
     @Override
     public double eval(double[] inputs) {
-        return arguments[2].eval(inputs) + ms * (Utils.sigmoid(arguments[0].eval(inputs)) - Utils.sigmoid(arguments[1].eval(inputs)));
+        double tr = arguments[0].eval(inputs);
+        return tr*arguments[1].eval(inputs) + (1-tr)*arguments[2].eval(inputs);
     }
-
+    
     @Override
     public int getNumNodes() {
-        return arguments[0].getNumNodes() + arguments[1].getNumNodes() + arguments[2].getNumNodes() + 1;
+        return arguments[0].getNumNodes() + arguments[1].getNumNodes() + 1;
     }
 
     @Override
     public Node softClone() {
-        return new SGMutation(ms);
+        return new GSXover();
     }
-
+    
     @Override
     public void addNode(Node newNode, int argPosition) {
         arguments[argPosition] = newNode;
         newNode.setParent(this, argPosition);
     }
-    
+
     @Override
     public String toString() {
-        return "SGM(" + ms + "," + arguments[0] + "," + arguments[1] + "," + arguments[2] + ")";
+        return "SGX(" + arguments[0] + "," + arguments[1] + "," + arguments[2] + ")";
     }
-    
+
     @Override
     public Node getChild(int index) {
         return arguments[index];
@@ -75,13 +73,12 @@ public class SGMutation implements Function{
     public int getParentArgPosition() {
         return parentArgPosition;
     }
-    
+
     @Override
     public Node clone(Node parent) {
-        SGMutation newNode = new SGMutation(ms);
-        for(int i = 0; i < arity; i++) newNode.arguments[i] = arguments[i].clone(newNode);
+        GSXover newNode = new GSXover();
+        for(int i = 0; i < arity; i++) newNode.arguments[i] = arguments[i].clone(newNode); 
         newNode.parent = parent;
-        newNode.ms = ms;
         newNode.parentArgPosition = parentArgPosition;
         return newNode;
     }

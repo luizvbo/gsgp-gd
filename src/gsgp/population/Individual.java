@@ -18,7 +18,7 @@ import gsgp.nodes.Node;
  */
 public abstract class Individual implements Comparable<Individual>{
     protected Node tree;
-    protected double[] tr_semantics;
+    
     protected DecimalFormat df = new DecimalFormat("0.00000", new DecimalFormatSymbols(Locale.ENGLISH));
 
     public Individual(Node tree) {
@@ -27,7 +27,6 @@ public abstract class Individual implements Comparable<Individual>{
     
     public Individual(Node tree, ExperimentDataset data) {
         this(tree);
-        tr_semantics = new double[data.training.size()];
     }
     
     public double eval(double[] input){
@@ -61,16 +60,7 @@ public abstract class Individual implements Comparable<Individual>{
     public void setTree(Node randomSubtree) {
         this.tree = randomSubtree;
     }
-    
-    public double[] getTrSemantics() {
-        return tr_semantics;
-    }
-
-    public void setTrSemantics(double[] tr_semantics) {
-        this.tr_semantics = tr_semantics;
-    }
-    
-    
+        
     @Override
     public abstract Individual clone();
     
@@ -81,4 +71,6 @@ public abstract class Individual implements Comparable<Individual>{
     public abstract String getTrFitnessAsString();
 
     public abstract String getTsFitnessAsString();
+    
+    public abstract double[] getTrSemantics();
 }
