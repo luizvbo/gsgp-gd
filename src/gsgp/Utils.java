@@ -69,6 +69,15 @@ public class Utils {
         return newSemantic;
     }
     
+    public static double[] getSigmoidSemantics(Dataset training, Node f){
+        double[] newSemantic = new double[training.size()];
+        int i = 0;
+        for(Instance inst : training){
+            newSemantic[i++] = sigmoid(f.eval(inst.input));
+        }
+        return newSemantic;
+    }
+    
     public static double getMedian(double[] array) {
         double[] auxArray = Arrays.copyOf(array, array.length);
         Arrays.sort(auxArray);

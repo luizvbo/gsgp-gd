@@ -52,6 +52,7 @@ public class PropertiesManager {
     private int numGenerations;
     private int numThreads;
     private int populationSize;
+    private int rtPoolSize;
     private double minError;
     private double ms;
     private double mutProb;
@@ -81,6 +82,7 @@ public class PropertiesManager {
         if(numThreads == -1) numThreads = Runtime.getRuntime().availableProcessors();
         
         populationSize = getIntegerPropertie(ParameterList.POP_SIZE, 1000);
+        rtPoolSize = getIntegerPropertie(ParameterList.RT_POOL_SIZE, 200);
         minError = getDoublePropertie(ParameterList.MIN_ERROR, 0);
         ms = getDoublePropertie(ParameterList.MUT_STEP, -1);
         mutProb = getDoublePropertie(ParameterList.MUT_PROB, 0.5);
@@ -122,6 +124,7 @@ public class PropertiesManager {
         NUM_GENERATION("evol.num.generation", "Number of generations", false),
         NUM_REPETITIONS("experiment.num.repetition", "Number of experiment repetitions (per fold) - default = 1", false),
         POP_SIZE("pop.size", "Population size", false),
+        RT_POOL_SIZE("rt.pool.size", "Size of the pool of random trees used by GSX/GSM", false),
         NUMBER_THREADS("evol.num.threads", "Number of threads (for parallel execution)", false),
         TOURNAMENT_SIZE("pop.ind.selector.tourn.size", "Tournament size, when using tournament as selector", false),
         
@@ -405,6 +408,10 @@ public class PropertiesManager {
 
     public int getNumThreads() {
         return numThreads;
+    }
+    
+    public int getRTPoolSize() {
+        return rtPoolSize;
     }
 
     public double getMinError() {

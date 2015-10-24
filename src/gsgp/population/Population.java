@@ -31,21 +31,6 @@ public class Population {
         initialized = false;
     }
     
-    public void initialize(ExperimentDataset data) throws Exception{
-        ExecutorService executor = Executors.newFixedThreadPool(properties.getNumThreads());
-        GSGPParallelizer[] genParallel = GSGPParallelizer.getParallelizers(properties.getPopulationSize(), properties, data, this, 0);
-        for (GSGPParallelizer genParallel1 : genParallel) {
-            executor.execute(genParallel1);
-        }
-        executor.shutdown();
-        executor.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-        
-        for(int i = 0; i < genParallel.length; i++){
-            individuals.addAll(genParallel[i].getLocalPopulation());
-        }            
-        initialized = true;
-    }
-    
     public Individual getIndividual(int index){
         return individuals.get(index);
     }
@@ -64,6 +49,10 @@ public class Population {
     
     public void setCurrentPopulation(ArrayList<Individual> currentPopulation) {
         this.individuals = currentPopulation;
+    }
+    
+    public void addAll(ArrayList<Individual> newIndividuals){
+        individuals.addAll(newIndividuals);
     }
     
     public int size(){

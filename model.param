@@ -8,9 +8,9 @@ experiment.seed = 123456
 # Identifier prefix for files
 experiment.file.prefix = saida
 # List of terminals used to build new trees (separeted by commas)
-tree.build.terminals = sgp.nodes.terminals.ERC
+tree.build.terminals = gsgp.nodes.terminals.ERC
 # List of functions used to build new trees (separeted by commas)
-tree.build.functions = sgp.nodes.functions.AQ, sgp.nodes.functions.Sub, sgp.nodes.functions.Add, sgp.nodes.functions.Mul
+tree.build.functions = gsgp.nodes.functions.AQ, gsgp.nodes.functions.Sub, gsgp.nodes.functions.Add, gsgp.nodes.functions.Mul
 # Builder used to generate trees for the initial population
 tree.build.builder = RHH
 # Builder used to generate random trees for the semantic operators

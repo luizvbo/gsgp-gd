@@ -30,33 +30,35 @@ public class GSGPParallelizer extends Thread{
     protected static Population population;
     protected final double mutationStep;
     protected int size;
-
-    protected GSGPParallelizer(int localPopSize,
-                            PropertiesManager properties, 
-                            ExperimentDataset dataset, 
-                            Population population,
-                            double ms) {
+    
+    protected GSGPParallelizer(int localPopSize, double ms) {
         size = localPopSize;
-        this.properties = properties;
-        this.experimentalData = dataset;
-        this.population = population;
         mutationStep = ms;
         localPop = new ArrayList<>();
     }
-
     
-    public static GSGPParallelizer[] getParallelizers(int totalSize,
-                                                    PropertiesManager properties, 
-                                                    ExperimentDataset dataset, 
-                                                    Population population, 
-                                                    double ms){
+    /**
+     * Initalize the static parameters of the class
+     * @param properties Properties manager
+     * @param dataset Training/test data
+     * @param population Initial population
+     */
+    public static void initializerParallelizer(PropertiesManager properties, 
+                                            ExperimentDataset dataset, 
+                                            Population population){
+        GSGPParallelizer.properties = properties;
+        GSGPParallelizer.experimentalData = dataset;
+        GSGPParallelizer.population = population;
+    }
+    
+    public static GSGPParallelizer[] getParallelizers(int totalSize, double ms){
         int numberOfThreads = Math.min(properties.getNumThreads(), totalSize);
         GSGPParallelizer[] genParallel = new GSGPParallelizer[numberOfThreads];
         double individualsPerThread = totalSize / (double)numberOfThreads;
         double lastThreadSize = 0;
         for(int i = 0; i <  numberOfThreads; i++){
             int size = (int)Math.round((i+1)*individualsPerThread - lastThreadSize);
-            genParallel[i] = new GSGPParallelizer(size, properties, dataset, population, ms);
+            genParallel[i] = new GSGPParallelizer(size, ms);
             lastThreadSize += size;
         }
         return genParallel;
@@ -142,7 +144,7 @@ public class GSGPParallelizer extends Thread{
         // Compute the (training) semantics of the new individual
         for(int i = 0; i < experimentalData.training.size(); i++){
             double r = Utils.sigmoid(rtTrSemantics[i]);
-            newTrSemantics[i] = r*p1.getTrSemantics()[i] + (1-r)*p2.getTrSemantics()[i];
+            newTrSemantics[i] = r*p1.getTrainingSemantics()[i] + (1-r)*p2.getTrainingSemantics()[i];
             
             double temp = newTrSemantics[i] - experimentalData.training.get(i).output;
             trSS_res += temp * temp;
@@ -150,7 +152,7 @@ public class GSGPParallelizer extends Thread{
         // Compute the (test) semantics of the new individual
         for(int i = 0; i < experimentalData.test.size(); i++){
             double r = Utils.sigmoid(rtTsSemantics[i]);
-            newTsSemantics[i] = r*p1.getTsSemantics()[i] + (1-r)*p2.getTsSemantics()[i];
+            newTsSemantics[i] = r*p1.getTestSemantics()[i] + (1-r)*p2.getTestSemantics()[i];
             
             double temp = newTsSemantics[i] - experimentalData.test.get(i).output;
             tsSS_res += temp * temp;
@@ -194,7 +196,7 @@ public class GSGPParallelizer extends Thread{
         for(int i = 0; i < experimentalData.training.size(); i++){
             double r = Utils.sigmoid(rt1TrSemantics[i]);
             r -=  Utils.sigmoid(rt2TrSemantics[i]);
-            newTrSemantics[i] = individual.getTrSemantics()[i] + mutationStep*r;
+            newTrSemantics[i] = individual.getTrainingSemantics()[i] + mutationStep*r;
             
             double temp = newTrSemantics[i] - experimentalData.training.get(i).output;
             trSS_res += temp * temp;
@@ -203,7 +205,7 @@ public class GSGPParallelizer extends Thread{
         for(int i = 0; i < experimentalData.test.size(); i++){
             double r = Utils.sigmoid(rt1TsSemantics[i]);
             r -=  Utils.sigmoid(rt2TsSemantics[i]);
-            newTsSemantics[i] = individual.getTsSemantics()[i] + mutationStep*r;
+            newTsSemantics[i] = individual.getTestSemantics()[i] + mutationStep*r;
             
             double temp = newTsSemantics[i] - experimentalData.test.get(i).output;
             tsSS_res += temp * temp;

@@ -68,9 +68,9 @@ public abstract class Individual implements Comparable<Individual>{
     
     public abstract String getNumNodesAsString();
 
-    public abstract String getTrFitnessAsString();
+    public abstract String getTrainingFitnessAsString();
 
-    public abstract String getTsFitnessAsString();
+    public abstract String getTestFitnessAsString();
     
-    public abstract double[] getTrSemantics();
+    public abstract double[] getTrainingSemantics();
 }

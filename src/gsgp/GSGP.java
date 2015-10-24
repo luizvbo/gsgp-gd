@@ -40,10 +40,13 @@ public class GSGP {
         double mutationStep = properties.getMutationStep();
         if(mutationStep == -1) mutationStep = 0.1*dataset.training.getOutputSD();
         
-        population.initialize(dataset);
+        // Initialize the static attributes from the parallelizer
+        GSGPParallelizer.initializerParallelizer(properties, dataset, population);
+        
+        initializePopulation();
         
         // One member of the population is took from the previous one (elitism). That is why we subtract one
-        GSGPParallelizer[] parallelizers = GSGPParallelizer.getParallelizers(properties.getPopulationSize()-1, properties, dataset, population, mutationStep);
+        GSGPParallelizer[] parallelizers = GSGPParallelizer.getParallelizers(properties.getPopulationSize()-1, mutationStep);
         
         ExecutorService executor;
         
@@ -78,5 +81,21 @@ public class GSGP {
 
     public Statistics getStatistics() {
         return statistics;
+    }
+    
+    private void initializePopulation() throws Exception{
+        ExecutorService executor = Executors.newFixedThreadPool(properties.getNumThreads());
+        
+        GSGPParallelizer[] genParallel = GSGPParallelizer.getParallelizers(properties.getPopulationSize(), 0);
+        for (GSGPParallelizer genParallel1 : genParallel) {
+            executor.execute(genParallel1);
+        }
+        executor.shutdown();
+        executor.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+        
+        for(int i = 0; i < genParallel.length; i++){
+            population.addAll(genParallel[i].getLocalPopulation());
+        }            
+        population.setInitialized(true);
     }
 }

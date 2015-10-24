@@ -121,12 +121,12 @@ public class GSGPIndividual extends Individual{
     }
 
     @Override
-    public String getTrFitnessAsString() {
+    public String getTrainingFitnessAsString() {
         return df.format(tr_rmse);
     }
 
     @Override
-    public String getTsFitnessAsString() {
+    public String getTestFitnessAsString() {
         return df.format(ts_rmse);
     }
     
@@ -138,11 +138,12 @@ public class GSGPIndividual extends Individual{
         this.ts_semantics = newSemantics;
     }
 
-    public double[] getTrSemantics() {
+    @Override
+    public double[] getTrainingSemantics() {
         return tr_semantics;
     }
     
-    public double[] getTsSemantics() {
+    public double[] getTestSemantics() {
         return ts_semantics;
     }
 }

@@ -39,8 +39,8 @@ public class Statistics {
         Individual bestOfGen = pop.getBestIndividual();
         
         bestOfGenSize[currentGeneration] = bestOfGen.getNumNodesAsString();
-        bestOfGenTrFitness[currentGeneration] = bestOfGen.getTrFitnessAsString();
-        bestOfGenTsFitness[currentGeneration] = bestOfGen.getTsFitnessAsString();
+        bestOfGenTrFitness[currentGeneration] = bestOfGen.getTrainingFitnessAsString();
+        bestOfGenTsFitness[currentGeneration] = bestOfGen.getTestFitnessAsString();
         
         System.out.println("Best of Gen (RMSE-TR/RMSE-TS/nodes: " + bestOfGenTrFitness[currentGeneration] + 
                            "/" + bestOfGenTsFitness[currentGeneration] + "/" + bestOfGenSize[currentGeneration]);
@@ -52,7 +52,7 @@ public class Statistics {
         initialSemantics = new double[population.size()][];
         int i = 0;
         for(Individual ind : population.getIndividuals()){
-            initialSemantics[i++] = ind.getTrSemantics();
+            initialSemantics[i++] = ind.getTrainingSemantics();
         }
     }
     
