@@ -17,8 +17,6 @@ public interface Node {
     
     public int getNumNodes();
     
-    public Node softClone();
-    
     public Node clone(Node parent);
     
     public Node getChild(int index);

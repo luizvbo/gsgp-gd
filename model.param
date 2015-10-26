@@ -6,7 +6,7 @@ experiment.output.dir = /tmp/teste
 # Path to a file with the list of seeds to use during iterations
 experiment.seed = 123456
 # Identifier prefix for files
-experiment.file.prefix = saida
+experiment.file.prefix = GSGP
 # List of terminals used to build new trees (separeted by commas)
 tree.build.terminals = gsgp.nodes.terminals.ERC
 # List of functions used to build new trees (separeted by commas)
@@ -32,7 +32,7 @@ tree.build.max.depth = 6
 # Min depth allowed when building trees
 tree.min.depth = 2
 # Number of experiment repetitions (per fold) - default = 1
-experiment.num.repetition = 1
+experiment.num.repetition = 6
 # Population size
 pop.size = 1000
 # Number of generations

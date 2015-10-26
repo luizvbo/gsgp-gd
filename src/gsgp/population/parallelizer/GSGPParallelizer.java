@@ -6,6 +6,7 @@
 
 package gsgp.population.parallelizer;
 
+import gsgp.MersenneTwister;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import gsgp.population.Population;
@@ -29,12 +30,14 @@ public class GSGPParallelizer extends Thread{
     protected static ExperimentDataset experimentalData;
     protected static Population population;
     protected final double mutationStep;
+    protected MersenneTwister rndGenerator;
     protected int size;
     
-    protected GSGPParallelizer(int localPopSize, double ms) {
+    protected GSGPParallelizer(int localPopSize, double ms, MersenneTwister rndGenerator) {
         size = localPopSize;
         mutationStep = ms;
         localPop = new ArrayList<>();
+        this.rndGenerator = rndGenerator;
     }
     
     /**
@@ -51,14 +54,15 @@ public class GSGPParallelizer extends Thread{
         GSGPParallelizer.population = population;
     }
     
-    public static GSGPParallelizer[] getParallelizers(int totalSize, double ms){
+    public static GSGPParallelizer[] getParallelizers(int totalSize, double ms) throws Exception{
         int numberOfThreads = Math.min(properties.getNumThreads(), totalSize);
         GSGPParallelizer[] genParallel = new GSGPParallelizer[numberOfThreads];
+        MersenneTwister rndGenerators[] = properties.getMersennePRGNArray(numberOfThreads);
         double individualsPerThread = totalSize / (double)numberOfThreads;
         double lastThreadSize = 0;
         for(int i = 0; i <  numberOfThreads; i++){
             int size = (int)Math.round((i+1)*individualsPerThread - lastThreadSize);
-            genParallel[i] = new GSGPParallelizer(size, ms);
+            genParallel[i] = new GSGPParallelizer(size, ms, rndGenerators[i]);
             lastThreadSize += size;
         }
         return genParallel;
@@ -69,7 +73,7 @@ public class GSGPParallelizer extends Thread{
         localPop.clear();
         if(!population.isInitialized()){
             for(int i = 0; i < size; i++){
-                GSGPIndividual newIndividual = new GSGPIndividual(properties.getNewIndividualTree(), experimentalData);
+                GSGPIndividual newIndividual = new GSGPIndividual(properties.getNewIndividualTree(rndGenerator), experimentalData);
                 localPop.add(newIndividual);
                 evaluateNewIndividual(newIndividual, TargetType.TRAINING);
                 evaluateNewIndividual(newIndividual, TargetType.TEST);
@@ -77,17 +81,17 @@ public class GSGPParallelizer extends Thread{
         }
         else{
             for(int i = 0; i < size; i++){
-                double floatDice = properties.getMersennePRNG().nextDouble();
+                double floatDice = rndGenerator.nextDouble();
                 GSGPIndividual newIndividual;
                 if(floatDice < properties.getXoverProb()){
                     newIndividual = semanticXover();
                 }
                 else if(floatDice < properties.getXoverProb() + properties.getMutProb()){
-                    newIndividual = (GSGPIndividual)properties.selectIndividual(population);
+                    newIndividual = (GSGPIndividual)properties.selectIndividual(population, rndGenerator);
                     newIndividual = semanticMutation(newIndividual);
                 }
                 else{
-                    newIndividual = (GSGPIndividual)properties.selectIndividual(population);
+                    newIndividual = (GSGPIndividual)properties.selectIndividual(population, rndGenerator);
                 }
                 localPop.add(newIndividual);
             }
@@ -119,10 +123,10 @@ public class GSGPParallelizer extends Thread{
     }
 
     protected GSGPIndividual semanticXover() {
-        GSGPIndividual p1 = (GSGPIndividual)properties.selectIndividual(population);
-        GSGPIndividual p2 = (GSGPIndividual)properties.selectIndividual(population);
-        while(p1.equals(p2)) p2 = (GSGPIndividual)properties.selectIndividual(population);
-        Node rt = properties.getRandomTree();
+        GSGPIndividual p1 = (GSGPIndividual)properties.selectIndividual(population, rndGenerator);
+        GSGPIndividual p2 = (GSGPIndividual)properties.selectIndividual(population, rndGenerator);
+        while(p1.equals(p2)) p2 = (GSGPIndividual)properties.selectIndividual(population, rndGenerator);
+        Node rt = properties.getRandomTree(rndGenerator);
         
 //        Function newTree = new SGXover();
 //        newTree.addNode(rt, 0);
@@ -169,8 +173,8 @@ public class GSGPParallelizer extends Thread{
     }
 
     protected GSGPIndividual semanticMutation(GSGPIndividual individual) {
-        Node rt1 = properties.getRandomTree();
-        Node rt2 = properties.getRandomTree();
+        Node rt1 = properties.getRandomTree(rndGenerator);
+        Node rt2 = properties.getRandomTree(rndGenerator);
 
 //        Function newTree = new SGMutation(ms);
 //        newTree.addNode(rt1, 0);

@@ -58,7 +58,7 @@ public class PropertiesManager {
     private double mutProb;
     private double xoverProb;
     private double semSimThres;
-    private Node[] terminals;
+    private Terminal[] terminals;
     private Function[] functions;
     
     private IndividualSelector individualSelector;
@@ -308,11 +308,11 @@ public class PropertiesManager {
         int minDepth = getIntegerPropertie(ParameterList.MIN_TREE_DEPTH, 2);
         switch(builderType){
             case "grow":
-                return new GrowBuilder(maxDepth, minDepth, functions, terminals, mersennePRNG);
+                return new GrowBuilder(maxDepth, minDepth, functions, terminals);
             case "full":
-                return new FullBuilder(maxDepth, minDepth, functions, terminals, mersennePRNG);
+                return new FullBuilder(maxDepth, minDepth, functions, terminals);
             case "rhh":
-                return new HalfBuilder(maxDepth, minDepth, functions, terminals, mersennePRNG);
+                return new HalfBuilder(maxDepth, minDepth, functions, terminals);
             default:
                 throw new Exception("There is no builder called " + builderType + ".");
         }
@@ -322,7 +322,7 @@ public class PropertiesManager {
         return parameterLoaded;
     }
     
-    private Node[] getTerminals() throws Exception{
+    private Terminal[] getTerminals() throws Exception{
         String[] sTerminals = getStringPropertie(ParameterList.TERMINAL_LIST, false).replaceAll("\\s", "").split(",");
         boolean useAllInputs = true;
         for(String str : sTerminals){
@@ -331,20 +331,20 @@ public class PropertiesManager {
                 break;
             }
         }
-        ArrayList<Node> terminals = new ArrayList<Node>();
+        ArrayList<Terminal> terminals = new ArrayList<Terminal>();
         if(useAllInputs){
             for(int i = 0; i < dataProducer.getNumInputs(); i++) terminals.add(new Input(i));
             for(String str : sTerminals){
                 Class<?> terminal = Class.forName(str);
                 Terminal newTerminal = (Terminal)terminal.newInstance();
-                newTerminal.setup(mersennePRNG);
+//                newTerminal.setup(mersennePRNG);
                 terminals.add(newTerminal);
             }
         }
         else{
             // ************************ TO IMPLEMENT ************************
         }
-        return terminals.toArray(new Node[terminals.size()]);
+        return terminals.toArray(new Terminal[terminals.size()]);
     }
 
     /**
@@ -442,15 +442,29 @@ public class PropertiesManager {
         return filePrefix;
     }
     
-    public Node getRandomTree(){
-        return randomTreeBuilder.newRootedTree(0);
+    public Node getRandomTree(MersenneTwister rnd){
+        return randomTreeBuilder.newRootedTree(0, rnd);
     }
     
-    public Node getNewIndividualTree(){
-        return individualBuilder.newRootedTree(0);
+    public Node  getRandomTree(){
+        return randomTreeBuilder.newRootedTree(0, mersennePRNG);
     }
     
-    public Individual selectIndividual(Population population){
-        return individualSelector.selectIndividual(population, mersennePRNG);
+    public Node getNewIndividualTree(MersenneTwister rnd){
+        return individualBuilder.newRootedTree(0, rnd);
+    }
+    
+    public Individual selectIndividual(Population population, MersenneTwister rndGenerator){
+        return individualSelector.selectIndividual(population, rndGenerator);
+    }
+    
+    public MersenneTwister[] getMersennePRGNArray(int size) throws Exception{
+        MersenneTwister[] generators = new MersenneTwister[size];
+        for(int i = 0; i < size; i++){
+            long seed = mersennePRNG.nextLong();
+//            generators[i] = new MersenneTwister(getLongPropertie(ParameterList.SEED, System.currentTimeMillis())+(long)i);
+            generators[i] = new MersenneTwister(seed);
+        }
+        return generators;
     }
 }

@@ -6,13 +6,14 @@
 
 package gsgp.nodes.terminals;
 
+import gsgp.MersenneTwister;
 import gsgp.nodes.Node;
 
 /**
  *
  * @author luiz
  */
-public class Input implements Node{
+public class Input implements Terminal{
     private final int index;
     private Node parent = null;
     private int parentArgPosition;
@@ -33,11 +34,6 @@ public class Input implements Node{
     
     public int getIndex() {
         return index;
-    }
-
-    @Override
-    public Node softClone() {
-        return new Input(index);
     }
     
     @Override
@@ -77,5 +73,10 @@ public class Input implements Node{
         newNode.parent = parent;
         newNode.parentArgPosition = parentArgPosition;
         return newNode;
+    }
+
+    @Override
+    public Terminal softClone(MersenneTwister rnd) {
+        return new Input(index);
     }
 }

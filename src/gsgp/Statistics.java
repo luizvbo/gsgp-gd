@@ -35,8 +35,15 @@ public class Statistics {
         currentGeneration = 0;
     }
     
-    public void addGenerationStatistic(Population pop){
+    public void addGenerationStatistic(Population pop){        
         Individual bestOfGen = pop.getBestIndividual();
+        
+//        long[] sizes = new long[pop.size()];
+//        int count = 0;
+//        for(Individual ind : pop.getIndividuals()){
+//            sizes[count++] = Long.parseLong(ind.getNumNodesAsString());
+//        }        
+//        bestOfGenSize[currentGeneration] = Utils.getMedian(sizes)+"";
         
         bestOfGenSize[currentGeneration] = bestOfGen.getNumNodesAsString();
         bestOfGenTrFitness[currentGeneration] = bestOfGen.getTrainingFitnessAsString();

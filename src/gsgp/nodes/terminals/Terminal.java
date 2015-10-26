@@ -14,5 +14,6 @@ import gsgp.nodes.Node;
  * @author luiz
  */
 public interface Terminal extends Node{
-    public void setup(MersenneTwister rnd);
+//    public void setup(MersenneTwister rnd);
+    public Terminal softClone(MersenneTwister rnd);
 }

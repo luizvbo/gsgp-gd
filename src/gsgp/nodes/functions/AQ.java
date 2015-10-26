@@ -38,7 +38,7 @@ public class AQ implements Function{
     }
     
     @Override
-    public Node softClone() {
+    public Function softClone() {
         return new AQ();
     }
 

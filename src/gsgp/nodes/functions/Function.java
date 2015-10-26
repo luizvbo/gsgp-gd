@@ -14,4 +14,6 @@ import gsgp.nodes.Node;
  */
 public interface Function extends Node{
     public void addNode(Node newNode, int arPosition);
+    
+    public Function softClone();
 }

@@ -21,15 +21,16 @@ public class ERC implements Terminal{
 
     public ERC(){}
     
+    
     // Koza claimed to be generating from [-1.0, 1.0] but he wasn't,
     // given the published simple-lisp code.  It was [-1.0, 1.0).  This is
     // pretty minor, but we're going to go with the code rather than the
     // published specs in the books.  If you want to go with [-1.0, 1.0],
     // just change nextDouble() to nextDouble(true, true)
-    public void setup(MersenneTwister rnd) {
-        this.rnd = rnd;
-        this.value = this.rnd.nextDouble() * 2 - 1.0;
-    }
+//    public void setup(MersenneTwister rnd) {
+//        this.rnd = rnd;
+//        this.value = this.rnd.nextDouble() * 2 - 1.0;
+//    }
     
     @Override
     public int getArity() {
@@ -42,9 +43,10 @@ public class ERC implements Terminal{
     }
     
     @Override
-    public Node softClone() {
+    public Terminal softClone(MersenneTwister rnd) {
         ERC newERC = new ERC();
-        newERC.setup(rnd);
+        newERC.rnd = rnd;
+        newERC.value = newERC.rnd.nextDouble() * 2 - 1.0;
         return newERC;
     }
     

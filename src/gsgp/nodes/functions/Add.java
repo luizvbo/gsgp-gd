@@ -37,7 +37,7 @@ public class Add implements Function{
     }
     
     @Override
-    public Node softClone() {
+    public Function softClone() {
         return new Add();
     }
 

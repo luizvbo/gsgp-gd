@@ -41,11 +41,8 @@ public class Experimenter {
                 GSGP sgp = new GSGP(data, parameters);
                 sgp.evolve();
                 stats[execution] = sgp.getStatistics();
-            
-                                
                 DataWriter.writeInitialSemantics(parameters.getOutputDir(), parameters.getFilePrefix(), stats[execution]);
                 stats[execution].resetInitialSemantics();
-                
             }
             DataWriter.writeResults(parameters.getOutputDir(), parameters.getFilePrefix(), stats);
         } catch (Exception ex) {
