@@ -50,7 +50,7 @@ public class GSGP {
         
         ExecutorService executor;
         
-        statistics.setInitialSemantics(population);
+//        statistics.setInitialSemantics(population);
         statistics.addGenerationStatistic(population);
         
         for(int i = 0; i < properties.getNumGenerations() && !canStop; i++){

@@ -32,7 +32,7 @@ public class Experimenter {
     protected void execute(){
         try {
             Statistics[] stats = new Statistics[parameters.getNumExperiments()];
-            DataWriter.resetInitialSemantics(parameters.getOutputDir(), parameters.getFilePrefix());
+//            DataWriter.resetInitialSemantics(parameters.getOutputDir(), parameters.getFilePrefix());
             
             // Run the algorithm for a defined number of repetitions
             for(int execution = 0; execution < parameters.getNumExperiments(); execution++){
@@ -41,8 +41,8 @@ public class Experimenter {
                 GSGP sgp = new GSGP(data, parameters);
                 sgp.evolve();
                 stats[execution] = sgp.getStatistics();
-                DataWriter.writeInitialSemantics(parameters.getOutputDir(), parameters.getFilePrefix(), stats[execution]);
-                stats[execution].resetInitialSemantics();
+//                DataWriter.writeInitialSemantics(parameters.getOutputDir(), parameters.getFilePrefix(), stats[execution]);
+//                stats[execution].resetInitialSemantics();
             }
             DataWriter.writeResults(parameters.getOutputDir(), parameters.getFilePrefix(), stats);
         } catch (Exception ex) {

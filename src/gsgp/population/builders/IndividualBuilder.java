@@ -83,7 +83,7 @@ public abstract class IndividualBuilder {
         // else pick a random node
         else{
             // Pick a terminal
-            if(rnd.nextBoolean()){
+            if(rnd.nextDouble() < 0.5){
                 return terminals[rnd.nextInt(terminals.length)].softClone(rnd);
             }
             // Pick a function

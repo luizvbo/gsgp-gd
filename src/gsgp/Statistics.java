@@ -14,10 +14,12 @@ import gsgp.population.Individual;
  * @author luiz
  */
 public class Statistics {
-
-    
     public enum StatsType{
-        BEST_OF_GEN_SIZE, BEST_OF_GEN_TS_FIT, BEST_OF_GEN_TR_FIT, SOLUTION, INITIAL_SEMANTICS;
+        BEST_OF_GEN_SIZE, 
+        BEST_OF_GEN_TS_FIT, 
+        BEST_OF_GEN_TR_FIT, 
+        SOLUTION, 
+        INITIAL_SEMANTICS;
     }
     
     protected String[] bestOfGenSize;
