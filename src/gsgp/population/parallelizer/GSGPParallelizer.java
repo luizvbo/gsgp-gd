@@ -111,6 +111,15 @@ public class GSGPParallelizer extends Thread{
             ss_res += temp * temp;
         }
         ss_res = Math.sqrt(ss_res/data.size());
+//        
+//        PearsonsCorrelation pearsonCorr = new PearsonsCorrelation();
+//        double corr = pearsonCorr.correlation(data.getOutputs(), newSemantics);
+//        if(Double.isNaN(corr) || Double.isInfinite(corr)){
+//            corr = -1;
+//        }
+//        
+//        ss_res = 1-corr;
+//        
         if(target == TargetType.TRAINING){
             individual.setTrRMSE(ss_res);
             individual.setTrSemantics(newSemantics);
@@ -168,7 +177,12 @@ public class GSGPParallelizer extends Thread{
         
         newInd.setTrRMSE(Math.sqrt(trSS_res/experimentalData.training.size()));
         newInd.setTsRMSE(Math.sqrt(tsSS_res/experimentalData.test.size()));
-
+        
+//        PearsonsCorrelation pearsonCorr = new PearsonsCorrelation();
+//        double corr = pearsonCorr.correlation(newTrSemantics, experimentalData.training.getOutputs());
+//        if(Double.isNaN(corr) || Double.isInfinite(corr)) corr = -1;
+//        newInd.setTrRMSE(1-corr);
+//        
         return newInd;
     }
 
@@ -221,6 +235,11 @@ public class GSGPParallelizer extends Thread{
         newInd.setTrSemantics(newTrSemantics);
         newInd.setTsSemantics(newTsSemantics);
         
+//        PearsonsCorrelation pearsonCorr = new PearsonsCorrelation();
+//        double corr = pearsonCorr.correlation(newTrSemantics, experimentalData.training.getOutputs());
+//        if(Double.isNaN(corr) || Double.isInfinite(corr)) corr = -1;
+//        newInd.setTrRMSE(1-corr);
+//        
         newInd.setTrRMSE(Math.sqrt(trSS_res/experimentalData.training.size()));
         newInd.setTsRMSE(Math.sqrt(tsSS_res/experimentalData.test.size()));
 

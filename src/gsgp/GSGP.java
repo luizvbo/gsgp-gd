@@ -77,6 +77,7 @@ public class GSGP {
             
             statistics.addGenerationStatistic(population);
         }
+        statistics.storeBestSemantics(population.getBestIndividual());
     }
 
     public Statistics getStatistics() {

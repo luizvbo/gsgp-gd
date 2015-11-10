@@ -6,6 +6,7 @@
 
 package gsgp;
 
+import gsgp.population.GSGPIndividual;
 import gsgp.population.Population;
 import gsgp.population.Individual;
 
@@ -19,12 +20,16 @@ public class Statistics {
         BEST_OF_GEN_TS_FIT, 
         BEST_OF_GEN_TR_FIT, 
         SOLUTION, 
+        SEMANTICS,
         INITIAL_SEMANTICS;
     }
     
     protected String[] bestOfGenSize;
     protected String[] bestOfGenTsFitness;
     protected String[] bestOfGenTrFitness;
+    
+    private double[] bestTrainingSemantics;
+    private double[] bestTestSemantics;
     
     private double[][] initialSemantics;
     
@@ -65,6 +70,11 @@ public class Statistics {
         }
     }
     
+    public void storeBestSemantics(Individual bestIndividual) {
+        bestTestSemantics = ((GSGPIndividual)bestIndividual).getTestSemantics();
+        bestTrainingSemantics = bestIndividual.getTrainingSemantics();
+    }
+    
     public void resetInitialSemantics() {
         initialSemantics = null;
     }
@@ -77,6 +87,8 @@ public class Statistics {
                 return concatenateArray(bestOfGenTrFitness);
             case INITIAL_SEMANTICS:
                 return concatenateMatrix(initialSemantics);
+            case SEMANTICS:
+                return getSemanticsAsString();
             default:
                 return concatenateArray(bestOfGenTsFitness);
         }
@@ -98,6 +110,19 @@ public class Statistics {
                 str.append(doubleMatrix[i][j] + ",");
             }
             str.append(doubleMatrix[i][doubleMatrix[0].length-1] + "\n");   
+        }
+        return str.toString();
+    }
+    
+    private String getSemanticsAsString() {
+        StringBuffer str = new StringBuffer();
+        for(int i = 0; i < bestTrainingSemantics.length; i++){
+            str.append(bestTrainingSemantics[i] + ",");
+        }
+        String sep = "";
+        for(int i = 0; i < bestTestSemantics.length; i++){
+            str.append(sep + bestTestSemantics[i]);
+            sep = ",";
         }
         return str.toString();
     }

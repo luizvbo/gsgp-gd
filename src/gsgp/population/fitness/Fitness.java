@@ -6,8 +6,6 @@
 
 package gsgp.population.fitness;
 
-import gsgp.nodes.Node;
-
 
 /**
  *

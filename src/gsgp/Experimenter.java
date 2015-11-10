@@ -45,6 +45,7 @@ public class Experimenter {
 //                stats[execution].resetInitialSemantics();
             }
             DataWriter.writeResults(parameters.getOutputDir(), parameters.getFilePrefix(), stats);
+            DataWriter.writeOutputs(parameters.getOutputDir(), parameters.getFilePrefix(), stats, parameters.getDataProducer().getExperimentDataset());
         } catch (Exception ex) {
             ex.printStackTrace();
         }

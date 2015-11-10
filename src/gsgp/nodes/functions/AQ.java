@@ -9,7 +9,7 @@ package gsgp.nodes.functions;
 import gsgp.nodes.Node;
 
 /**
- *
+ * Analytic Quotient
  * @author luiz
  */
 public class AQ implements Function{

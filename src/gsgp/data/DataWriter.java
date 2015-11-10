@@ -33,9 +33,20 @@ public class DataWriter {
         bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "individualSize.csv"));
         bw.write(getStatisticsFromArray(statsArray, Statistics.StatsType.BEST_OF_GEN_SIZE));
         bw.close();
-//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "initialSemantics.csv"));
-//        bw.write(getStatisticsFromArray(statsArray, Statistics.StatsType.INITIAL_SEMANTICS));
-//        bw.close();
+    }
+    
+    public static void writeOutputs(String outputPath,
+                                    String outputPrefix, 
+                                    Statistics[] statsArray,
+                                    ExperimentDataset data) throws Exception{
+        File outputDir = getOutputDir(outputPath);
+        outputDir = new File(outputDir.getAbsolutePath()+ File.separator + outputPrefix);
+        outputDir.mkdirs();
+        BufferedWriter bw;
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "outputs.csv"));
+        bw.write(getDesiredOutputs(data));
+        bw.write(getStatisticsFromArray(statsArray, Statistics.StatsType.SEMANTICS));
+        bw.close();
     }
     
     public static void writeInitialSemantics(String outputPath,
@@ -86,5 +97,20 @@ public class DataWriter {
             str.append(stats.asWritableString(type) + "\n");
         }
         return str.toString();
+    }
+
+    private static String getDesiredOutputs(ExperimentDataset data) {
+        double outputs[][] = new double[2][];
+        outputs[0] = data.training.getOutputs();
+        outputs[1] = data.training.getOutputs();
+        StringBuilder str = new StringBuilder();
+        String sep = "";
+        for(int i = 0; i < outputs.length; i++){
+            for(int j = 0; j < outputs[i].length; j++){
+                str.append(sep + outputs[i][j]);
+                sep = ",";
+            }
+        }
+        return str.toString() + "\n";
     }
 }
