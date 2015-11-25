@@ -12,19 +12,13 @@ import edu.gsgp.nodes.Node;
  *
  * @author luiz
  */
-public class Mul implements Function{
-    private Node[] arguments;
-    private Node parent = null;
-    private int parentArgPosition;  
-    
-    private final int arity = 2;
-
+public class Mul extends Function{
     public Mul() {
-        arguments = new Node[arity];
+        super();
     }
     
     @Override
-    public final int getArity(){ return arity; }
+    public int getArity() { return 2; }
 
     @Override
     public double eval(double[] inputs) {
@@ -40,12 +34,6 @@ public class Mul implements Function{
     public Function softClone() {
         return new Mul();
     }
-
-    @Override
-    public void addNode(Node newNode, int argPosition) {
-        arguments[argPosition] = newNode;
-        newNode.setParent(this, argPosition);
-    }
     
     @Override
     public String toString() {
@@ -53,30 +41,9 @@ public class Mul implements Function{
     }
     
     @Override
-    public Node getChild(int index) {
-        return arguments[index];
-    }
-
-    @Override
-    public Node getParent() {
-        return parent;
-    }
-
-    @Override
-    public void setParent(Node parent, int argPosition) {
-        this.parent = parent;
-        this.parentArgPosition = argPosition;
-    }
-
-    @Override
-    public int getParentArgPosition() {
-        return parentArgPosition;
-    }
-    
-    @Override
     public Node clone(Node parent) {
         Mul newNode = new Mul();
-        for(int i = 0; i < arity; i++) newNode.arguments[i] = arguments[i].clone(newNode);
+        for(int i = 0; i < getArity(); i++) newNode.arguments[i] = arguments[i].clone(newNode);
         newNode.parent = parent;
         newNode.parentArgPosition = parentArgPosition;
         return newNode;

@@ -5,6 +5,7 @@
 package edu.gsgp.data;
 
 import edu.gsgp.MersenneTwister;
+import edu.gsgp.Utils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,7 +25,7 @@ public class HoldoutHandler implements DataProducer{
     private Dataset dataset;
     
     /** Input parted datasets. Used when sampled data are provided by user files.*/
-    private ExperimentDataset[] datasetFromFiles;
+    private ExperimentalData[] datasetFromFiles;
         
     /** Percentage of data used for test. */
     private double testPercentage;
@@ -74,16 +75,16 @@ public class HoldoutHandler implements DataProducer{
      * @return Array with training and test data in first and second positions, respectvely
      */
     @Override
-    public ExperimentDataset getExperimentDataset(){
+    public ExperimentalData getExperimentDataset(){
         // If a list of files is provided, alternate the current dataset at each method call
         if(useFiles){
-            ExperimentDataset data = datasetFromFiles[currentExperiment];
+            ExperimentalData data = datasetFromFiles[currentExperiment];
             if(currentExperiment < datasetFromFiles.length - 1) currentExperiment++;
             else currentExperiment = 0;
             return data;
         }
         
-        ExperimentDataset data = new ExperimentDataset();
+        ExperimentalData data = new ExperimentalData();
         ArrayList<Instance> dataCopy = dataset.softClone();
         
         
@@ -99,20 +100,20 @@ public class HoldoutHandler implements DataProducer{
         if(rnd == null){
             Iterator<Instance> it = dataCopy.iterator();
             for(int i = 0; i < trainingSize; i++){
-                data.training.add(it.next());
+                data.getDataset(Utils.DataType.TRAINING).add(it.next());
                 it.remove();
             }
             while(it.hasNext()){
-                data.test.add(it.next());
+                data.getDataset(Utils.DataType.TEST).add(it.next());
                 it.remove();
             }
         }
         else{
             for(int i = 0; i < testSize; i++){
-                data.test.add(dataCopy.remove(rnd.nextInt(dataCopy.size())));
+                data.getDataset(Utils.DataType.TEST).add(dataCopy.remove(rnd.nextInt(dataCopy.size())));
             }
             while(!dataCopy.isEmpty()){
-                data.training.add(dataCopy.remove(rnd.nextInt(dataCopy.size())));
+                data.getDataset(Utils.DataType.TRAINING).add(dataCopy.remove(rnd.nextInt(dataCopy.size())));
             }
         }
         return data;
@@ -173,13 +174,13 @@ public class HoldoutHandler implements DataProducer{
         if(trainFiles.size() != testFiles.size())
             throw new Exception("The number of test and training files is different. Check if the names are correct.\n");
         
-        datasetFromFiles = new ExperimentDataset[trainFiles.size()];
+        datasetFromFiles = new ExperimentalData[trainFiles.size()];
         for(int i = 0; i < datasetFromFiles.length; i++){
-            datasetFromFiles[i] = new ExperimentDataset(DataReader.readInputDataFile(trainFiles.get(i)), DataReader.readInputDataFile(testFiles.get(i)));
+            datasetFromFiles[i] = new ExperimentalData(DataReader.readInputDataFile(trainFiles.get(i)), DataReader.readInputDataFile(testFiles.get(i)));
 //            datasetFromFiles[i].training = DataReader.readInputDataFile(trainFiles.get(i));
 //            datasetFromFiles[i].test = DataReader.readInputDataFile(testFiles.get(i));
         }
-        numInputs = datasetFromFiles[0].training.getInputNumber();
+        numInputs = datasetFromFiles[0].getDataset(Utils.DataType.TRAINING).getInputNumber();
     }
 
     @Override

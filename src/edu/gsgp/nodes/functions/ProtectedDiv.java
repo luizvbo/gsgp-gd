@@ -12,27 +12,20 @@ import edu.gsgp.nodes.Node;
  *
  * @author luiz
  */
-public class ProtectedDiv implements Function{
-    private final Node[] arguments;
-    private Node parent = null;
-    private int parentArgPosition;
-    
-    private final int arity = 2;
-    
+public class ProtectedDiv extends Function{    
     public ProtectedDiv() {
-        arguments = new Node[arity];
+        super();
     }
-    
-    @Override
-    public final int getArity(){ return arity; }
 
+    @Override
+    public int getArity() { return 2; }
+    
     @Override
     public double eval(double[] inputs) {
         double den = arguments[1].eval(inputs);
         if(den == 0) return 1;
         return arguments[0].eval(inputs) / den;
     }
-
 
     @Override
     public int getNumNodes() {
@@ -43,12 +36,6 @@ public class ProtectedDiv implements Function{
     public Function softClone() {
         return new ProtectedDiv();
     }
-
-    @Override
-    public void addNode(Node newNode, int argPosition) {
-        arguments[argPosition] = newNode;
-        newNode.setParent(this, argPosition);
-    }
     
     @Override
     public String toString() {
@@ -56,30 +43,9 @@ public class ProtectedDiv implements Function{
     }
     
     @Override
-    public Node getChild(int index) {
-        return arguments[index];
-    }
-
-    @Override
-    public Node getParent() {
-        return parent;
-    }
-
-    @Override
-    public void setParent(Node parent, int argPosition) {
-        this.parent = parent;
-        this.parentArgPosition = argPosition;
-    }
-
-    @Override
-    public int getParentArgPosition() {
-        return parentArgPosition;
-    }
-    
-    @Override
     public Node clone(Node parent) {
         ProtectedDiv newNode = new ProtectedDiv();
-        for(int i = 0; i < arity; i++) newNode.arguments[i] = arguments[i].clone(newNode);
+        for(int i = 0; i < getArity(); i++) newNode.arguments[i] = arguments[i].clone(newNode);
         newNode.parent = parent;
         newNode.parentArgPosition = parentArgPosition;
         return newNode;

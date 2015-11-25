@@ -6,40 +6,36 @@
 
 package edu.gsgp.population;
 
+import edu.gsgp.Utils;
 import java.math.BigInteger;
-import java.util.Arrays;
-import edu.gsgp.data.ExperimentDataset;
 import edu.gsgp.nodes.Node;
+import edu.gsgp.population.fitness.Fitness;
 
 /**
  *
  * @author luiz
  */
 public class GSGPIndividual extends Individual{
-    private BigInteger numNodes;
-    
-    protected double[] tr_semantics;
-    protected double[] ts_semantics;
-    protected double tr_rmse;
-    protected double ts_rmse;
-    
-    public GSGPIndividual(Node tree){
-        super(tree);
+        
+    public GSGPIndividual(Node tree, Fitness fitnessFunction){
+        super(tree, fitnessFunction);
     }
     
-    public GSGPIndividual(Node tree, ExperimentDataset data) {
-        this(tree, data, new BigInteger(tree.getNumNodes()+""));
+    public GSGPIndividual(Fitness fitnessFunction){
+        super(null, fitnessFunction);
     }
     
-    public GSGPIndividual(Node tree, ExperimentDataset data, BigInteger numNodes) {
-        super(tree);
-        this.numNodes = numNodes;
-        tr_semantics = new double[data.training.size()];
-        ts_semantics = new double[data.test.size()];
+    public GSGPIndividual(Node tree, BigInteger numNodes, Fitness fitnessFunction) {
+        super(tree, fitnessFunction);
+        fitnessFunction.setNumNodes(numNodes);
     }
     
-    public GSGPIndividual(ExperimentDataset data, BigInteger numNodes) {
-        this(null, data, numNodes);
+    public GSGPIndividual(Node tree, int numNodes, Fitness fitnessFunction) {
+        this(tree, new BigInteger(numNodes + ""), fitnessFunction);
+    }
+    
+    public GSGPIndividual(BigInteger numNodes, Fitness fitnessFunction) {
+        this(null, numNodes, fitnessFunction);
     }
     
     public double eval(double[] input){
@@ -47,36 +43,15 @@ public class GSGPIndividual extends Individual{
     }
 
     public BigInteger getNumNodes() {
-        return numNodes;
+        return fitnessFunction.getNumNodes();
     }
 
     public void setNumNodes(BigInteger numNodes) {
-        this.numNodes = numNodes;
+        fitnessFunction.setNumNodes(numNodes);
     }
-    
+   
     public void startNumNodes() {
-        this.numNodes = new BigInteger(tree.getNumNodes()+"");
-    }
-
-    public void setTrRMSE(double tr_rmse) {
-        this.tr_rmse = tr_rmse;
-    }
-
-    public void setTsRMSE(double ts_rmse) {
-        this.ts_rmse = ts_rmse;
-    }
-
-    @Override
-    public double getFitness() {
-        return tr_rmse;
-    }
-
-    public double getTrRMSE() {
-        return tr_rmse;
-    }
-    
-    public double getTsRMSE() {
-        return ts_rmse;
+        fitnessFunction.setNumNodes(tree.getNumNodes());
     }
     
 //    @Override
@@ -91,13 +66,9 @@ public class GSGPIndividual extends Individual{
 //    }
     
     public GSGPIndividual clone(){
-        GSGPIndividual newInd = new GSGPIndividual(tree.clone(null));
-        newInd.numNodes = numNodes;
-        newInd.tr_semantics = Arrays.copyOf(tr_semantics, tr_semantics.length);
-        newInd.ts_semantics = Arrays.copyOf(ts_semantics, ts_semantics.length);
-        newInd.tr_rmse = tr_rmse;
-        newInd.ts_rmse = ts_rmse;
-        return newInd;
+        if(tree != null)
+            return new GSGPIndividual(tree.clone(null), fitnessFunction);
+        return new GSGPIndividual(fitnessFunction);
     }
 
     @Override
@@ -117,33 +88,31 @@ public class GSGPIndividual extends Individual{
 
     @Override
     public String getNumNodesAsString() {
-        return numNodes.toString();
+        return fitnessFunction.getNumNodes().toString();
     }
 
     @Override
     public String getTrainingFitnessAsString() {
-        return df.format(tr_rmse);
+        return df.format(fitnessFunction.getTrainingFitness());
     }
 
     @Override
     public String getTestFitnessAsString() {
-        return df.format(ts_rmse);
+        return df.format(fitnessFunction.getTestFitness());
     }
-    
-    public void setTrSemantics(double[] tr_semantics) {
-        this.tr_semantics = tr_semantics;
-    }
-    
-    public void setTsSemantics(double[] newSemantics) {
-        this.ts_semantics = newSemantics;
+
+    @Override
+    public double getFitness() {
+        return fitnessFunction.getComparableValue();
     }
 
     @Override
     public double[] getTrainingSemantics() {
-        return tr_semantics;
+        return fitnessFunction.getSemantics(Utils.DataType.TRAINING);
     }
-    
+
+    @Override
     public double[] getTestSemantics() {
-        return ts_semantics;
+        return fitnessFunction.getSemantics(Utils.DataType.TEST);
     }
 }

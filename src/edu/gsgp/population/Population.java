@@ -7,8 +7,8 @@
 package edu.gsgp.population;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import edu.gsgp.data.PropertiesManager;
 
 
 /**
@@ -17,13 +17,16 @@ import edu.gsgp.data.PropertiesManager;
  */
 public class Population {
     protected ArrayList<Individual> individuals;
-    protected PropertiesManager properties;
     protected boolean initialized;
     
-    public Population(PropertiesManager properties) {
-        this.properties = properties;
+    public Population() {
         individuals = new ArrayList<>();
         initialized = false;
+    }
+    
+    public Population(ArrayList<Individual> individuals) {
+        this.individuals = new ArrayList<>();
+        initialized = true;
     }
     
     public Individual getIndividual(int index){
@@ -32,10 +35,6 @@ public class Population {
 
     public ArrayList<Individual> getIndividuals() {
         return individuals;
-    }
-
-    public PropertiesManager getProperties() {
-        return properties;
     }
 
     public void setInitialized(boolean initialized) {
@@ -50,6 +49,10 @@ public class Population {
         individuals.addAll(newIndividuals);
     }
     
+    public void addAll(Individual[] newIndividuals){
+        individuals.addAll(Arrays.asList(newIndividuals));
+    }
+    
     public int size(){
         return individuals.size();
     }
@@ -61,5 +64,9 @@ public class Population {
 
     public boolean isInitialized() {
         return initialized;
+    }
+
+    public void add(Individual individual) {
+        individuals.add(individual);
     }
 }

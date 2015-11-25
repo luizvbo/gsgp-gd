@@ -19,7 +19,7 @@ import edu.gsgp.nodes.Node;
  * @author luiz
  */
 public class Utils {    
-    public enum TargetType{ TRAINING, TEST }
+    public enum DataType{ TRAINING, TEST }
     
     /**
      * Generates an array with a number of folds defined by the user. Each fold

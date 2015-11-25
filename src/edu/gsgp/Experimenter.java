@@ -9,7 +9,7 @@ package edu.gsgp;
 
 
 
-import edu.gsgp.data.ExperimentDataset;
+import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.data.DataProducer;
 import edu.gsgp.data.DataWriter;
 import edu.gsgp.data.PropertiesManager;
@@ -24,7 +24,7 @@ public class Experimenter {
     protected DataProducer dataProducer;
     
     public Experimenter(String[] args) throws Exception{
-        setup(args);
+        parameters = new PropertiesManager(args);
         if(parameters.isParameterLoaded())
             execute();
     }
@@ -37,7 +37,7 @@ public class Experimenter {
             // Run the algorithm for a defined number of repetitions
             for(int execution = 0; execution < parameters.getNumExperiments(); execution++){
                 System.out.println("Execution " + (execution+1) + ":");
-                ExperimentDataset data = parameters.getDataProducer().getExperimentDataset();
+                ExperimentalData data = parameters.getDataProducer().getExperimentDataset();
                 GSGP sgp = new GSGP(data, parameters);
                 sgp.evolve();
                 stats[execution] = sgp.getStatistics();
@@ -48,19 +48,6 @@ public class Experimenter {
             DataWriter.writeOutputs(parameters.getOutputDir(), parameters.getFilePrefix(), stats, parameters.getDataProducer().getExperimentDataset());
         } catch (Exception ex) {
             ex.printStackTrace();
-        }
-    }
-    
-    /**
-     * Reads inputs, initialize the TrainingData object and load the parameter file
-     * @param args Input parameters from command line
-     */
-    protected final void setup(String[] args){
-        try{    
-            parameters = new PropertiesManager(args);
-        }
-        catch (Exception e) {
-            System.out.print(e.getMessage());
         }
     }
 }

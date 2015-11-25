@@ -56,16 +56,16 @@ public class CrossvalidationHandler implements DataProducer{
      * @return Array with training and test data in first and second positions, respectvely
      */
     @Override
-    public ExperimentDataset getExperimentDataset(){
+    public ExperimentalData getExperimentDataset(){
         if(currentFold == 0 && !useFiles){
             resampleFolds();
         }
-        ExperimentDataset data = new ExperimentDataset();
+        ExperimentalData data = new ExperimentalData();
         for(int i = 0; i < numFolds; i++){
             if(i == currentFold)
-                data.test = folds[i].softClone();
+                data.setDataset(folds[i].softClone(), Utils.DataType.TEST);
             else{
-                data.training.addAll(folds[i].softClone());
+                data.setDataset(folds[i].softClone(), Utils.DataType.TRAINING);
             }
         }
         if(currentFold < numFolds - 1) currentFold++;

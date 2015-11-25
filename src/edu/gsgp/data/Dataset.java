@@ -13,8 +13,6 @@ import edu.gsgp.Utils;
  */
 public class Dataset extends ArrayList<Instance>{   
     private double[] outputs;
-    // Used to calculate the coefficient of determination
-    private Double ss_total = null;
     
     /**
      * Constructor declaration
@@ -90,19 +88,29 @@ public class Dataset extends ArrayList<Instance>{
         }
     }
     
+    /** Used to calculate store the total sum of squares. **/
+    private Double ssTotal = null;
+    
+    /**
+     * Compute SStot for the coefficient of determination: 1-(SSres/SStot),
+     * where SSres is the residual sum of squares and SStot is total sum of 
+     * squares.
+     * @return The total sum of squares
+     */
     public double getSStotal(){
-        if(ss_total == null){
+        // SStot is computed only one time and stored in ssTotal
+        if(ssTotal == null){
             double meanOutput = 0;
-            ss_total = new Double(0);
+            ssTotal = new Double(0);
             if(outputs == null) setOutputs();
             for(int i = 0; i < outputs.length; i++) meanOutput += outputs[i];
             meanOutput /= outputs.length;            
             for(int i = 0; i < outputs.length; i++){
                 double tmp = outputs[i] - meanOutput;
-                ss_total += tmp * tmp;
+                ssTotal += tmp * tmp;
             }
         }
-        return ss_total;
+        return ssTotal;
     }
 }
 

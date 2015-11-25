@@ -12,19 +12,14 @@ import edu.gsgp.nodes.Node;
  *
  * @author luiz
  */
-public class Sub implements Function{
-    private Node[] arguments;
-    private final int arity = 2;
-    private Node parent = null;
-    private int parentArgPosition;
-    
+public class Sub extends Function{
     public Sub() {
-        arguments = new Node[arity];
+        super();
     }
-    
-    @Override
-    public int getArity(){ return arity; }
 
+    @Override
+    public int getArity() { return 2; }
+    
     @Override
     public double eval(double[] inputs) {
         return arguments[0].eval(inputs) - arguments[1].eval(inputs);
@@ -41,41 +36,14 @@ public class Sub implements Function{
     }
     
     @Override
-    public void addNode(Node newNode, int argPosition) {
-        arguments[argPosition] = newNode;
-        newNode.setParent(this, argPosition);
-    }
-    
-    @Override
     public String toString() {
         return "(" + arguments[0].toString() + "-" + arguments[1].toString() + ")";
     }
     
     @Override
-    public Node getChild(int index) {
-        return arguments[index];
-    }
-
-    @Override
-    public Node getParent() {
-        return parent;
-    }
-
-    @Override
-    public void setParent(Node parent, int argPosition) {
-        this.parent = parent;
-        this.parentArgPosition = argPosition;
-    }
-
-    @Override
-    public int getParentArgPosition() {
-        return parentArgPosition;
-    }
-
-    @Override
     public Node clone(Node parent) {
         Sub newNode = new Sub();
-        for(int i = 0; i < arity; i++){
+        for(int i = 0; i < getArity(); i++){
             newNode.arguments[i] = arguments[i].clone(newNode);
         }        
         newNode.parent = parent;

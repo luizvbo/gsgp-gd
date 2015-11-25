@@ -30,8 +30,11 @@ import edu.gsgp.population.builders.GrowBuilder;
 import edu.gsgp.population.builders.HalfBuilder;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.builders.IndividualBuilder;
+import edu.gsgp.population.fitness.Fitness;
+import edu.gsgp.population.fitness.FitnessRMSE;
 import edu.gsgp.population.selector.IndividualSelector;
 import edu.gsgp.population.selector.TournamentSelector;
+import java.io.FileNotFoundException;
 
 /**
  *
@@ -47,7 +50,7 @@ public class PropertiesManager {
     
     private DataProducer dataProducer;
     private MersenneTwister mersennePRNG;
-    private ExperimentDataset data;
+    private ExperimentalData data;
     private int numExperiments;
     private int numGenerations;
     private int numThreads;
@@ -58,6 +61,7 @@ public class PropertiesManager {
     private double mutProb;
     private double xoverProb;
     private double semSimThres;
+    private Fitness fitnessFunction;
     private Terminal[] terminals;
     private Function[] functions;
     
@@ -75,6 +79,7 @@ public class PropertiesManager {
         mersennePRNG = new MersenneTwister(getLongPropertie(ParameterList.SEED, System.currentTimeMillis()));
         terminals = getTerminals();
         functions = getFunctions();
+        fitnessFunction = getFitnessClass();
         numExperiments = getIntegerPropertie(ParameterList.NUM_REPETITIONS, 1);
         numGenerations = getIntegerPropertie(ParameterList.NUM_GENERATION, 200);
         
@@ -105,6 +110,7 @@ public class PropertiesManager {
         FILE_PREFIX("experiment.file.prefix", "Identifier prefix for files", false),
         TERMINAL_LIST("tree.build.terminals", "List of terminals used to build new trees (separeted by commas)", true),
         FUNCTION_LIST("tree.build.functions", "List of functions used to build new trees (separeted by commas)", true),
+        FITNESS_FUNCTION("pop.fitness", "Fitness function adopted during the evolution", true),
         INDIVIDUAL_BUILDER_POP("tree.build.builder", "Builder used to generate trees for the initial population", true),
         INDIVIDUAL_BUILDER_RAND_TREE("tree.build.builder.random.tree", "Builder used to generate random trees for the semantic operators", true),
         INDIVIDUAL_SELECTOR("pop.ind.selector", "Type of selector used to select individuals for next generations", true),
@@ -166,12 +172,12 @@ public class PropertiesManager {
                 return false;
             }
             if(!parametersCLI.hasOption("p"))
-                throw new Exception("The parameter file was not specied.");
+                throw new Exception("The parameter file was not specified.");
             String path = parametersCLI.getOptionValue("p");
             path = path.replaceFirst("^~",System.getProperty("user.home"));
             File parameterFile = new File(path);
             if(!parameterFile.canRead()) 
-                throw new Exception("Parameter file can not be read.");
+                throw new FileNotFoundException("Parameter file can not be read: " + parameterFile.getCanonicalPath());
             FileInputStream fileInput = new FileInputStream(parameterFile);
             fileParameters = new Properties();
             fileParameters.load(fileInput);
@@ -285,7 +291,7 @@ public class PropertiesManager {
     private String getStringPropertie(ParameterList key, boolean isFile) throws Exception {
         try {
             if (!fileParameters.containsKey(key.name) && key.mandatory) {
-                throw new NoSuchFieldException("The input parameter (" + key.name + ") was not found");
+                throw new NoSuchFieldException("Input parameter not found: " + key.name);
             }
             else if(!fileParameters.containsKey(key.name))
                 return null;
@@ -335,10 +341,14 @@ public class PropertiesManager {
         if(useAllInputs){
             for(int i = 0; i < dataProducer.getNumInputs(); i++) terminals.add(new Input(i));
             for(String str : sTerminals){
-                Class<?> terminal = Class.forName(str);
-                Terminal newTerminal = (Terminal)terminal.newInstance();
-//                newTerminal.setup(mersennePRNG);
-                terminals.add(newTerminal);
+                try{
+                    Class<?> terminal = Class.forName(str);
+                    Terminal newTerminal = (Terminal)terminal.newInstance();
+                    terminals.add(newTerminal);
+                }
+                catch(ClassNotFoundException e){
+                    throw new ClassNotFoundException("Error loading the terminal set. Class " + str + " not found", e);
+                }
             }
         }
         else{
@@ -355,11 +365,30 @@ public class PropertiesManager {
     private Function[] getFunctions()throws Exception{
         String[] sFunctions = getStringPropertie(ParameterList.FUNCTION_LIST, false).replaceAll("\\s", "").split(",");
         ArrayList<Function> functionArray = new ArrayList<Function>();
+       
         for(String str : sFunctions){
-            Class<?> function = Class.forName(str);
-            functionArray.add((Function)function.newInstance());
+            try{
+                Class<?> function = Class.forName(str);
+                functionArray.add((Function)function.newInstance());
+            }
+            catch(ClassNotFoundException e){
+                throw new ClassNotFoundException("Error loading the function set. Class " + str + " not found", e);
+            }
         }
+        
         return functionArray.toArray(new Function[functionArray.size()]);
+    }
+    
+    /**
+     * Get the fitness class form the file
+     * @return A new fintess function
+     * @throws Exception Parameter not found, error while parsing the function type 
+     */
+    private Fitness getFitnessClass() throws Exception {
+        String fitnessClassname = getStringPropertie(ParameterList.FITNESS_FUNCTION, false).replaceAll("\\s", "");
+//        Class<?> fitnessClass = Class.forName(fitnessClassname);
+//        return (Fitness)fitnessClass.newInstance();
+        return new FitnessRMSE();
     }
 
     /**
@@ -442,6 +471,10 @@ public class PropertiesManager {
         return filePrefix;
     }
     
+    public Fitness geFitness(){
+        return fitnessFunction.softClone();
+    }
+    
     public Node getRandomTree(MersenneTwister rnd){
         return randomTreeBuilder.newRootedTree(0, rnd);
     }
@@ -458,7 +491,7 @@ public class PropertiesManager {
         return individualSelector.selectIndividual(population, rndGenerator);
     }
     
-    public MersenneTwister[] getMersennePRGNArray(int size) throws Exception{
+    public MersenneTwister[] getMersennePRGNArray(int size){
         MersenneTwister[] generators = new MersenneTwister[size];
         for(int i = 0; i < size; i++){
             long seed = mersennePRNG.nextLong();

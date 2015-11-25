@@ -16,7 +16,7 @@ public interface DataProducer {
      * Returns an array with trainin and test set, in this order
      * @return Two positions array
      */
-    public ExperimentDataset getExperimentDataset();
+    public ExperimentalData getExperimentDataset();
     
     /**
      * Sets a dataset path

@@ -7,15 +7,16 @@
 package edu.gsgp;
 
 import edu.gsgp.population.Population;
-import java.util.ArrayList;
 import edu.gsgp.population.Individual;
-import edu.gsgp.data.ExperimentDataset;
-import java.util.Collections;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.data.PropertiesManager;
-import edu.gsgp.population.parallelizer.GSGPParallelizer;
+import edu.gsgp.population.generator.PopulationGenerator;
+import edu.gsgp.Utils.DataType;
+import edu.gsgp.population.generator.Breeder;
+import edu.gsgp.population.generator.GSMBreeder;
+import edu.gsgp.population.generator.GSXBreeder;
+import edu.gsgp.population.generator.ReproductionBreeder;
+import edu.gsgp.population.generator.VoidBreeder;
 
 /**
  *
@@ -23,14 +24,14 @@ import edu.gsgp.population.parallelizer.GSGPParallelizer;
  */
 public class GSGP {
     private final PropertiesManager properties;
-    private final ExperimentDataset dataset;
+    private final ExperimentalData dataset;
     private final Statistics statistics;
-    private final Population population;
+    private Population population;
 
-    public GSGP(ExperimentDataset dataset, PropertiesManager properties) throws Exception{
+    public GSGP(ExperimentalData dataset, PropertiesManager properties) throws Exception{
         this.dataset = dataset;
         this.properties = properties;
-        population = new Population(properties);
+        population = new Population();
         statistics = new Statistics(properties.getNumGenerations());
     }
     
@@ -38,42 +39,33 @@ public class GSGP {
         boolean canStop = false;
         
         double mutationStep = properties.getMutationStep();
-        if(mutationStep == -1) mutationStep = 0.1*dataset.training.getOutputSD();
+        if(mutationStep == -1) mutationStep = 0.1*dataset.getDataset(DataType.TRAINING).getOutputSD();
         
-        // Initialize the static attributes from the parallelizer
-        GSGPParallelizer.initializerParallelizer(properties, dataset, population);
+        Breeder breederArray[] = new Breeder[1];
+        breederArray[0] =  new VoidBreeder(dataset, properties);
         
-        initializePopulation();
-        
-        // One member of the population is took from the previous one (elitism). That is why we subtract one
-        GSGPParallelizer[] parallelizers = GSGPParallelizer.getParallelizers(properties.getPopulationSize()-1, mutationStep);
-        
-        ExecutorService executor;
+        PopulationGenerator popGenerator = new PopulationGenerator(properties, dataset, properties.getPopulationSize(), breederArray);
+        population = popGenerator.populate();
         
 //        statistics.setInitialSemantics(population);
         statistics.addGenerationStatistic(population);
         
         for(int i = 0; i < properties.getNumGenerations() && !canStop; i++){
             System.out.println("Generation " + (i+1) + ":");
-            executor = Executors.newFixedThreadPool(properties.getNumThreads());
+            breederArray = new Breeder[3];
+            breederArray[0] = new GSXBreeder(dataset, properties.getXoverProb(), properties, population);
+            breederArray[1] = new GSMBreeder(dataset, mutationStep, properties.getMutProb(), properties, population);
+            breederArray[2] = new ReproductionBreeder(1-(properties.getXoverProb()+properties.getMutProb()), properties, population);
             
-            for (GSGPParallelizer parallelizer : parallelizers) {
-                executor.execute(parallelizer);
-            }
-            executor.shutdown();
-            executor.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+            popGenerator = new PopulationGenerator(properties, dataset, properties.getPopulationSize()-1, breederArray);
             
             // Merge to compose the new Population
-            ArrayList<Individual> newPopulation = new ArrayList<>();
+            Population newPopulation = popGenerator.populate();
             // The first position is reserved for the best of the generation (elitism)
             newPopulation.add(population.getBestIndividual());
-            
-            for(int j = 0; j < parallelizers.length; j++){
-                newPopulation.addAll(parallelizers[j].getLocalPopulation());
-            }            
-            Collections.sort(newPopulation);
-            if(newPopulation.get(0).isBestSolution(properties.getMinError())) canStop = true;
-            population.setCurrentPopulation(newPopulation);
+            Individual bestIndividual = newPopulation.getBestIndividual();
+            if(bestIndividual.isBestSolution(properties.getMinError())) canStop = true;
+            population = newPopulation;
             
             statistics.addGenerationStatistic(population);
         }
@@ -82,21 +74,5 @@ public class GSGP {
 
     public Statistics getStatistics() {
         return statistics;
-    }
-    
-    private void initializePopulation() throws Exception{
-        ExecutorService executor = Executors.newFixedThreadPool(properties.getNumThreads());
-        
-        GSGPParallelizer[] genParallel = GSGPParallelizer.getParallelizers(properties.getPopulationSize(), 0);
-        for (GSGPParallelizer genParallel1 : genParallel) {
-            executor.execute(genParallel1);
-        }
-        executor.shutdown();
-        executor.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-        
-        for(int i = 0; i < genParallel.length; i++){
-            population.addAll(genParallel[i].getLocalPopulation());
-        }            
-        population.setInitialized(true);
     }
 }

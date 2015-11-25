@@ -9,24 +9,26 @@ package edu.gsgp.population;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
-import edu.gsgp.data.ExperimentDataset;
+import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.nodes.Node;
+import edu.gsgp.population.fitness.Fitness;
 
 /**
  *
  * @author luiz
  */
 public abstract class Individual implements Comparable<Individual>{
-    protected Node tree;
-    
+    protected Node tree;    
     protected DecimalFormat df = new DecimalFormat("0.00000", new DecimalFormatSymbols(Locale.ENGLISH));
+    protected Fitness fitnessFunction;
 
-    public Individual(Node tree) {
+    public Individual(Node tree, Fitness fitnessFunction) {
         this.tree = tree;
+        this.fitnessFunction = fitnessFunction;
     }   
     
-    public Individual(Node tree, ExperimentDataset data) {
-        this(tree);
+    public Individual(Node tree, Fitness fitnessFunction, ExperimentalData data) {
+        this(tree, fitnessFunction);
     }
     
     public double eval(double[] input){
@@ -61,16 +63,17 @@ public abstract class Individual implements Comparable<Individual>{
         this.tree = randomSubtree;
     }
         
+    public Fitness getFitnessFunction(){
+        return fitnessFunction;
+    }
+    
     @Override
     public abstract Individual clone();
     
     public abstract double getFitness();
-    
     public abstract String getNumNodesAsString();
-
     public abstract String getTrainingFitnessAsString();
-
-    public abstract String getTestFitnessAsString();
-    
+    public abstract String getTestFitnessAsString();  
     public abstract double[] getTrainingSemantics();
+    public abstract double[] getTestSemantics();
 }

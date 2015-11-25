@@ -10,6 +10,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import edu.gsgp.Statistics;
+import edu.gsgp.Utils;
 
 /**
  *
@@ -38,7 +39,7 @@ public class DataWriter {
     public static void writeOutputs(String outputPath,
                                     String outputPrefix, 
                                     Statistics[] statsArray,
-                                    ExperimentDataset data) throws Exception{
+                                    ExperimentalData data) throws Exception{
         File outputDir = getOutputDir(outputPath);
         outputDir = new File(outputDir.getAbsolutePath()+ File.separator + outputPrefix);
         outputDir.mkdirs();
@@ -99,10 +100,10 @@ public class DataWriter {
         return str.toString();
     }
 
-    private static String getDesiredOutputs(ExperimentDataset data) {
+    private static String getDesiredOutputs(ExperimentalData data) {
         double outputs[][] = new double[2][];
-        outputs[0] = data.training.getOutputs();
-        outputs[1] = data.training.getOutputs();
+        outputs[0] = data.getDataset(Utils.DataType.TRAINING).getOutputs();
+        outputs[1] = data.getDataset(Utils.DataType.TEST).getOutputs();
         StringBuilder str = new StringBuilder();
         String sep = "";
         for(int i = 0; i < outputs.length; i++){
