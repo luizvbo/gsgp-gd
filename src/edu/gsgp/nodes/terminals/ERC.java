@@ -10,8 +10,15 @@ import edu.gsgp.MersenneTwister;
 import edu.gsgp.nodes.Node;
 
 /**
- *
- * @author luiz
+ * @author Luiz Otavio Vilas Boas Oliveira
+ * http://homepages.dcc.ufmg.br/~luizvbo/ 
+ * luiz.vbo@gmail.com
+ * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
+ * 
+ * Ephemeral Random Constant (Koza J. R. Genetic Programming: On the Programming 
+ * of Computers by Means of Natural Selection. 1992). Every time this terminal 
+ * is chosen in the construction of an initial tree, a different random value is
+ * generated which is then used for that particular terminal.
  */
 public class ERC implements Terminal{
     private double value;
@@ -19,6 +26,9 @@ public class ERC implements Terminal{
     private Node parent = null;
     private int parentArgPosition;
 
+    /**
+     * ERC default constructor
+     */
     public ERC(){}
     
     
@@ -27,10 +37,6 @@ public class ERC implements Terminal{
     // pretty minor, but we're going to go with the code rather than the
     // published specs in the books.  If you want to go with [-1.0, 1.0],
     // just change nextDouble() to nextDouble(true, true)
-//    public void setup(MersenneTwister rnd) {
-//        this.rnd = rnd;
-//        this.value = this.rnd.nextDouble() * 2 - 1.0;
-//    }
     
     @Override
     public int getArity() {

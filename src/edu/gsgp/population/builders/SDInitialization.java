@@ -21,6 +21,11 @@ import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
 
 /**
+ * @author Luiz Otavio Vilas Boas Oliveira
+ * http://homepages.dcc.ufmg.br/~luizvbo/ 
+ * luiz.vbo@gmail.com
+ * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
+ *
  * Semantic Driven Initialization. See "Beadle, L. Semantic and Structural 
  * Analysis of Genetic Programming Computing, University of Kent, 2009, 182-196"
  * for more details.

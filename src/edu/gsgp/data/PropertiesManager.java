@@ -37,8 +37,14 @@ import edu.gsgp.population.selector.TournamentSelector;
 import java.io.FileNotFoundException;
 
 /**
- *
- * @author luiz
+ * @author Luiz Otavio Vilas Boas Oliveira
+ * http://homepages.dcc.ufmg.br/~luizvbo/ 
+ * luiz.vbo@gmail.com
+ * 
+ * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
+ * 
+ * This class load the parameters from the file and instantiate the objects used 
+ * in the GSGP
  */
 public class PropertiesManager {
     protected boolean parameterLoaded;

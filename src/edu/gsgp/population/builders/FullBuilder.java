@@ -12,7 +12,12 @@ import edu.gsgp.nodes.functions.Function;
 import edu.gsgp.nodes.terminals.Terminal;
 
 
-
+/**
+ * @author Luiz Otavio Vilas Boas Oliveira
+ * http://homepages.dcc.ufmg.br/~luizvbo/ 
+ * luiz.vbo@gmail.com
+ * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
+ */
 public class FullBuilder extends IndividualBuilder {
 
     public FullBuilder(final int maxDepth, 

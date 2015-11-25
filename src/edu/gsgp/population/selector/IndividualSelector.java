@@ -11,8 +11,10 @@ import edu.gsgp.population.Individual;
 import edu.gsgp.population.Population;
 
 /**
- *
- * @author luiz
+ * @author Luiz Otavio Vilas Boas Oliveira
+ * http://homepages.dcc.ufmg.br/~luizvbo/ 
+ * luiz.vbo@gmail.com
+ * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
 public interface IndividualSelector {
     public Individual selectIndividual(Population population, MersenneTwister rnd);

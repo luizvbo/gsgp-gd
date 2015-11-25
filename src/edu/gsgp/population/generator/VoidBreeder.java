@@ -7,7 +7,6 @@
 package edu.gsgp.population.generator;
 
 import edu.gsgp.MersenneTwister;
-import edu.gsgp.Utils;
 import edu.gsgp.Utils.DataType;
 import edu.gsgp.data.Dataset;
 import edu.gsgp.data.ExperimentalData;
@@ -16,13 +15,13 @@ import edu.gsgp.data.PropertiesManager;
 import edu.gsgp.nodes.Node;
 import edu.gsgp.population.GSGPIndividual;
 import edu.gsgp.population.Individual;
-import edu.gsgp.population.Population;
 import edu.gsgp.population.fitness.Fitness;
-import java.math.BigInteger;
 
 /**
- *
- * @author luiz
+ * @author Luiz Otavio Vilas Boas Oliveira
+ * http://homepages.dcc.ufmg.br/~luizvbo/ 
+ * luiz.vbo@gmail.com
+ * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
 public class VoidBreeder extends Breeder{
     private ExperimentalData experimentalData;

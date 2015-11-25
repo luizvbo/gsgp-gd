@@ -9,8 +9,10 @@ package edu.gsgp.data;
 import edu.gsgp.Utils.DataType;
 
 /**
- *
- * @author luiz
+ * @author Luiz Otavio Vilas Boas Oliveira
+ * http://homepages.dcc.ufmg.br/~luizvbo/ 
+ * luiz.vbo@gmail.com
+ * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
 public class ExperimentalData {
     private Dataset training;

@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import edu.gsgp.Utils;
 
 /**
- * CrossvalidationHandler.java
+ * @author Luiz Otavio Vilas Boas Oliveira
+ * http://homepages.dcc.ufmg.br/~luizvbo/ 
+ * luiz.vbo@gmail.com
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
 public class CrossvalidationHandler implements DataProducer{

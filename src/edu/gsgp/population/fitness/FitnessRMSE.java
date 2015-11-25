@@ -10,8 +10,10 @@ import edu.gsgp.Utils.DataType;
 import edu.gsgp.data.ExperimentalData;
 
 /**
- *
- * @author luiz
+ * @author Luiz Otavio Vilas Boas Oliveira
+ * http://homepages.dcc.ufmg.br/~luizvbo/ 
+ * luiz.vbo@gmail.com
+ * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
 public class FitnessRMSE extends Fitness{    
     private double rmseTr;

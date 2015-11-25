@@ -15,8 +15,10 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import edu.gsgp.nodes.Node;
 
 /**
- *
- * @author luiz
+ * @author Luiz Otavio Vilas Boas Oliveira
+ * http://homepages.dcc.ufmg.br/~luizvbo/ 
+ * luiz.vbo@gmail.com
+ * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
 public class Utils {    
     public enum DataType{ TRAINING, TEST }

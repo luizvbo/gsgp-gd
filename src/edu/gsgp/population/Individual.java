@@ -14,8 +14,10 @@ import edu.gsgp.nodes.Node;
 import edu.gsgp.population.fitness.Fitness;
 
 /**
- *
- * @author luiz
+ * @author Luiz Otavio Vilas Boas Oliveira
+ * http://homepages.dcc.ufmg.br/~luizvbo/ 
+ * luiz.vbo@gmail.com
+ * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
 public abstract class Individual implements Comparable<Individual>{
     protected Node tree;    

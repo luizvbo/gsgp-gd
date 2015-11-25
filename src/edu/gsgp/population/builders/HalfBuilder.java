@@ -11,23 +11,12 @@ import edu.gsgp.nodes.Node;
 import edu.gsgp.nodes.functions.Function;
 import edu.gsgp.nodes.terminals.Terminal;
 
-/* 
- * HalfBuilder.java
- * 
- * Created: Thu Oct  7 18:03:49 1999
- * By: Sean Luke
+/**
+ * @author Luiz Otavio Vilas Boas Oliveira
+ * http://homepages.dcc.ufmg.br/~luizvbo/ 
+ * luiz.vbo@gmail.com
+ * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
-
-/** HalfBuilder is a GPNodeBuilder which 
-    implements the RAMPED HALF-AND-HALF tree building method described in Koza I/II.  
-    <p><b>Default Base</b><br>
-    gp.koza.half
-
-    * @author Sean Luke
-    * @version 1.0 
-    */
-
-
 public class HalfBuilder extends IndividualBuilder{
 
     public HalfBuilder(final int maxDepth, 

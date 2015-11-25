@@ -12,6 +12,12 @@ import edu.gsgp.nodes.Node;
 import edu.gsgp.nodes.functions.Function;
 import edu.gsgp.nodes.terminals.Terminal;
 
+/**
+ * @author Luiz Otavio Vilas Boas Oliveira
+ * http://homepages.dcc.ufmg.br/~luizvbo/ 
+ * luiz.vbo@gmail.com
+ * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
+ */
 public abstract class IndividualBuilder {
     
     /** The largest maximum tree depth RAMPED HALF-AND-HALF can specify. */
@@ -23,8 +29,6 @@ public abstract class IndividualBuilder {
     protected Function[] functions;
             
     protected Terminal[] terminals;
-    
-//    protected MersenneTwister rnd;
 
     public IndividualBuilder(final int maxDepth, 
                              final int minDepth, 
@@ -34,7 +38,6 @@ public abstract class IndividualBuilder {
         this.minDepth = minDepth;
         this.functions = functions;
         this.terminals = terminals;
-//        this.rnd = rnd;
     }    
     
     public abstract Node newRootedTree(final int current, MersenneTwister rnd);
@@ -43,6 +46,7 @@ public abstract class IndividualBuilder {
      * A private recursive method which builds a FULL-style tree for newRootedTree
      * @param current Current depth
      * @param max Maximum depth
+     * @param rnd Pseudo random number generator
      * @return The new tree root node
      */
     protected Node fullNode(final int current, final int max, MersenneTwister rnd){
