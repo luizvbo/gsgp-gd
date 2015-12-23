@@ -21,7 +21,7 @@ import edu.gsgp.nodes.Node;
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
 public class Utils {    
-    public enum DataType{ TRAINING, TEST }
+    public enum DatasetType{ TRAINING, TEST };
     
     /**
      * Generates an array with a number of folds defined by the user. Each fold

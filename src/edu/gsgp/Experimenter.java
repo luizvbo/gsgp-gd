@@ -6,10 +6,6 @@
 
 package edu.gsgp;
 
-
-
-
-import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.data.DataProducer;
 import edu.gsgp.data.DataWriter;
 import edu.gsgp.data.PropertiesManager;
@@ -31,7 +27,7 @@ public class Experimenter {
             execute();
     }
     
-    protected void execute(){
+    private void execute(){
         try {
             Statistics[] stats = new Statistics[parameters.getNumExperiments()];
 //            DataWriter.resetInitialSemantics(parameters.getOutputDir(), parameters.getFilePrefix());
@@ -39,15 +35,15 @@ public class Experimenter {
             // Run the algorithm for a defined number of repetitions
             for(int execution = 0; execution < parameters.getNumExperiments(); execution++){
                 System.out.println("Execution " + (execution+1) + ":");
-                ExperimentalData data = parameters.getDataProducer().getExperimentDataset();
-                GSGP sgp = new GSGP(data, parameters);
+                parameters.updateExperimentalData();
+                GSGP sgp = new GSGP(parameters);
                 sgp.evolve();
                 stats[execution] = sgp.getStatistics();
 //                DataWriter.writeInitialSemantics(parameters.getOutputDir(), parameters.getFilePrefix(), stats[execution]);
 //                stats[execution].resetInitialSemantics();
             }
             DataWriter.writeResults(parameters.getOutputDir(), parameters.getFilePrefix(), stats);
-            DataWriter.writeOutputs(parameters.getOutputDir(), parameters.getFilePrefix(), stats, parameters.getDataProducer().getExperimentDataset());
+            DataWriter.writeOutputs(parameters.getOutputDir(), parameters.getFilePrefix(), stats, parameters.getExperimentalData());
         } catch (Exception ex) {
             ex.printStackTrace();
         }

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package edu.gsgp.population.generator;
+package edu.gsgp.population.builder.individual;
 
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.data.PropertiesManager;
@@ -19,15 +19,21 @@ import edu.gsgp.population.Population;
  */
 public class ReproductionBreeder extends Breeder {
 
-    public ReproductionBreeder(double probability, 
-                               PropertiesManager properties, 
-                               Population population) {
-        super(probability, properties, population);
+    public ReproductionBreeder(PropertiesManager properties, Double probability) {
+        super(properties, probability);
+    }
+    
+    public ReproductionBreeder(PropertiesManager properties, double probability) {
+        super(properties, probability);
     }
 
     @Override
     public Individual generateIndividual(MersenneTwister rndGenerator) {
-        return properties.selectIndividual(population, rndGenerator).clone();
+        return properties.selectIndividual(originalPopulation, rndGenerator).clone();
     }
     
+    @Override
+    public Breeder softClone(PropertiesManager properties) {
+        return new ReproductionBreeder(properties, this.probability);
+    }
 }

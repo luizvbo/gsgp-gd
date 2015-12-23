@@ -67,7 +67,7 @@ public class Statistics {
     public void setInitialSemantics(Population population) {
         initialSemantics = new double[population.size()][];
         int i = 0;
-        for(Individual ind : population.getIndividuals()){
+        for(Individual ind : population){
             initialSemantics[i++] = ind.getTrainingSemantics();
         }
     }

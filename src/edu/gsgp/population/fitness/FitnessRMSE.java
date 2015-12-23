@@ -6,7 +6,7 @@
 
 package edu.gsgp.population.fitness;
 
-import edu.gsgp.Utils.DataType;
+import edu.gsgp.Utils.DatasetType;
 import edu.gsgp.data.ExperimentalData;
 
 /**
@@ -27,41 +27,41 @@ public class FitnessRMSE extends Fitness{
         super(0);
     }
     
-    public void setRMSE(double rmse, DataType dataType) {
-        if(dataType == DataType.TRAINING)
+    public void setRMSE(double rmse, DatasetType dataType) {
+        if(dataType == DatasetType.TRAINING)
             rmseTr = rmse;
         else
             rmseTs = rmse;
     }
 
-    public double getRMSE(DataType dataType){
-        if(dataType == DataType.TRAINING)
+    public double getRMSE(DatasetType dataType){
+        if(dataType == DatasetType.TRAINING)
             return rmseTr;
         return rmseTs;
     }
     
     /** Control variables used during fitness calculation. **/
     // Variable to store the sum of squared errors (to compute the RMSE).
-    private int ctrSumQuadErro;
+    private double ctrSumSquarError;
     // Variable to indicate What fitness we are computing.
 //    private DataType ctrFitnessType;
     
     @Override
-    public void resetFitness(DataType dataType, ExperimentalData datasets){
-        ctrSumQuadErro = 0;
+    public void resetFitness(DatasetType dataType, ExperimentalData datasets){
+        ctrSumSquarError = 0;
         setSemantics(datasets.getDataset(dataType).size(), dataType);
     }
     
     @Override
-    public void setSemanticsAtIndex(double estimated, double desired, int index, DataType dataType){
+    public void setSemanticsAtIndex(double estimated, double desired, int index, DatasetType dataType){
         getSemantics(dataType)[index] = estimated;
         double error = estimated - desired;
-        ctrSumQuadErro += error * error;
+        ctrSumSquarError += error * error;
     }
     
     @Override
-    public void computeFitness(DataType dataType){
-        double rmse = Math.sqrt(ctrSumQuadErro/getSemantics(dataType).length);
+    public void computeFitness(DatasetType dataType){
+        double rmse = Math.sqrt(ctrSumSquarError/getSemantics(dataType).length);
         setRMSE(rmse, dataType);
     }
 
@@ -82,6 +82,6 @@ public class FitnessRMSE extends Fitness{
     
     @Override
     public double getComparableValue() {
-        return getRMSE(DataType.TRAINING);
+        return getRMSE(DatasetType.TRAINING);
     }
 }

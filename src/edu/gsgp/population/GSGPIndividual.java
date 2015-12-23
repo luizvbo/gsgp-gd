@@ -56,17 +56,7 @@ public class GSGPIndividual extends Individual{
         fitnessFunction.setNumNodes(tree.getNumNodes());
     }
     
-//    @Override
-//    public int compareTo(Individual o) {
-//        if (getFitness() < o.getFitness()){
-//            return -1;
-//        }
-//        if (getFitness() > o.getFitness()) {
-//            return 1;
-//        }
-//        return 0;
-//    }
-    
+    @Override
     public GSGPIndividual clone(){
         if(tree != null)
             return new GSGPIndividual(tree.clone(null), fitnessFunction);
@@ -105,16 +95,18 @@ public class GSGPIndividual extends Individual{
 
     @Override
     public double getFitness() {
-        return fitnessFunction.getComparableValue();
+        double value = fitnessFunction.getComparableValue();
+        if(Double.isInfinite(value) || Double.isNaN(value)) return Double.MAX_VALUE;
+        return value;
     }
 
     @Override
     public double[] getTrainingSemantics() {
-        return fitnessFunction.getSemantics(Utils.DataType.TRAINING);
+        return fitnessFunction.getSemantics(Utils.DatasetType.TRAINING);
     }
 
     @Override
     public double[] getTestSemantics() {
-        return fitnessFunction.getSemantics(Utils.DataType.TEST);
+        return fitnessFunction.getSemantics(Utils.DatasetType.TEST);
     }
 }

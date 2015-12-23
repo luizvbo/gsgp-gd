@@ -17,58 +17,22 @@ import java.util.Collections;
  * luiz.vbo@gmail.com
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
-public class Population {
-    protected ArrayList<Individual> individuals;
-    protected boolean initialized;
+public class Population extends ArrayList<Individual>{
     
     public Population() {
-        individuals = new ArrayList<>();
-        initialized = false;
+        super();
     }
     
     public Population(ArrayList<Individual> individuals) {
-        this.individuals = new ArrayList<>();
-        initialized = true;
-    }
-    
-    public Individual getIndividual(int index){
-        return individuals.get(index);
-    }
-
-    public ArrayList<Individual> getIndividuals() {
-        return individuals;
-    }
-
-    public void setInitialized(boolean initialized) {
-        this.initialized = initialized;
-    }
-    
-    public void setCurrentPopulation(ArrayList<Individual> currentPopulation) {
-        this.individuals = currentPopulation;
-    }
-    
-    public void addAll(ArrayList<Individual> newIndividuals){
-        individuals.addAll(newIndividuals);
+        super(individuals);
     }
     
     public void addAll(Individual[] newIndividuals){
-        individuals.addAll(Arrays.asList(newIndividuals));
+        addAll(Arrays.asList(newIndividuals));
     }
-    
-    public int size(){
-        return individuals.size();
-    }
-    
+        
     public Individual getBestIndividual(){
-        Collections.sort(individuals);
-        return individuals.get(0);
-    }
-
-    public boolean isInitialized() {
-        return initialized;
-    }
-
-    public void add(Individual individual) {
-        individuals.add(individual);
+        Collections.sort(this);
+        return get(0);
     }
 }

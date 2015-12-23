@@ -40,7 +40,7 @@ public class Input implements Terminal{
     
     @Override
     public String toString() {
-        return "x[" + index + "]";
+        return "x" + index + "";
     }
 
     @Override

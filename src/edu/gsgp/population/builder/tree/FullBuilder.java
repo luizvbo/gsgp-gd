@@ -5,7 +5,7 @@
 */
 
 
-package edu.gsgp.population.builders;
+package edu.gsgp.population.builder.tree;
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.nodes.Node;
 import edu.gsgp.nodes.functions.Function;
@@ -18,7 +18,7 @@ import edu.gsgp.nodes.terminals.Terminal;
  * luiz.vbo@gmail.com
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
-public class FullBuilder extends IndividualBuilder {
+public class FullBuilder extends TreeBuilder {
 
     public FullBuilder(final int maxDepth, 
                        final int minDepth, 

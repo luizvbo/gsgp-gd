@@ -65,9 +65,9 @@ public class CrossvalidationHandler implements DataProducer{
         ExperimentalData data = new ExperimentalData();
         for(int i = 0; i < numFolds; i++){
             if(i == currentFold)
-                data.setDataset(folds[i].softClone(), Utils.DataType.TEST);
+                data.setDataset(folds[i].softClone(), Utils.DatasetType.TEST);
             else{
-                data.setDataset(folds[i].softClone(), Utils.DataType.TRAINING);
+                data.setDataset(folds[i].softClone(), Utils.DatasetType.TRAINING);
             }
         }
         if(currentFold < numFolds - 1) currentFold++;

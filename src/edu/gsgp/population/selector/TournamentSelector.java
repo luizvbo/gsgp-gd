@@ -32,7 +32,7 @@ public class TournamentSelector implements IndividualSelector{
         for(int i = 0; i < popSize; i++) indexes.add(i);
         Individual[] tournament = new Individual[tournamentSize];
         for(int i = 0; i < tournamentSize; i++){
-            tournament[i] = population.getIndividual(indexes.remove(rnd.nextInt(indexes.size())));
+            tournament[i] = population.get(indexes.remove(rnd.nextInt(indexes.size())));
         }
         Arrays.sort(tournament);
         return tournament[0];

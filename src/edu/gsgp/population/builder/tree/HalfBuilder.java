@@ -5,12 +5,11 @@
 */
 
 
-package edu.gsgp.population.builders;
+package edu.gsgp.population.builder.tree;
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.nodes.Node;
 import edu.gsgp.nodes.functions.Function;
 import edu.gsgp.nodes.terminals.Terminal;
-
 
 /**
  * @author Luiz Otavio Vilas Boas Oliveira
@@ -18,9 +17,9 @@ import edu.gsgp.nodes.terminals.Terminal;
  * luiz.vbo@gmail.com
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
-public class GrowBuilder extends IndividualBuilder {
+public class HalfBuilder extends TreeBuilder{
 
-    public GrowBuilder(final int maxDepth, 
+    public HalfBuilder(final int maxDepth, 
                        final int minDepth, 
                        final Function[] functions,
                        final Terminal[] terminals) {
@@ -29,8 +28,12 @@ public class GrowBuilder extends IndividualBuilder {
     
     @Override
     public Node newRootedTree(final int current, MersenneTwister rnd){
-        return growNode(0, maxDepth, rnd);
+        if (rnd.nextBoolean())
+            return growNode(0, rnd.nextInt(maxDepth-minDepth+1) + minDepth, rnd);
+        else
+            return fullNode(0, rnd.nextInt(maxDepth-minDepth+1) + minDepth, rnd);
+        }
+
     }
-}
 
 

@@ -20,21 +20,24 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import edu.gsgp.MersenneTwister;
+import edu.gsgp.Utils.DatasetType;
 import edu.gsgp.population.Population;
 import edu.gsgp.nodes.Node;
 import edu.gsgp.nodes.functions.Function;
 import edu.gsgp.nodes.terminals.Input;
 import edu.gsgp.nodes.terminals.Terminal;
-import edu.gsgp.population.builders.FullBuilder;
-import edu.gsgp.population.builders.GrowBuilder;
-import edu.gsgp.population.builders.HalfBuilder;
+import edu.gsgp.population.builder.tree.FullBuilder;
+import edu.gsgp.population.builder.tree.GrowBuilder;
+import edu.gsgp.population.builder.tree.HalfBuilder;
 import edu.gsgp.population.Individual;
-import edu.gsgp.population.builders.IndividualBuilder;
+import edu.gsgp.population.builder.individual.Breeder;
+import edu.gsgp.population.builder.individual.Populator;
+import edu.gsgp.population.builder.tree.TreeBuilder;
 import edu.gsgp.population.fitness.Fitness;
-import edu.gsgp.population.fitness.FitnessRMSE;
 import edu.gsgp.population.selector.IndividualSelector;
 import edu.gsgp.population.selector.TournamentSelector;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Constructor;
 
 /**
  * @author Luiz Otavio Vilas Boas Oliveira
@@ -47,6 +50,10 @@ import java.io.FileNotFoundException;
  * in the GSGP
  */
 public class PropertiesManager {
+    public enum paramType{
+        STRING, INT, DOUBLE, CLASS, CLASS_LIST, FILE
+    }
+    
     protected boolean parameterLoaded;
     
     protected Properties fileParameters;
@@ -57,24 +64,31 @@ public class PropertiesManager {
     private DataProducer dataProducer;
     private MersenneTwister mersennePRNG;
     private ExperimentalData data;
+    private boolean mutStepFromSD;
     private int numExperiments;
     private int numGenerations;
     private int numThreads;
     private int populationSize;
     private int rtPoolSize;
+    
+    private int maxInitAttempts;
+    
     private double minError;
-    private double ms;
-    private double mutProb;
-    private double xoverProb;
-    private double semSimThres;
+    private double mutationStep;
+//    private double mutProb;
+//    private double xoverProb;
+//    private double semSimThres;
+    private Populator populationInitializer;
+    private Breeder[] breederList;
     private Fitness fitnessFunction;
-    private Terminal[] terminals;
-    private Function[] functions;
+    private Terminal[] terminalSet;
+    private Function[] functionSet;
+    private ExperimentalData experimentalData;
     
     private IndividualSelector individualSelector;
     
-    private IndividualBuilder individualBuilder;
-    private IndividualBuilder randomTreeBuilder;
+    private TreeBuilder individualBuilder;
+    private TreeBuilder randomTreeBuilder;
     
     private String outputDir;
     private String filePrefix;
@@ -82,34 +96,42 @@ public class PropertiesManager {
 
     private void loadParameters() throws Exception{
         dataProducer = getDataProducer();
-        mersennePRNG = new MersenneTwister(getLongPropertie(ParameterList.SEED, System.currentTimeMillis()));
-        terminals = getTerminals();
-        functions = getFunctions();
-        fitnessFunction = getFitnessClass();
-        numExperiments = getIntegerPropertie(ParameterList.NUM_REPETITIONS, 1);
-        numGenerations = getIntegerPropertie(ParameterList.NUM_GENERATION, 200);
+        mersennePRNG = new MersenneTwister(getLongProperty(ParameterList.SEED, System.currentTimeMillis()));
+        terminalSet = getTerminalObjects();
+        functionSet = getFunctionObjects();
+        fitnessFunction = getFitnessObject();
+        numExperiments = getIntegerProperty(ParameterList.NUM_REPETITIONS, 1);
+        numGenerations = getIntegerProperty(ParameterList.NUM_GENERATION, 200);
         
-        numThreads = getIntegerPropertie(ParameterList.NUMBER_THREADS, -1);
+        numThreads = getIntegerProperty(ParameterList.NUMBER_THREADS, -1);
         if(numThreads == -1) numThreads = Runtime.getRuntime().availableProcessors();
         
-        populationSize = getIntegerPropertie(ParameterList.POP_SIZE, 1000);
-        rtPoolSize = getIntegerPropertie(ParameterList.RT_POOL_SIZE, 200);
-        minError = getDoublePropertie(ParameterList.MIN_ERROR, 0);
-        ms = getDoublePropertie(ParameterList.MUT_STEP, -1);
-        mutProb = getDoublePropertie(ParameterList.MUT_PROB, 0.5);
-        xoverProb = getDoublePropertie(ParameterList.XOVER_PROB, 0.5);
-        semSimThres = getDoublePropertie(ParameterList.SEMANTIC_SIMILARITY_THRESHOLD, 0.1);
-        outputDir = getStringPropertie(ParameterList.PATH_OUTPUT_DIR, true);
-        filePrefix = getStringPropertie(ParameterList.FILE_PREFIX, false);
+        populationSize = getIntegerProperty(ParameterList.POP_SIZE, 1000);
+        rtPoolSize = getIntegerProperty(ParameterList.RT_POOL_SIZE, 200);
+        
+        maxInitAttempts = getIntegerProperty(ParameterList.POP_INIT_ATTEMPTS, 10);
+        
+        minError = getDoubleProperty(ParameterList.MIN_ERROR, 0);
+        mutationStep = getDoubleProperty(ParameterList.MUT_STEP, 0.1);
+        mutStepFromSD = getBooleanProperty(ParameterList.MUT_STEP_SD, true);
+        
+//        mutProb = getDoubleProperty(ParameterList.MUT_PROB, 0.5);
+//        xoverProb = getDoubleProperty(ParameterList.XOVER_PROB, 0.5);
+//        semSimThres = getDoubleProperty(ParameterList.SEMANTIC_SIMILARITY_THRESHOLD, 0.1);
+        outputDir = getStringProperty(ParameterList.PATH_OUTPUT_DIR, true);
+        filePrefix = getStringProperty(ParameterList.FILE_PREFIX, false);
         
         individualBuilder = getIndividualBuilder(false);
         randomTreeBuilder = getIndividualBuilder(true);
         
+        populationInitializer = getPopInitObject();
+        breederList = getBreederObjects();
+        
         individualSelector = getIndividualSelector();        
     }
-    
-    public enum ParameterList {
 
+    public enum ParameterList {
+        PARENT_FILE("parent", "Path to the parent parameter file. The child parameters overwrite the parent", false),
         PATH_DATA_FILE("experiment.data", "Path for the training/test files. See experiment.sampling option for more details", true),
         PATH_OUTPUT_DIR("experiment.output.dir", "Output directory", false),
         SEED("experiment.seed", "Seed (long int) used by the pseudo-random number generator", false),
@@ -141,10 +163,17 @@ public class PropertiesManager {
         TOURNAMENT_SIZE("pop.ind.selector.tourn.size", "Tournament size, when using tournament as selector", false),
         
         MIN_ERROR("evol.min.error", "Minimum error to consider a hit", false),
-        MUT_PROB("breed.mut.prob", "Probability of applying the mutation operator", false),
         MUT_STEP("breed.mut.step", "Mutation step", false),
-        XOVER_PROB("breed.xover.prob", "Probability of applying the crossover operator", false),
-        SEMANTIC_SIMILARITY_THRESHOLD("sem.gp.epsilon", "Threshold used to determine if two semantics are similar", false);
+        MUT_STEP_SD("breed.mut.step.sd", "Indicate if the mutation step is absolute (false) or relative to the stardard deviation"
+                                        + "\n# of the outputs of the training set.", false),
+        BREEDERS_LIST("breed.list", "List of breeders classes used during the evolution. The list items must be comma separated and the propability"
+                                  + "\n# must follow the breeder class separated by a *. E.g.: "
+                                  + "\n# edu.gsgp.population.builder.individual.BreederA*0.1, edu.gsgp.population.builder.individual.BreederB*0.9", true),
+        POP_INITIALIZER("pop.initializer", "Population Initializer class. Default: edu.gsgp.population.builder.individual.SimplePopulator", true),
+        POP_INIT_ATTEMPTS("pop.initializer.attempts", "Number of attemtps before adding an individual in the population", false);
+//        MUT_PROB("breed.mut.prob", "Probability of applying the mutation operator", false),
+//        XOVER_PROB("breed.xover.prob", "Probability of applying the crossover operator", false),
+//        SEMANTIC_SIMILARITY_THRESHOLD("sem.gp.epsilon", "Threshold used to determine if two semantics are similar", false);
 
         public final String name;
         public final String description;
@@ -180,13 +209,14 @@ public class PropertiesManager {
             if(!parametersCLI.hasOption("p"))
                 throw new Exception("The parameter file was not specified.");
             String path = parametersCLI.getOptionValue("p");
-            path = path.replaceFirst("^~",System.getProperty("user.home"));
-            File parameterFile = new File(path);
-            if(!parameterFile.canRead()) 
-                throw new FileNotFoundException("Parameter file can not be read: " + parameterFile.getCanonicalPath());
-            FileInputStream fileInput = new FileInputStream(parameterFile);
-            fileParameters = new Properties();
-            fileParameters.load(fileInput);
+            fileParameters = loadProperties(path);
+//            path = path.replaceFirst("^~",System.getProperty("user.home"));
+//            File parameterFile = new File(path);
+//            if(!parameterFile.canRead()) 
+//                throw new FileNotFoundException("Parameter file can not be read: " + parameterFile.getCanonicalPath());
+//            FileInputStream fileInput = new FileInputStream(parameterFile);
+//            fileParameters = new Properties();
+//            fileParameters.load(fileInput);
             return true;
         } 
         catch (MissingOptionException ex){
@@ -196,6 +226,23 @@ public class PropertiesManager {
             throw new Exception("Error while parsing the command line.");
         }
     }
+    
+    private Properties loadProperties(String path) throws Exception{
+        path = path.replaceFirst("^~",System.getProperty("user.home"));
+        File parameterFile = new File(path);
+        if(!parameterFile.canRead()) 
+            throw new FileNotFoundException("Parameter file can not be read: " + parameterFile.getCanonicalPath());
+        FileInputStream fileInput = new FileInputStream(parameterFile);
+        Properties property = new Properties();
+        property.load(fileInput);
+        if(property.containsKey(ParameterList.PARENT_FILE.name)){
+            Properties propertyParent = loadProperties(property.getProperty("parent").trim());
+            propertyParent.putAll(property);
+            property = propertyParent;
+        }
+        return property;
+    }
+        
     private void writeParameterModel(){
         try{
             File file = new File("model.param");
@@ -220,11 +267,11 @@ public class PropertiesManager {
     }
     
     private IndividualSelector getIndividualSelector() throws Exception{
-        String value = getStringPropertie(ParameterList.INDIVIDUAL_SELECTOR, false).toLowerCase();
+        String value = getStringProperty(ParameterList.INDIVIDUAL_SELECTOR, false).toLowerCase();
         IndividualSelector indSelector;
         switch(value){
             case "tournament":
-                indSelector = new TournamentSelector(getIntegerPropertie(ParameterList.TOURNAMENT_SIZE, 7));
+                indSelector = new TournamentSelector(getIntegerProperty(ParameterList.TOURNAMENT_SIZE, 7));
                 break;
             default:
                 throw new Exception("The inidividual selector must be defined.");
@@ -232,8 +279,8 @@ public class PropertiesManager {
         return indSelector;
     }
     
-    public DataProducer getDataProducer() throws Exception{
-        String value = getStringPropertie(ParameterList.EXPERIMENT_DESIGN, false).toLowerCase();
+    private DataProducer getDataProducer() throws Exception{
+        String value = getStringProperty(ParameterList.EXPERIMENT_DESIGN, false).toLowerCase();
         DataProducer dataProducer;
         switch(value){
             case "crossvalidation":
@@ -245,14 +292,49 @@ public class PropertiesManager {
             default:
                 throw new Exception("Experiment design must be crossvalidation or holdout.");
         }
-        dataProducer.setDataset(getStringPropertie(ParameterList.PATH_DATA_FILE, true));
+        dataProducer.setDataset(getStringProperty(ParameterList.PATH_DATA_FILE, true));
         return dataProducer;
     }
     
-    private int getIntegerPropertie(ParameterList key, int defaultValue) throws Exception {
+    /**
+     * Load a boolean property from the file.
+     * @param key The name of the property
+     * @param defaultValue The default value for this property
+     * @return The value loaded from the file or the default value, if it is not specified in the file.
+     * @throws NumberFormatException The loaded value can not be converted to boolean
+     * @throws NullPointerException The parameter file was not initialized
+     * @throws MissingOptionException The parameter is mandatory and it was not found in the parameter file.
+     */
+    private boolean getBooleanProperty(ParameterList key, boolean defaultValue) 
+                    throws NumberFormatException, NullPointerException, MissingOptionException{
         try {
             if (!fileParameters.containsKey(key.name) && key.mandatory) {
-                throw new NoSuchFieldException("The input parameter (" + key.name + ") was not found");
+                throw new MissingOptionException("The input parameter (" + key.name + ") was not found");
+            }
+            else if(!fileParameters.containsKey(key.name) || fileParameters.getProperty(key.name).replaceAll("\\s", "").equals(""))
+                return defaultValue;
+            return Boolean.parseBoolean(fileParameters.getProperty(key.name));
+        } catch (NumberFormatException e) {
+            throw new NumberFormatException(e.getMessage() + "\nThe input parameter (" + key.name + ") could not be converted to boolean.");
+        } catch (NullPointerException e) {
+            throw new NullPointerException(e.getMessage() + "\nThe parameter file was not initialized.");
+        }
+    }
+    
+    /**
+     * Load an int property from the file.
+     * @param key The name of the property
+     * @param defaultValue The default value for this property
+     * @return The value loaded from the file or the default value, if it is not specified in the file.
+     * @throws NumberFormatException The loaded value can not be converted to int
+     * @throws NullPointerException The parameter file was not initialized
+     * @throws MissingOptionException The parameter is mandatory and it was not found in the parameter file.
+     */
+    private int getIntegerProperty(ParameterList key, int defaultValue) 
+                    throws NumberFormatException, NullPointerException, MissingOptionException{
+        try {
+            if (!fileParameters.containsKey(key.name) && key.mandatory) {
+                throw new MissingOptionException("The input parameter (" + key.name + ") was not found");
             }
             else if(!fileParameters.containsKey(key.name) || fileParameters.getProperty(key.name).replaceAll("\\s", "").equals(""))
                 return defaultValue;
@@ -264,25 +346,45 @@ public class PropertiesManager {
         }
     }
     
-    private long getLongPropertie(ParameterList key, long defaultValue) throws Exception {
+    /**
+     * Load a long property from the file.
+     * @param key The name of the property
+     * @param defaultValue The default value for this property
+     * @return The value loaded from the file or the default value, if it is not specified in the file.
+     * @throws NumberFormatException The loaded value can not be converted to long
+     * @throws NullPointerException The parameter file was not initialized
+     * @throws MissingOptionException The parameter is mandatory and it was not found in the parameter file.
+     */
+    private long getLongProperty(ParameterList key, long defaultValue) 
+                    throws NumberFormatException, NullPointerException, MissingOptionException{
         try {
             if (!fileParameters.containsKey(key.name) && key.mandatory) {
-                throw new NoSuchFieldException("The input parameter (" + key.name + ") was not found");
+                throw new MissingOptionException("The input parameter (" + key.name + ") was not found");
             }
             else if(!fileParameters.containsKey(key.name) || fileParameters.getProperty(key.name).replaceAll("\\s", "").equals(""))
                 return defaultValue;
             return Integer.parseInt(fileParameters.getProperty(key.name));
         } catch (NumberFormatException e) {
-            throw new NumberFormatException(e.getMessage() + "\nThe input parameter (" + key.name + ") could not be converted to int.");
+            throw new NumberFormatException(e.getMessage() + "\nThe input parameter (" + key.name + ") could not be converted to long.");
         } catch (NullPointerException e) {
             throw new NullPointerException(e.getMessage() + "\nThe parameter file was not initialized.");
         }
     }
 
-    private Double getDoublePropertie(ParameterList key, double defaultValue) throws Exception {
+    /**
+     * Load a double property from the file.
+     * @param key The name of the property
+     * @param defaultValue The default value for this property
+     * @return The value loaded from the file or the default value, if it is not specified in the file.
+     * @throws NumberFormatException The loaded value can not be converted to double
+     * @throws NullPointerException The parameter file was not initialized
+     * @throws MissingOptionException The parameter is mandatory and it was not found in the parameter file.
+     */
+    private double getDoubleProperty(ParameterList key, double defaultValue) 
+                    throws NumberFormatException, NullPointerException, MissingOptionException{
         try {
             if (!fileParameters.containsKey(key.name) && key.mandatory) {
-                throw new NoSuchFieldException("The input parameter (" + key.name + ") was not found");
+                throw new MissingOptionException("The input parameter (" + key.name + ") was not found");
             }
             else if(!fileParameters.containsKey(key.name))
                 return defaultValue;
@@ -294,10 +396,20 @@ public class PropertiesManager {
         }
     }
     
-    private String getStringPropertie(ParameterList key, boolean isFile) throws Exception {
+    /**
+     * Load a string property from the file.
+     * @param key The name of the property
+     * @param defaultValue The default value for this property
+     * @return The value loaded from the file or the default value, if it is not specified in the file.
+     * @throws NumberFormatException The loaded value can not be converted to string
+     * @throws NullPointerException The parameter file was not initialized
+     * @throws MissingOptionException The parameter is mandatory and it was not found in the parameter file.
+     */
+    private String getStringProperty(ParameterList key, boolean isFile) 
+                    throws NumberFormatException, NullPointerException, MissingOptionException{
         try {
             if (!fileParameters.containsKey(key.name) && key.mandatory) {
-                throw new NoSuchFieldException("Input parameter not found: " + key.name);
+                throw new MissingOptionException("Input parameter not found: " + key.name);
             }
             else if(!fileParameters.containsKey(key.name))
                 return null;
@@ -310,21 +422,21 @@ public class PropertiesManager {
         }
     }
 
-    private IndividualBuilder getIndividualBuilder(boolean isForRandomTrees) throws Exception{
+    private TreeBuilder getIndividualBuilder(boolean isForRandomTrees) throws Exception{
         String builderType;
         if(isForRandomTrees)
-            builderType = getStringPropertie(ParameterList.INDIVIDUAL_BUILDER_RAND_TREE, false).toLowerCase();
+            builderType = getStringProperty(ParameterList.INDIVIDUAL_BUILDER_RAND_TREE, false).toLowerCase();
         else
-            builderType = getStringPropertie(ParameterList.INDIVIDUAL_BUILDER_POP, false).toLowerCase();
-        int maxDepth = getIntegerPropertie(ParameterList.MAX_TREE_DEPTH, 6);
-        int minDepth = getIntegerPropertie(ParameterList.MIN_TREE_DEPTH, 2);
+            builderType = getStringProperty(ParameterList.INDIVIDUAL_BUILDER_POP, false).toLowerCase();
+        int maxDepth = getIntegerProperty(ParameterList.MAX_TREE_DEPTH, 6);
+        int minDepth = getIntegerProperty(ParameterList.MIN_TREE_DEPTH, 2);
         switch(builderType){
             case "grow":
-                return new GrowBuilder(maxDepth, minDepth, functions, terminals);
+                return new GrowBuilder(maxDepth, minDepth, functionSet, terminalSet);
             case "full":
-                return new FullBuilder(maxDepth, minDepth, functions, terminals);
+                return new FullBuilder(maxDepth, minDepth, functionSet, terminalSet);
             case "rhh":
-                return new HalfBuilder(maxDepth, minDepth, functions, terminals);
+                return new HalfBuilder(maxDepth, minDepth, functionSet, terminalSet);
             default:
                 throw new Exception("There is no builder called " + builderType + ".");
         }
@@ -334,10 +446,36 @@ public class PropertiesManager {
         return parameterLoaded;
     }
     
-    private Terminal[] getTerminals() throws Exception{
-        String[] sTerminals = getStringPropertie(ParameterList.TERMINAL_LIST, false).replaceAll("\\s", "").split(",");
+    
+    private Breeder[] getBreederObjects() throws Exception{
+        String[] strBreeders = getStringProperty(ParameterList.BREEDERS_LIST, false).split(",");
+        ArrayList<Breeder> breeders = new ArrayList<Breeder>();
+        for(String sBreeder : strBreeders){
+            try{
+                sBreeder = sBreeder.trim();
+                String[] strBreedersSplitted = sBreeder.split("\\*");
+                Class<?> breederClass = Class.forName(strBreedersSplitted[0].trim());
+                Constructor<?> breederConstructor = breederClass.getConstructor(PropertiesManager.class, Double.class);
+                Breeder newBreeder = (Breeder)breederConstructor.newInstance(this, Double.parseDouble(strBreedersSplitted[1].trim()));
+                breeders.add(newBreeder);
+            }
+            catch(ClassNotFoundException e){
+                throw new ClassNotFoundException("Error loading the terminal set. Class " + sBreeder + " not found", e);
+            }
+        }
+        return breeders.toArray(new Breeder[breeders.size()]);
+    }
+    
+    /**
+     * 
+     * @return
+     * @throws Exception 
+     */
+    private Terminal[] getTerminalObjects() throws Exception{
+        String[] sTerminals = getStringProperty(ParameterList.TERMINAL_LIST, false).split(",");
         boolean useAllInputs = true;
         for(String str : sTerminals){
+            str = str.trim();
             if(str.toLowerCase().matches("x\\d+")){
                 useAllInputs = false;
                 break;
@@ -348,6 +486,7 @@ public class PropertiesManager {
             for(int i = 0; i < dataProducer.getNumInputs(); i++) terminals.add(new Input(i));
             for(String str : sTerminals){
                 try{
+                    str = str.trim();
                     Class<?> terminal = Class.forName(str);
                     Terminal newTerminal = (Terminal)terminal.newInstance();
                     terminals.add(newTerminal);
@@ -368,12 +507,13 @@ public class PropertiesManager {
      * @return An array of functions
      * @throws Exception Parameter not found, error while parsing the function type 
      */
-    private Function[] getFunctions()throws Exception{
-        String[] sFunctions = getStringPropertie(ParameterList.FUNCTION_LIST, false).replaceAll("\\s", "").split(",");
+    private Function[] getFunctionObjects() throws Exception{
+        String[] sFunctions = getStringProperty(ParameterList.FUNCTION_LIST, false).split(",");
         ArrayList<Function> functionArray = new ArrayList<Function>();
        
         for(String str : sFunctions){
             try{
+                str = str.trim();
                 Class<?> function = Class.forName(str);
                 functionArray.add((Function)function.newInstance());
             }
@@ -386,15 +526,45 @@ public class PropertiesManager {
     }
     
     /**
-     * Get the fitness class form the file
-     * @return A new fintess function
-     * @throws Exception Parameter not found, error while parsing the function type 
+     * Get the population initializer from the file
+     * @return A new population initializer object
+     * @throws Exception Parameter not found, error while parsing the Populator type 
      */
-    private Fitness getFitnessClass() throws Exception {
-        String fitnessClassname = getStringPropertie(ParameterList.FITNESS_FUNCTION, false).replaceAll("\\s", "");
-//        Class<?> fitnessClass = Class.forName(fitnessClassname);
-//        return (Fitness)fitnessClass.newInstance();
-        return new FitnessRMSE();
+    private Populator getPopInitObject() throws Exception{
+        String populatorClassname = "";
+        try {            
+            populatorClassname = getStringProperty(ParameterList.POP_INITIALIZER, false).replaceAll("\\s", "");
+            Class<?> populatorClass = Class.forName(populatorClassname);
+            Constructor<?> populatorConstructor = populatorClass.getConstructor(PropertiesManager.class);
+            return (Populator)populatorConstructor.newInstance(this);
+        } 
+        catch (ClassNotFoundException e) {
+            throw new ClassNotFoundException("Error loading the population initializer. Class " + populatorClassname + " not found", e);
+        } 
+    }
+    
+    /**
+     * Get the fitness object from the file
+     * @return A new fintess function
+     * @throws Exception Parameter not found, error while parsing the Fitness type
+     */
+    private Fitness getFitnessObject() throws Exception{
+        String fitnessClassname = "";
+        try {
+            fitnessClassname = getStringProperty(ParameterList.FITNESS_FUNCTION, false).replaceAll("\\s", "");
+            Class<?> fitnessClass = Class.forName(fitnessClassname);
+            return (Fitness)fitnessClass.newInstance();
+        } 
+        catch (ClassNotFoundException e) {
+            throw new ClassNotFoundException("Error loading the fitness function. Class " + fitnessClassname + " not found", e);
+        } 
+    }
+    
+    /**
+     * Update the experimental data from the dataProducer
+     */
+    public void updateExperimentalData() {
+        experimentalData = dataProducer.getExperimentDataset();
     }
 
     /**
@@ -425,6 +595,7 @@ public class PropertiesManager {
                 .build());
     }
 
+    /********************************** Public getters **********************************/
     public MersenneTwister getMersennePRNG() {
         return mersennePRNG;
     }
@@ -449,25 +620,41 @@ public class PropertiesManager {
         return rtPoolSize;
     }
 
+    public int getMaxInitAttempts() {
+        return maxInitAttempts;
+    }
+
     public double getMinError() {
         return minError;
     }
 
+    /**
+     * Return the mutation step. If the mutation step is defined w.r.t. the standard 
+     * deviation of the training set outputs, we compute the value before returning it.
+     * Otherwise, we return the value obtained from the parameter file.
+     * @return The mutation step.
+     */
     public double getMutationStep() {
-        return ms;
+        // The variable mutationStep is obtained from the parameter file
+        if(!mutStepFromSD){
+            return mutationStep;
+        }
+        else{
+            return mutationStep * experimentalData.getDataset(DatasetType.TRAINING).getOutputSD();
+        }
     }
 
-    public double getMutProb() {
-        return mutProb;
-    }
-
-    public double getXoverProb() {
-        return xoverProb;
-    }
-
-    public double getSemSimThreshold() {
-        return semSimThres;
-    }
+//    public double getMutProb() {
+//        return mutProb;
+//    }
+//
+//    public double getXoverProb() {
+//        return xoverProb;
+//    }
+//
+//    public double getSemSimThreshold() {
+//        return semSimThres;
+//    }
     
     public String getOutputDir() {
         return outputDir;
@@ -477,7 +664,7 @@ public class PropertiesManager {
         return filePrefix;
     }
     
-    public Fitness geFitness(){
+    public Fitness geFitnessFunction(){
         return fitnessFunction.softClone();
     }
     
@@ -496,14 +683,72 @@ public class PropertiesManager {
     public Individual selectIndividual(Population population, MersenneTwister rndGenerator){
         return individualSelector.selectIndividual(population, rndGenerator);
     }
+
+    public Function getRandomFunction(MersenneTwister rnd) {
+        return functionSet[rnd.nextInt(functionSet.length)].softClone();
+    }
+
+    public Terminal getRandomTerminal(MersenneTwister rnd) {
+        return terminalSet[rnd.nextInt(terminalSet.length)].softClone(rnd);
+    }
+
+    public ExperimentalData getExperimentalData() {
+        return experimentalData;
+    }
+
+    /**
+     * Return a copy of the function set, to avoid modifications in the original set.
+     * @return A copy of the terminal set
+     */
+    public Function[] getFunctionSet() {
+        Function[] copyFunctionSet = new Function[functionSet.length];
+        for(int i = 0; i < functionSet.length; i++){
+            copyFunctionSet[i] = functionSet[i].softClone();
+        }
+        return copyFunctionSet;
+    }
     
+    /**
+     * Return a copy of the terminal set, to avoid modifications in the original set.
+     * @return A copy of the terminal set
+     */
+    public Terminal[] getTerminalSet() {
+        Terminal[] copyTerminalSet = new Terminal[terminalSet.length];
+        for(int i = 0; i < terminalSet.length; i++){
+            copyTerminalSet[i] = terminalSet[i].softClone(mersennePRNG);
+        }
+        return copyTerminalSet;
+    }
+
+    /**
+     * Generate an array of pseudorandom number generators, used in multithreaded
+     * environments.
+     * @param size Number of pseudorandom number generators to be generated
+     * @return The array of PRNG's
+     */
     public MersenneTwister[] getMersennePRGNArray(int size){
         MersenneTwister[] generators = new MersenneTwister[size];
         for(int i = 0; i < size; i++){
             long seed = mersennePRNG.nextLong();
-//            generators[i] = new MersenneTwister(getLongPropertie(ParameterList.SEED, System.currentTimeMillis())+(long)i);
             generators[i] = new MersenneTwister(seed);
         }
         return generators;
+    }
+
+    public Populator getPopulationInitializer() {
+        return populationInitializer;
+    }
+
+    /**
+     * Return a list of sof clones of the breeders list recovered from the 
+     * parameter file
+     * @return The list of soft clones of the breeders
+     */
+    public Breeder[] getBreederList() {
+        Breeder[] copyBreeders = new Breeder[breederList.length];
+        for(int i = 0; i < breederList.length; i++){
+            copyBreeders[i] = breederList[i].softClone(this);
+        }
+        return copyBreeders;
     }
 }

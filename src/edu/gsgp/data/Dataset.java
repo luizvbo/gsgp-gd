@@ -14,7 +14,9 @@ import edu.gsgp.Utils;
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
 public class Dataset extends ArrayList<Instance>{   
-    private double[] outputs;
+    private double[] outputVector;
+    // Outputs standard deviation
+    private Double outputSD;
     
     /**
      * Constructor declaration
@@ -66,27 +68,30 @@ public class Dataset extends ArrayList<Instance>{
     }
 
     public double getOutputSD() {
-        double mean = 0;
-        double[] outputs = new double[size()];
-        for(int i = 0; i < size(); i ++){
-            double tmp = get(i).output;
-            outputs[i] = tmp;
-            mean += tmp;
+        if(outputSD == null){
+            double mean = 0;
+            double[] outputs = new double[size()];
+            for(int i = 0; i < size(); i ++){
+                double tmp = get(i).output;
+                outputs[i] = tmp;
+                mean += tmp;
+            }
+            outputSD = Utils.getSD(outputs, mean/size());
         }
-        return Utils.getSD(outputs, mean/size());
+        return outputSD;
     }
 
     public double[] getOutputs() {
-        if(outputs == null){
+        if(outputVector == null){
             setOutputs();
         }
-        return outputs;
+        return outputVector;
     }
     
     private void setOutputs(){
-        outputs = new double[size()];
+        outputVector = new double[size()];
         for(int i = 0; i < size(); i++){
-            outputs[i] = get(i).output;
+            outputVector[i] = get(i).output;
         }
     }
     
@@ -104,11 +109,11 @@ public class Dataset extends ArrayList<Instance>{
         if(ssTotal == null){
             double meanOutput = 0;
             ssTotal = new Double(0);
-            if(outputs == null) setOutputs();
-            for(int i = 0; i < outputs.length; i++) meanOutput += outputs[i];
-            meanOutput /= outputs.length;            
-            for(int i = 0; i < outputs.length; i++){
-                double tmp = outputs[i] - meanOutput;
+            if(outputVector == null) setOutputs();
+            for(int i = 0; i < outputVector.length; i++) meanOutput += outputVector[i];
+            meanOutput /= outputVector.length;            
+            for(int i = 0; i < outputVector.length; i++){
+                double tmp = outputVector[i] - meanOutput;
                 ssTotal += tmp * tmp;
             }
         }

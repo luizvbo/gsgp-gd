@@ -47,7 +47,7 @@ public class DataWriter {
         outputDir.mkdirs();
         BufferedWriter bw;
         bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "outputs.csv"));
-        bw.write(getDesiredOutputs(data));
+//        bw.write(getDesiredOutputs(data));
         bw.write(getStatisticsFromArray(statsArray, Statistics.StatsType.SEMANTICS));
         bw.close();
     }
@@ -104,8 +104,8 @@ public class DataWriter {
 
     private static String getDesiredOutputs(ExperimentalData data) {
         double outputs[][] = new double[2][];
-        outputs[0] = data.getDataset(Utils.DataType.TRAINING).getOutputs();
-        outputs[1] = data.getDataset(Utils.DataType.TEST).getOutputs();
+        outputs[0] = data.getDataset(Utils.DatasetType.TRAINING).getOutputs();
+        outputs[1] = data.getDataset(Utils.DatasetType.TEST).getOutputs();
         StringBuilder str = new StringBuilder();
         String sep = "";
         for(int i = 0; i < outputs.length; i++){

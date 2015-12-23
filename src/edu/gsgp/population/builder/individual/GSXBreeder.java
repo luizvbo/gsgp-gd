@@ -4,13 +4,12 @@
  * and open the template in the editor.
  */
 
-package edu.gsgp.population.generator;
+package edu.gsgp.population.builder.individual;
 
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.Utils;
-import edu.gsgp.Utils.DataType;
+import edu.gsgp.Utils.DatasetType;
 import edu.gsgp.data.Dataset;
-import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.data.Instance;
 import edu.gsgp.data.PropertiesManager;
 import edu.gsgp.nodes.Node;
@@ -27,28 +26,34 @@ import java.math.BigInteger;
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
 public class GSXBreeder extends Breeder{
-    private ExperimentalData experimentalData;
 
-    public GSXBreeder(ExperimentalData experimentalData,
-                      double probability, 
-                      PropertiesManager properties, 
-                      Population population) {
-        super(probability, properties, population);
-        this.experimentalData = experimentalData;
+    public GSXBreeder(PropertiesManager properties, Double probability) {
+        super(properties, probability);
     }
     
     private Fitness evaluate(GSGPIndividual ind1,
                             GSGPIndividual ind2, 
                             Node randomTree){
         Fitness fitnessFunction = ind1.getFitnessFunction().softClone();
-        for(DataType dataType : DataType.values()){
+        for(DatasetType dataType : DatasetType.values()){
             // Compute the (training/test) semantics of generated random tree
-            fitnessFunction.resetFitness(dataType, experimentalData);
-            Dataset dataset = experimentalData.getDataset(dataType);
+            fitnessFunction.resetFitness(dataType, properties.getExperimentalData());
+            Dataset dataset = properties.getExperimentalData().getDataset(dataType);
+            double[] semInd1;
+            double[] semInd2;
+            if(dataType == DatasetType.TRAINING){
+                semInd1 = ind1.getTrainingSemantics();
+                semInd2 = ind2.getTrainingSemantics();
+            }
+            else{
+                semInd1 = ind1.getTestSemantics();
+                semInd2 = ind2.getTestSemantics();
+            }
             int instanceIndex = 0;
             for (Instance instance : dataset) {
                 double rtValue = Utils.sigmoid(randomTree.eval(instance.input));
-                double estimated = rtValue*ind1.getTrainingSemantics()[instanceIndex] + (1-rtValue)*ind2.getTrainingSemantics()[instanceIndex];
+//                double estimated = rtValue*ind1.getTrainingSemantics()[instanceIndex] + (1-rtValue)*ind2.getTrainingSemantics()[instanceIndex];
+                double estimated = rtValue*semInd1[instanceIndex] + (1-rtValue)*semInd2[instanceIndex];
                 fitnessFunction.setSemanticsAtIndex(estimated, instance.output, instanceIndex++, dataType);
             }
             fitnessFunction.computeFitness(dataType);
@@ -58,13 +63,18 @@ public class GSXBreeder extends Breeder{
 
     @Override
     public Individual generateIndividual(MersenneTwister rndGenerator) {
-        GSGPIndividual p1 = (GSGPIndividual)properties.selectIndividual(population, rndGenerator);
-        GSGPIndividual p2 = (GSGPIndividual)properties.selectIndividual(population, rndGenerator);
-        while(p1.equals(p2)) p2 = (GSGPIndividual)properties.selectIndividual(population, rndGenerator);
+        GSGPIndividual p1 = (GSGPIndividual)properties.selectIndividual(originalPopulation, rndGenerator);
+        GSGPIndividual p2 = (GSGPIndividual)properties.selectIndividual(originalPopulation, rndGenerator);
+        while(p1.equals(p2)) p2 = (GSGPIndividual)properties.selectIndividual(originalPopulation, rndGenerator);
         Node rt = properties.getRandomTree(rndGenerator);
         BigInteger numNodes = p1.getNumNodes().add(p2.getNumNodes()).add(new BigInteger(rt.getNumNodes() + "")).add(BigInteger.ONE);
         Fitness fitnessFunction = evaluate(p1, p2, rt);
         GSGPIndividual offspring = new GSGPIndividual(numNodes, fitnessFunction);
         return offspring;
+    }
+
+    @Override
+    public Breeder softClone(PropertiesManager properties) {
+        return new GSXBreeder(properties, this.probability);
     }
 }

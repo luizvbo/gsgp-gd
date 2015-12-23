@@ -5,7 +5,7 @@
 */
 
 
-package edu.gsgp.population.builders;
+package edu.gsgp.population.builder.tree;
 
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.nodes.Node;
@@ -18,7 +18,7 @@ import edu.gsgp.nodes.terminals.Terminal;
  * luiz.vbo@gmail.com
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
-public abstract class IndividualBuilder {
+public abstract class TreeBuilder {
     
     /** The largest maximum tree depth RAMPED HALF-AND-HALF can specify. */
     protected int maxDepth;
@@ -30,7 +30,7 @@ public abstract class IndividualBuilder {
             
     protected Terminal[] terminals;
 
-    public IndividualBuilder(final int maxDepth, 
+    public TreeBuilder(final int maxDepth, 
                              final int minDepth, 
                              final Function[] functions,
                              final Terminal[] terminals) {

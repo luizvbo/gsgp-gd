@@ -6,7 +6,7 @@
 
 package edu.gsgp.data;
 
-import edu.gsgp.Utils.DataType;
+import edu.gsgp.Utils.DatasetType;
 
 /**
  * @author Luiz Otavio Vilas Boas Oliveira
@@ -33,7 +33,7 @@ public class ExperimentalData {
      * @param dataType Indicate what dataset to return
      * @return The selected dataset
      */
-    public Dataset getDataset(DataType dataType){
+    public Dataset getDataset(DatasetType dataType){
         switch(dataType){
             case TEST:
                 return test;
@@ -44,7 +44,7 @@ public class ExperimentalData {
         }
     }
 
-    public void setDataset(Dataset dataset, DataType dataType) {
+    public void setDataset(Dataset dataset, DatasetType dataType) {
         switch(dataType){
             case TEST:
                 test = dataset;

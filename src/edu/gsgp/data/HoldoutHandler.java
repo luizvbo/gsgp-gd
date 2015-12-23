@@ -102,20 +102,20 @@ public class HoldoutHandler implements DataProducer{
         if(rnd == null){
             Iterator<Instance> it = dataCopy.iterator();
             for(int i = 0; i < trainingSize; i++){
-                data.getDataset(Utils.DataType.TRAINING).add(it.next());
+                data.getDataset(Utils.DatasetType.TRAINING).add(it.next());
                 it.remove();
             }
             while(it.hasNext()){
-                data.getDataset(Utils.DataType.TEST).add(it.next());
+                data.getDataset(Utils.DatasetType.TEST).add(it.next());
                 it.remove();
             }
         }
         else{
             for(int i = 0; i < testSize; i++){
-                data.getDataset(Utils.DataType.TEST).add(dataCopy.remove(rnd.nextInt(dataCopy.size())));
+                data.getDataset(Utils.DatasetType.TEST).add(dataCopy.remove(rnd.nextInt(dataCopy.size())));
             }
             while(!dataCopy.isEmpty()){
-                data.getDataset(Utils.DataType.TRAINING).add(dataCopy.remove(rnd.nextInt(dataCopy.size())));
+                data.getDataset(Utils.DatasetType.TRAINING).add(dataCopy.remove(rnd.nextInt(dataCopy.size())));
             }
         }
         return data;
@@ -182,7 +182,7 @@ public class HoldoutHandler implements DataProducer{
 //            datasetFromFiles[i].training = DataReader.readInputDataFile(trainFiles.get(i));
 //            datasetFromFiles[i].test = DataReader.readInputDataFile(testFiles.get(i));
         }
-        numInputs = datasetFromFiles[0].getDataset(Utils.DataType.TRAINING).getInputNumber();
+        numInputs = datasetFromFiles[0].getDataset(Utils.DatasetType.TRAINING).getInputNumber();
     }
 
     @Override

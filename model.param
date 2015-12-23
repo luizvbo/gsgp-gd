@@ -1,22 +1,25 @@
+# Path to the parent parameter file. The child parameters overwrite the parent
+parent = 
 # Path for the training/test files. See experiment.sampling option for more details
-#experiment.data = /home/luiz/Dropbox/benchmark/particionado/reais/cpu-test-#.dat
-experiment.data = /home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/dados/noise_test/noisy/airfoil/airfoil-test-#.dat-0.05
+experiment.data = 
 # Output directory
-experiment.output.dir = /tmp/teste
-# Path to a file with the list of seeds to use during iterations
-experiment.seed = 123456
+experiment.output.dir = 
+# Seed (long int) used by the pseudo-random number generator
+experiment.seed = 
 # Identifier prefix for files
-experiment.file.prefix = GSGP
+experiment.file.prefix = 
 # List of terminals used to build new trees (separeted by commas)
-tree.build.terminals = gsgp.nodes.terminals.ERC
+tree.build.terminals = 
 # List of functions used to build new trees (separeted by commas)
-tree.build.functions = gsgp.nodes.functions.AQ, gsgp.nodes.functions.Sub, gsgp.nodes.functions.Add, gsgp.nodes.functions.Mul
+tree.build.functions = 
+# Fitness function adopted during the evolution
+pop.fitness = 
 # Builder used to generate trees for the initial population
-tree.build.builder = RHH
+tree.build.builder = 
 # Builder used to generate random trees for the semantic operators
-tree.build.builder.random.tree = GROW
+tree.build.builder.random.tree = 
 # Type of selector used to select individuals for next generations
-pop.ind.selector = TOURNAMENT
+pop.ind.selector = 
 # Type of experiment (cross-validation or holdout):
 # - If crossvalidation, uses splited data from a list of files. Use paths to the
 # files in the form /pathToFile/repeatedName#repeatedName, where # indicates 
@@ -26,26 +29,35 @@ pop.ind.selector = TOURNAMENT
 # where # is composed by the pattern (train|test)-i with i=0,1,...,n-1, where n is
 # the number of experiment files. E.g. /home/iris-#.dat, with 4 files (2x(train+test))
 # in the path will look for iris-train-0.dat, iris-test-0.dat, iris-train-1.dat and iris-test-1.dat
-experiment.design = crossvalidation
+experiment.design = 
 # Max depth allowed when building trees
-tree.build.max.depth = 6
+tree.build.max.depth = 
 # Min depth allowed when building trees
-tree.min.depth = 2
-# Number of experiment repetitions (per fold) - default = 1
-experiment.num.repetition = 6
-# Population size
-pop.size = 1000
+tree.min.depth = 
 # Number of generations
-evol.num.generation = 50
-# Tournament size, when using tournament as selector
-pop.ind.selector.tourn.size = 10
+evol.num.generation = 
+# Number of experiment repetitions (per fold) - default = 1
+experiment.num.repetition = 
+# Population size
+pop.size = 
+# Size of the pool of random trees used by GSX/GSM
+rt.pool.size = 
 # Number of threads (for parallel execution)
-evol.num.threads = 6
+evol.num.threads = 
+# Tournament size, when using tournament as selector
+pop.ind.selector.tourn.size = 
 # Minimum error to consider a hit
-evol.min.error = 0
+evol.min.error = 
 # Mutation step
-breed.mut.step = -1
-# Probability of applying the mutation operator
-breed.mut.prob = 0.5
-# Probability of applying the crossover operator
-breed.xover.prob = 0.5
+breed.mut.step = 
+# Indicate if the mutation step is absolute (false) or relative to the stardard deviation
+# of the outputs of the training set.
+breed.mut.step.sd = 
+# List of breeders classes used during the evolution. The list items must be comma separated and the propability
+# must follow the breeder class separated by a *. E.g.: 
+# edu.gsgp.population.builder.individual.BreederA*0.1, edu.gsgp.population.builder.individual.BreederB*0.9
+breed.list = 
+# Population Initializer class. Default: edu.gsgp.population.builder.individual.SimplePopulator
+pop.initializer = 
+# Number of attemtps before adding an individual in the population
+pop.initializer.attempts = 

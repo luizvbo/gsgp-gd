@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package edu.gsgp.population.generator;
+package edu.gsgp.population.builder.individual;
 
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.data.PropertiesManager;
@@ -16,23 +16,27 @@ import edu.gsgp.population.Population;
  * http://homepages.dcc.ufmg.br/~luizvbo/ 
  * luiz.vbo@gmail.com
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
+ * 
+ * Breeder methods are reponsible for the genetic operators throughout the evolution.
  */
-public abstract class Breeder {
+public abstract class Breeder extends IndividualBuilder{
     protected double probability;
-    protected PropertiesManager properties;
-    protected Population population;
-        
+    protected Population originalPopulation;
+    
+    protected Breeder(PropertiesManager properties, double probability) {
+        super(properties);
+        this.probability = probability;
+    }
+
     public double getProbability() {
         return probability;
     }
-
-    public Breeder(double probability,
-                   PropertiesManager properties,
-                   Population population) {
-        this.probability = probability;
-        this.properties = properties;
-        this.population = population;
-    }
+    
+    public abstract Breeder softClone(PropertiesManager properties);
     
     public abstract Individual generateIndividual(MersenneTwister rndGenerator);
+    
+    public void setup(Population originalPopulation){
+        this.originalPopulation = originalPopulation;
+    }
 }
