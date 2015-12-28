@@ -6,6 +6,7 @@
 
 package edu.gsgp;
 
+import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.population.GSGPIndividual;
 import edu.gsgp.population.Population;
 import edu.gsgp.population.Individual;
@@ -18,13 +19,24 @@ import edu.gsgp.population.Individual;
  */
 public class Statistics {
     public enum StatsType{
-        BEST_OF_GEN_SIZE, 
-        BEST_OF_GEN_TS_FIT, 
-        BEST_OF_GEN_TR_FIT, 
-        SOLUTION, 
-        SEMANTICS,
-        INITIAL_SEMANTICS;
+        BEST_OF_GEN_SIZE("individualSize.csv"), 
+        BEST_OF_GEN_TS_FIT("tsFitness.csv"), 
+        BEST_OF_GEN_TR_FIT("trFitness.csv"), 
+        SEMANTICS("outputs.csv"),
+        INITIAL_SEMANTICS("initialSemantics.csv");
+        
+        private final String filePath;
+
+        private StatsType(String filePath) {
+            this.filePath = filePath;
+        }
+        
+        public String getPath(){
+            return filePath;
+        }
     }
+    
+    protected ExperimentalData expData;
     
     protected String[] bestOfGenSize;
     protected String[] bestOfGenTsFitness;
@@ -37,11 +49,12 @@ public class Statistics {
     
     protected int currentGeneration;
     
-    public Statistics(int numGenerations) {
+    public Statistics(int numGenerations, ExperimentalData expData) {
         bestOfGenSize = new String[numGenerations+1];
         bestOfGenTsFitness = new String[numGenerations+1];
         bestOfGenTrFitness = new String[numGenerations+1];
         currentGeneration = 0;
+        this.expData = expData;
     }
     
     public void addGenerationStatistic(Population pop){        

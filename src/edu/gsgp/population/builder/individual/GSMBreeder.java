@@ -10,6 +10,7 @@ import edu.gsgp.MersenneTwister;
 import edu.gsgp.Utils;
 import edu.gsgp.Utils.DatasetType;
 import edu.gsgp.data.Dataset;
+import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.data.Instance;
 import edu.gsgp.data.PropertiesManager;
 import edu.gsgp.nodes.Node;
@@ -26,8 +27,8 @@ import java.math.BigInteger;
  */
 public class GSMBreeder extends Breeder{
 
-    public GSMBreeder(PropertiesManager properties, Double probability) {
-        super(properties, probability);
+    public GSMBreeder(PropertiesManager properties, ExperimentalData expData, Double probability) {
+        super(properties, expData, probability);
     }
     
     private Fitness evaluate(GSGPIndividual ind, 
@@ -36,8 +37,8 @@ public class GSMBreeder extends Breeder{
         Fitness fitnessFunction = ind.getFitnessFunction().softClone();
         for(DatasetType dataType : DatasetType.values()){
             // Compute the (training/test) semantics of generated random tree
-            fitnessFunction.resetFitness(dataType, properties.getExperimentalData());
-            Dataset dataset = properties.getExperimentalData().getDataset(dataType);
+            fitnessFunction.resetFitness(dataType, expData);
+            Dataset dataset = expData.getDataset(dataType);
             double[] semInd;
             if(dataType == DatasetType.TRAINING)
                 semInd = ind.getTrainingSemantics();
@@ -70,6 +71,6 @@ public class GSMBreeder extends Breeder{
     
     @Override
     public Breeder softClone(PropertiesManager properties) {
-        return new GSMBreeder(properties, this.probability);
+        return new GSMBreeder(properties, expData, probability);
     }
 }

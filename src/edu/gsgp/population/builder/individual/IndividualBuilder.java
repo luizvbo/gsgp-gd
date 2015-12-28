@@ -6,6 +6,7 @@
 
 package edu.gsgp.population.builder.individual;
 
+import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.data.PropertiesManager;
 
 /**
@@ -14,8 +15,10 @@ import edu.gsgp.data.PropertiesManager;
  */
 public abstract class IndividualBuilder {
     protected PropertiesManager properties;
+    protected ExperimentalData expData;
 
-    public IndividualBuilder(PropertiesManager properties) {
+    public IndividualBuilder(PropertiesManager properties, ExperimentalData expData) {
         this.properties = properties;
+        this.expData = expData;
     }
 }

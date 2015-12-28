@@ -7,6 +7,7 @@
 package edu.gsgp.population.builder.individual;
 
 import edu.gsgp.MersenneTwister;
+import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.data.PropertiesManager;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.Population;
@@ -23,8 +24,8 @@ public abstract class Breeder extends IndividualBuilder{
     protected double probability;
     protected Population originalPopulation;
     
-    protected Breeder(PropertiesManager properties, double probability) {
-        super(properties);
+    protected Breeder(PropertiesManager properties, ExperimentalData expData, double probability) {
+        super(properties, expData);
         this.probability = probability;
     }
 

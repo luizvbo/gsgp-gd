@@ -6,6 +6,7 @@
 
 package edu.gsgp;
 
+import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.population.Population;
 import edu.gsgp.population.Individual;
 import edu.gsgp.data.PropertiesManager;
@@ -22,12 +23,14 @@ import edu.gsgp.population.builder.individual.IndividualBuilder;
 public class GSGP {
     private final PropertiesManager properties;
     private final Statistics statistics;
+    private final ExperimentalData expData;
     private Population population;
 
-    public GSGP(PropertiesManager properties) throws Exception{
+    public GSGP(PropertiesManager properties, ExperimentalData expData) throws Exception{
         this.properties = properties;
         population = new Population();
-        statistics = new Statistics(properties.getNumGenerations());
+        statistics = new Statistics(properties.getNumGenerations(), expData);
+        this.expData = expData;
     }
     
     public void evolve() throws Exception{

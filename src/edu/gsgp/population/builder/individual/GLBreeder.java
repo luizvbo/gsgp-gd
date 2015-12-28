@@ -9,6 +9,7 @@ package edu.gsgp.population.builder.individual;
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.Utils.DatasetType;
 import edu.gsgp.data.Dataset;
+import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.data.Instance;
 import edu.gsgp.data.PropertiesManager;
 import edu.gsgp.population.GSGPIndividual;
@@ -32,14 +33,14 @@ public class GLBreeder extends Breeder{
     private int numIndGreaterTarget[];
     private int numIndLessTarget[];
         
-    public GLBreeder(PropertiesManager properties, Double probability) {
-        super(properties, probability);
+    public GLBreeder(PropertiesManager properties, ExperimentalData expData, Double probability) {
+        super(properties, expData, probability);
     }
     
     
     @Override
     public Breeder softClone(PropertiesManager properties) {
-        return new GLBreeder(properties, this.probability);
+        return new GLBreeder(properties, expData, this.probability);
     }
 
     @Override
@@ -49,7 +50,7 @@ public class GLBreeder extends Breeder{
         // UpperBound: alpha <= ub
         // LowerBound: lb <= alpha
         int numUpperBounds = 0;
-        Dataset trainingData = properties.getExperimentalData().getDataset(DatasetType.TRAINING);
+        Dataset trainingData = expData.getDataset(DatasetType.TRAINING);
         // Compute the restrictions regarding alpha to put the inidividual in the correct position
         for(int i = 0; i < numIndGreaterTarget.length; i++){
             double pSem = p.getTrainingSemantics()[i];
@@ -118,8 +119,8 @@ public class GLBreeder extends Breeder{
         Fitness fitnessFunction = ind.getFitnessFunction().softClone();
         for(DatasetType dataType : DatasetType.values()){
             // Compute the (training/test) semantics of generated random tree
-            fitnessFunction.resetFitness(dataType, properties.getExperimentalData());
-            Dataset dataset = properties.getExperimentalData().getDataset(dataType);
+            fitnessFunction.resetFitness(dataType, expData);
+            Dataset dataset = expData.getDataset(dataType);
             double[] semInd;
             if(dataType == DatasetType.TRAINING)
                 semInd = ind.getTrainingSemantics();
@@ -138,7 +139,7 @@ public class GLBreeder extends Breeder{
     @Override
     public void setup(Population originalPop){
         super.setup(originalPop);
-        Dataset trainingData = properties.getExperimentalData().getDataset(DatasetType.TRAINING);
+        Dataset trainingData = expData.getDataset(DatasetType.TRAINING);
         numIndGreaterTarget = new int[trainingData.size()];
         numIndLessTarget = new int[trainingData.size()];
         for(int i = 0; i < numIndGreaterTarget.length; i++){

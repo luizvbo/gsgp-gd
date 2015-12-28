@@ -7,6 +7,7 @@
 package edu.gsgp.population.builder.individual;
 
 import edu.gsgp.MersenneTwister;
+import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.data.PropertiesManager;
 import edu.gsgp.population.Population;
 
@@ -19,8 +20,8 @@ import edu.gsgp.population.Population;
  * Populator methods are responsible for the population initialization
  */
 public abstract class Populator extends IndividualBuilder{
-    public Populator(PropertiesManager properties) {
-        super(properties);
+    public Populator(PropertiesManager properties, ExperimentalData expData) {
+        super(properties, expData);
     }
     
     public abstract Population populate(MersenneTwister rndGenerator, int size);

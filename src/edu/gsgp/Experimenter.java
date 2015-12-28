@@ -9,6 +9,9 @@ package edu.gsgp;
 import edu.gsgp.data.DataProducer;
 import edu.gsgp.data.DataWriter;
 import edu.gsgp.data.PropertiesManager;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Luiz Otavio Vilas Boas Oliveira
@@ -21,7 +24,7 @@ public class Experimenter {
     
     protected DataProducer dataProducer;
     
-    public Experimenter(String[] args) throws Exception{
+     public Experimenter(String[] args) throws Exception{
         parameters = new PropertiesManager(args);
         if(parameters.isParameterLoaded())
             execute();
@@ -29,23 +32,57 @@ public class Experimenter {
     
     private void execute(){
         try {
-            Statistics[] stats = new Statistics[parameters.getNumExperiments()];
+            Experiment experiments[] = new Experiment[parameters.getNumExperiments()];
+            int numThreads = Math.min(parameters.getNumThreads(), parameters.getNumExperiments());
+            ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 //            DataWriter.resetInitialSemantics(parameters.getOutputDir(), parameters.getFilePrefix());
             
             // Run the algorithm for a defined number of repetitions
             for(int execution = 0; execution < parameters.getNumExperiments(); execution++){
-                System.out.println("Execution " + (execution+1) + ":");
+//                System.out.println("Execution " + (execution+1) + ":");
                 parameters.updateExperimentalData();
-                GSGP sgp = new GSGP(parameters);
-                sgp.evolve();
-                stats[execution] = sgp.getStatistics();
+                experiments[execution] = new Experiment(new GSGP(parameters, parameters.getExperimentalData()), execution);
+                executor.execute(experiments[execution]);
+                
+//                sgp.evolve();
+//                stats[execution] = sgp.getStatistics();
 //                DataWriter.writeInitialSemantics(parameters.getOutputDir(), parameters.getFilePrefix(), stats[execution]);
 //                stats[execution].resetInitialSemantics();
             }
-            DataWriter.writeResults(parameters.getOutputDir(), parameters.getFilePrefix(), stats);
-            DataWriter.writeOutputs(parameters.getOutputDir(), parameters.getFilePrefix(), stats, parameters.getExperimentalData());
+            executor.shutdown();
+            executor.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+            
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+    
+    private class Experiment implements Runnable{
+        GSGP gsgpInstance;
+        int id;
+
+        public Experiment(GSGP gsgpInstance, int id) {
+            this.gsgpInstance = gsgpInstance;
+            this.id = id;
+        }
+        
+        private synchronized void writeStatistics() throws Exception{
+            DataWriter.writeResults(parameters.getOutputDir(), 
+                    parameters.getFilePrefix(), 
+                    gsgpInstance.getStatistics(), id);
+        }
+        
+        @Override
+        public void run() {
+            try{
+                gsgpInstance.evolve();
+                writeStatistics();
+                
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        
     }
 }

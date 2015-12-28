@@ -9,6 +9,7 @@ package edu.gsgp.population.builder.individual;
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.Utils.DatasetType;
 import edu.gsgp.data.Dataset;
+import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.data.Instance;
 import edu.gsgp.data.PropertiesManager;
 import edu.gsgp.nodes.Node;
@@ -26,8 +27,8 @@ import edu.gsgp.population.fitness.Fitness;
  */
 public class SimplePopulator extends Populator{
 
-    public SimplePopulator(PropertiesManager properties) {
-        super(properties);
+    public SimplePopulator(PropertiesManager properties, ExperimentalData expData) {
+        super(properties, expData);
     }
     
     /**
@@ -39,8 +40,8 @@ public class SimplePopulator extends Populator{
         Fitness fitnessFunction = properties.geFitnessFunction();
         for(DatasetType dataType : DatasetType.values()){
             // Compute the (training/test) semantics of generated random tree
-            fitnessFunction.resetFitness(dataType, properties.getExperimentalData());
-            Dataset dataset = properties.getExperimentalData().getDataset(dataType);
+            fitnessFunction.resetFitness(dataType, expData);
+            Dataset dataset = expData.getDataset(dataType);
             int instanceIndex = 0;
             for (Instance instance : dataset) {
                 double estimated = newTree.eval(instance.input);

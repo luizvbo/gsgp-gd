@@ -7,9 +7,9 @@
 package edu.gsgp.population.builder.individual;
 
 import edu.gsgp.MersenneTwister;
+import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.data.PropertiesManager;
 import edu.gsgp.population.Individual;
-import edu.gsgp.population.Population;
 
 /**
  * @author Luiz Otavio Vilas Boas Oliveira
@@ -19,12 +19,12 @@ import edu.gsgp.population.Population;
  */
 public class ReproductionBreeder extends Breeder {
 
-    public ReproductionBreeder(PropertiesManager properties, Double probability) {
-        super(properties, probability);
-    }
+//    public ReproductionBreeder(PropertiesManager properties, ExperimentalData expData,  Double probability) {
+//        super(properties, expData, probability);
+//    }
     
-    public ReproductionBreeder(PropertiesManager properties, double probability) {
-        super(properties, probability);
+    public ReproductionBreeder(PropertiesManager properties, ExperimentalData expData, double probability) {
+        super(properties, expData, probability);
     }
 
     @Override
@@ -34,6 +34,6 @@ public class ReproductionBreeder extends Breeder {
     
     @Override
     public Breeder softClone(PropertiesManager properties) {
-        return new ReproductionBreeder(properties, this.probability);
+        return new ReproductionBreeder(properties, expData, this.probability);
     }
 }
