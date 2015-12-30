@@ -19,11 +19,14 @@ import edu.gsgp.population.Population;
  * 
  * Populator methods are responsible for the population initialization
  */
-public abstract class Populator extends IndividualBuilder{
-    public Populator(PropertiesManager properties, ExperimentalData expData) {
-        super(properties, expData);
+public abstract class Populator{
+    protected PropertiesManager properties;
+    
+    public Populator(PropertiesManager properties) {
+        this.properties = properties;
     }
     
-    public abstract Population populate(MersenneTwister rndGenerator, int size);
-    
+    public abstract Population populate(MersenneTwister rndGenerator, ExperimentalData expData, int size);
+
+    public abstract Populator softClone();
 }

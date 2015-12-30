@@ -27,13 +27,14 @@ import java.math.BigInteger;
  */
 public class GSMBreeder extends Breeder{
 
-    public GSMBreeder(PropertiesManager properties, ExperimentalData expData, Double probability) {
-        super(properties, expData, probability);
+    public GSMBreeder(PropertiesManager properties, Double probability) {
+        super(properties, probability);
     }
     
     private Fitness evaluate(GSGPIndividual ind, 
                              Node randomTree1,
-                             Node randomTree2){
+                             Node randomTree2, 
+                             ExperimentalData expData){
         Fitness fitnessFunction = ind.getFitnessFunction().softClone();
         for(DatasetType dataType : DatasetType.values()){
             // Compute the (training/test) semantics of generated random tree
@@ -57,20 +58,20 @@ public class GSMBreeder extends Breeder{
     }
 
     @Override
-    public Individual generateIndividual(MersenneTwister rndGenerator) {
+    public Individual generateIndividual(MersenneTwister rndGenerator, ExperimentalData expData) {
         GSGPIndividual p = (GSGPIndividual)properties.selectIndividual(originalPopulation, rndGenerator);
         Node rt1 = properties.getRandomTree(rndGenerator);
         Node rt2 = properties.getRandomTree(rndGenerator);
         BigInteger numNodes = p.getNumNodes().add(new BigInteger(rt1.getNumNodes()+"")).
                                               add(new BigInteger(rt2.getNumNodes()+"")).
                                               add(BigInteger.ONE);
-        Fitness fitnessFunction = evaluate(p, rt1, rt2);
+        Fitness fitnessFunction = evaluate(p, rt1, rt2, expData);
         GSGPIndividual offspring = new GSGPIndividual(numNodes, fitnessFunction);
         return offspring;
     }
     
     @Override
     public Breeder softClone(PropertiesManager properties) {
-        return new GSMBreeder(properties, expData, probability);
+        return new GSMBreeder(properties, probability);
     }
 }

@@ -44,7 +44,11 @@ public class DataWriter {
                                     String outputPrefix, 
                                     Statistics statistic,
                                     int experimentId) throws Exception{
-        for(StatsType type : StatsType.values()){
+        StatsType writeableStats[] = {StatsType.BEST_OF_GEN_SIZE, 
+                                     StatsType.BEST_OF_GEN_TR_FIT, 
+                                     StatsType.BEST_OF_GEN_TS_FIT,
+                                     StatsType.SEMANTICS };
+        for(StatsType type : writeableStats){
             writeOnFile(outputPath, outputPrefix, 
                     experimentId + "," + statistic.asWritableString(type) + "\n", type);
         }
@@ -84,7 +88,7 @@ public class DataWriter {
         outputDir.mkdirs();
         // Object to write results on file
         BufferedWriter bw;
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + statsType.getPath()));
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + statsType.getPath(), true));
         bw.write(info);
         bw.close();
     }

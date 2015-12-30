@@ -12,7 +12,8 @@ import edu.gsgp.population.Individual;
 import edu.gsgp.data.PropertiesManager;
 import edu.gsgp.population.builder.individual.Breeder;
 import edu.gsgp.population.builder.individual.PopulationGenerator;
-import edu.gsgp.population.builder.individual.IndividualBuilder;
+import edu.gsgp.population.builder.individual.Populator;
+import edu.gsgp.population.pipeline.Pipeline;
 
 /**
  * @author Luiz Otavio Vilas Boas Oliveira
@@ -24,39 +25,31 @@ public class GSGP {
     private final PropertiesManager properties;
     private final Statistics statistics;
     private final ExperimentalData expData;
-    private Population population;
+    private final MersenneTwister rndGenerator;
 
     public GSGP(PropertiesManager properties, ExperimentalData expData) throws Exception{
         this.properties = properties;
-        population = new Population();
-        statistics = new Statistics(properties.getNumGenerations(), expData);
         this.expData = expData;
+        statistics = new Statistics(properties.getNumGenerations(), expData);
+        rndGenerator = properties.getRandomGenerator();
     }
     
     public void evolve() throws Exception{
         boolean canStop = false;
         
-        IndividualBuilder indBuilderArray[] = new IndividualBuilder[1];
-        indBuilderArray[0] =  properties.getPopulationInitializer();
+        Populator populator = properties.getPopulationInitializer();
+        Population population = populator.populate(rndGenerator, expData, properties.getPopulationSize());
         
-        PopulationGenerator popGenerator = new PopulationGenerator(properties, indBuilderArray, properties.getPopulationSize());
-        population = popGenerator.populate();
+        Pipeline pipe = properties.getPipeline();
+        pipe.setup(properties, statistics, expData, rndGenerator);
         
-//        statistics.setInitialSemantics(population);
         statistics.addGenerationStatistic(population);
-        
-        indBuilderArray = properties.getBreederList();
         
         for(int i = 0; i < properties.getNumGenerations() && !canStop; i++){
             System.out.println("Generation " + (i+1) + ":");
-            
-            // Update the breeder with the current population before generating a new one
-            for(IndividualBuilder breeder : indBuilderArray) ((Breeder)breeder).setup(population);
-            
-            popGenerator = new PopulationGenerator(properties, indBuilderArray, properties.getPopulationSize()-1);
-            
-            // Merge to compose the new Population
-            Population newPopulation = popGenerator.populate();
+                        
+            // Evolve a new Population
+            Population newPopulation = pipe.evolvePopulation(population, expData, properties.getPopulationSize()-1);
             // The first position is reserved for the best of the generation (elitism)
             newPopulation.add(population.getBestIndividual());
             Individual bestIndividual = newPopulation.getBestIndividual();

@@ -43,11 +43,6 @@ public class Experimenter {
                 parameters.updateExperimentalData();
                 experiments[execution] = new Experiment(new GSGP(parameters, parameters.getExperimentalData()), execution);
                 executor.execute(experiments[execution]);
-                
-//                sgp.evolve();
-//                stats[execution] = sgp.getStatistics();
-//                DataWriter.writeInitialSemantics(parameters.getOutputDir(), parameters.getFilePrefix(), stats[execution]);
-//                stats[execution].resetInitialSemantics();
             }
             executor.shutdown();
             executor.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
@@ -81,6 +76,7 @@ public class Experimenter {
             }
             catch (Exception ex) {
                 ex.printStackTrace();
+                System.exit(0);
             }
         }
         

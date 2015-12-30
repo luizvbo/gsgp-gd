@@ -77,7 +77,7 @@ public class Statistics {
         currentGeneration++;
     }
 
-    public void setInitialSemantics(Population population) {
+    private void setInitialSemantics(Population population) {
         initialSemantics = new double[population.size()][];
         int i = 0;
         for(Individual ind : population){
@@ -90,7 +90,7 @@ public class Statistics {
         bestTrainingSemantics = bestIndividual.getTrainingSemantics();
     }
     
-    public void resetInitialSemantics() {
+    private void resetInitialSemantics() {
         initialSemantics = null;
     }
     

@@ -23,17 +23,17 @@ public class ReproductionBreeder extends Breeder {
 //        super(properties, expData, probability);
 //    }
     
-    public ReproductionBreeder(PropertiesManager properties, ExperimentalData expData, double probability) {
-        super(properties, expData, probability);
+    public ReproductionBreeder(PropertiesManager properties, double probability) {
+        super(properties, probability);
     }
 
     @Override
-    public Individual generateIndividual(MersenneTwister rndGenerator) {
+    public Individual generateIndividual(MersenneTwister rndGenerator, ExperimentalData expData) {
         return properties.selectIndividual(originalPopulation, rndGenerator).clone();
     }
     
     @Override
     public Breeder softClone(PropertiesManager properties) {
-        return new ReproductionBreeder(properties, expData, this.probability);
+        return new ReproductionBreeder(properties, this.probability);
     }
 }

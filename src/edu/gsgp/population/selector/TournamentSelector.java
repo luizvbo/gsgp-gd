@@ -26,7 +26,7 @@ public class TournamentSelector implements IndividualSelector{
     }
     
     @Override
-    public Individual selectIndividual(Population population, MersenneTwister rnd){
+    public Individual selectIndividual(Population population, MersenneTwister rnd) throws NullPointerException{
         int popSize = population.size();
         ArrayList<Integer> indexes = new ArrayList<>();
         for(int i = 0; i < popSize; i++) indexes.add(i);

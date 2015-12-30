@@ -32,19 +32,24 @@ public class GLBreeder extends Breeder{
     // Store the number of inidividuals greater (and less) than the target in each dimension
     private int numIndGreaterTarget[];
     private int numIndLessTarget[];
+    // Probability of applying the operator in standalone
+    private double effectiveProb;
         
-    public GLBreeder(PropertiesManager properties, ExperimentalData expData, Double probability) {
-        super(properties, expData, probability);
+    public GLBreeder(PropertiesManager properties, Double probability) {
+        super(properties, probability);
     }
-    
     
     @Override
     public Breeder softClone(PropertiesManager properties) {
-        return new GLBreeder(properties, expData, this.probability);
+        return new GLBreeder(properties, this.probability);
+    }
+
+    public double getEffectiveProb() {
+        return effectiveProb;
     }
 
     @Override
-    public Individual generateIndividual(MersenneTwister rndGenerator) {
+    public Individual generateIndividual(MersenneTwister rndGenerator, ExperimentalData expData) {
         GSGPIndividual p = (GSGPIndividual)properties.selectIndividual(originalPopulation, rndGenerator);
         ArrayList<Bound> bounds = new ArrayList<Bound>();
         // UpperBound: alpha <= ub
@@ -109,13 +114,13 @@ public class GLBreeder extends Breeder{
         else 
             alpha = bounds.get(maxCovIndex).value + 
                     (bounds.get(maxCovIndex+1).value - bounds.get(maxCovIndex).value) * rndGenerator.nextDouble();
-        Fitness fitnessFunction = evaluate(p, alpha);
+        Fitness fitnessFunction = evaluate(p, alpha, expData);
         BigInteger numNodes = p.getNumNodes().add(new BigInteger(""+2));
         GSGPIndividual offspring = new GSGPIndividual(numNodes, fitnessFunction);
         return offspring;
     }
     
-    private Fitness evaluate(GSGPIndividual ind, double alpha){
+    private Fitness evaluate(GSGPIndividual ind, double alpha, ExperimentalData expData){
         Fitness fitnessFunction = ind.getFitnessFunction().softClone();
         for(DatasetType dataType : DatasetType.values()){
             // Compute the (training/test) semantics of generated random tree
@@ -136,9 +141,26 @@ public class GLBreeder extends Breeder{
         return fitnessFunction;
     }
     
+    /**
+     * Set the parameters for standalone use
+     * @param originalPop Current population in the generation
+     * @param expData Experimental data used to evaluate the individuals
+     * @param currentGen Index of the current generation (1 to max_number_generations)
+     */
+    public void setup(Population originalPop, ExperimentalData expData, int currentGen){
+        setup(originalPop, expData);
+        effectiveProb = -properties.getSpreaderAlpha()*currentGen/properties.getNumGenerations();
+        effectiveProb = properties.getSpreaderInitProb()*Math.exp(effectiveProb);
+    }
+    
+    /**
+     * Set the parameters for use as breeder operator
+     * @param originalPop Current population in the generation
+     * @param expData Experimental data used to evaluate the individuals
+     */
     @Override
-    public void setup(Population originalPop){
-        super.setup(originalPop);
+    public void setup(Population originalPop, ExperimentalData expData){
+        super.setup(originalPop, expData);
         Dataset trainingData = expData.getDataset(DatasetType.TRAINING);
         numIndGreaterTarget = new int[trainingData.size()];
         numIndLessTarget = new int[trainingData.size()];

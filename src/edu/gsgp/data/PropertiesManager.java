@@ -34,6 +34,7 @@ import edu.gsgp.population.builder.individual.Breeder;
 import edu.gsgp.population.builder.individual.Populator;
 import edu.gsgp.population.builder.tree.TreeBuilder;
 import edu.gsgp.population.fitness.Fitness;
+import edu.gsgp.population.pipeline.Pipeline;
 import edu.gsgp.population.selector.IndividualSelector;
 import edu.gsgp.population.selector.TournamentSelector;
 import java.io.FileNotFoundException;
@@ -75,10 +76,14 @@ public class PropertiesManager {
     
     private double minError;
     private double mutationStep;
+    private double spreaderInitProb;
+    private double spreaderAlpha;
+    
 //    private double mutProb;
 //    private double xoverProb;
 //    private double semSimThres;
     private Populator populationInitializer;
+    private Pipeline pipeline;
     private Breeder[] breederList;
     private Fitness fitnessFunction;
     private Terminal[] terminalSet;
@@ -115,6 +120,9 @@ public class PropertiesManager {
         mutationStep = getDoubleProperty(ParameterList.MUT_STEP, 0.1);
         mutStepFromSD = getBooleanProperty(ParameterList.MUT_STEP_SD, true);
         
+        spreaderInitProb = getDoubleProperty(ParameterList.SPREADER_PROB, 0.5);
+        spreaderAlpha = getDoubleProperty(ParameterList.SPREADER_ALPHA, 2);
+        
 //        mutProb = getDoubleProperty(ParameterList.MUT_PROB, 0.5);
 //        xoverProb = getDoubleProperty(ParameterList.XOVER_PROB, 0.5);
 //        semSimThres = getDoubleProperty(ParameterList.SEMANTIC_SIMILARITY_THRESHOLD, 0.1);
@@ -123,7 +131,7 @@ public class PropertiesManager {
         
         individualBuilder = getIndividualBuilder(false);
         randomTreeBuilder = getIndividualBuilder(true);
-        
+        pipeline = getPipelineObject();
         populationInitializer = getPopInitObject();
         breederList = getBreederObjects();
         
@@ -170,7 +178,11 @@ public class PropertiesManager {
                                   + "\n# must follow the breeder class separated by a *. E.g.: "
                                   + "\n# edu.gsgp.population.builder.individual.BreederA*0.1, edu.gsgp.population.builder.individual.BreederB*0.9", true),
         POP_INITIALIZER("pop.initializer", "Population Initializer class. Default: edu.gsgp.population.builder.individual.SimplePopulator", true),
-        POP_INIT_ATTEMPTS("pop.initializer.attempts", "Number of attemtps before adding an individual in the population", false);
+        POP_PIPELINE("pop.pipeline", "Class responsible for evolve a new population from a previous one", false),
+        POP_INIT_ATTEMPTS("pop.initializer.attempts", "Number of attemtps before adding an individual in the population", false),
+        
+        SPREADER_PROB("breed.spread.prob", "Probability of applying the spreader operator (in standalone mode)", false),
+        SPREADER_ALPHA("breed.spread.alpha", "Alpha used to compute the effective probability of applying the spreader", false);
 //        MUT_PROB("breed.mut.prob", "Probability of applying the mutation operator", false),
 //        XOVER_PROB("breed.xover.prob", "Probability of applying the crossover operator", false),
 //        SEMANTIC_SIMILARITY_THRESHOLD("sem.gp.epsilon", "Threshold used to determine if two semantics are similar", false);
@@ -544,6 +556,24 @@ public class PropertiesManager {
     }
     
     /**
+     * Get the pipeline object from the file
+     * @return A new pipeline object
+     * @throws Exception Parameter not found, error while parsing the Pipeline type 
+     */
+    private Pipeline getPipelineObject() throws Exception{
+        String populatorClassname = "";
+        try {            
+            populatorClassname = getStringProperty(ParameterList.POP_PIPELINE, false).replaceAll("\\s", "");
+            Class<?> populatorClass = Class.forName(populatorClassname);
+            Constructor<?> populatorConstructor = populatorClass.getConstructor();
+            return (Pipeline)populatorConstructor.newInstance();
+        } 
+        catch (ClassNotFoundException e) {
+            throw new ClassNotFoundException("Error loading the pipeline. Class " + populatorClassname + " not found", e);
+        } 
+    }
+    
+    /**
      * Get the fitness object from the file
      * @return A new fintess function
      * @throws Exception Parameter not found, error while parsing the Fitness type
@@ -595,9 +625,11 @@ public class PropertiesManager {
                 .build());
     }
 
-    /********************************** Public getters **********************************/
-    public MersenneTwister getMersennePRNG() {
-        return mersennePRNG;
+    //********************************** Public getters **********************************
+    
+    public MersenneTwister getRandomGenerator() {
+        long newSeed = mersennePRNG.nextLong();
+        return new MersenneTwister(newSeed);
     }
 
     public int getPopulationSize() {
@@ -608,6 +640,10 @@ public class PropertiesManager {
         return numExperiments;
     }
 
+    /**
+     * Return the number of generations to be performed during the evolution
+     * @return The number of generations
+     */
     public int getNumGenerations() {
         return numGenerations;
     }
@@ -626,6 +662,14 @@ public class PropertiesManager {
 
     public double getMinError() {
         return minError;
+    }
+
+    public double getSpreaderAlpha() {
+        return spreaderAlpha;
+    }
+
+    public double getSpreaderInitProb() {
+        return spreaderInitProb;
     }
 
     /**
@@ -672,10 +716,6 @@ public class PropertiesManager {
         return randomTreeBuilder.newRootedTree(0, rnd);
     }
     
-    public Node  getRandomTree(){
-        return randomTreeBuilder.newRootedTree(0, mersennePRNG);
-    }
-    
     public Node getNewIndividualTree(MersenneTwister rnd){
         return individualBuilder.newRootedTree(0, rnd);
     }
@@ -710,12 +750,13 @@ public class PropertiesManager {
     
     /**
      * Return a copy of the terminal set, to avoid modifications in the original set.
+     * @param rnd Random number generator used during terminal cloning
      * @return A copy of the terminal set
      */
-    public Terminal[] getTerminalSet() {
+    public Terminal[] getTerminalSet(MersenneTwister rnd){
         Terminal[] copyTerminalSet = new Terminal[terminalSet.length];
         for(int i = 0; i < terminalSet.length; i++){
-            copyTerminalSet[i] = terminalSet[i].softClone(mersennePRNG);
+            copyTerminalSet[i] = terminalSet[i].softClone(rnd);
         }
         return copyTerminalSet;
     }
@@ -735,8 +776,12 @@ public class PropertiesManager {
         return generators;
     }
 
+    public Pipeline getPipeline() {
+        return pipeline.softClone();
+    }
+    
     public Populator getPopulationInitializer() {
-        return populationInitializer;
+        return populationInitializer.softClone();
     }
 
     /**

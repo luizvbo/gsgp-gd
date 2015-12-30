@@ -20,12 +20,13 @@ import edu.gsgp.population.Population;
  * 
  * Breeder methods are reponsible for the genetic operators throughout the evolution.
  */
-public abstract class Breeder extends IndividualBuilder{
+public abstract class Breeder{
+    protected PropertiesManager properties;
     protected double probability;
     protected Population originalPopulation;
     
-    protected Breeder(PropertiesManager properties, ExperimentalData expData, double probability) {
-        super(properties, expData);
+    protected Breeder(PropertiesManager properties, double probability) {
+        this.properties = properties;
         this.probability = probability;
     }
 
@@ -35,9 +36,9 @@ public abstract class Breeder extends IndividualBuilder{
     
     public abstract Breeder softClone(PropertiesManager properties);
     
-    public abstract Individual generateIndividual(MersenneTwister rndGenerator);
+    public abstract Individual generateIndividual(MersenneTwister rndGenerator, ExperimentalData expData);
     
-    public void setup(Population originalPopulation){
+    public void setup(Population originalPopulation, ExperimentalData expData){
         this.originalPopulation = originalPopulation;
     }
 }

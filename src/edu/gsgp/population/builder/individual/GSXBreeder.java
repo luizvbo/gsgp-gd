@@ -27,13 +27,14 @@ import java.math.BigInteger;
  */
 public class GSXBreeder extends Breeder{
 
-    public GSXBreeder(PropertiesManager properties, ExperimentalData expData, Double probability) {
-        super(properties, expData, probability);
+    public GSXBreeder(PropertiesManager properties, Double probability) {
+        super(properties, probability);
     }
     
     private Fitness evaluate(GSGPIndividual ind1,
                             GSGPIndividual ind2, 
-                            Node randomTree){
+                            Node randomTree, 
+                            ExperimentalData expData){
         Fitness fitnessFunction = ind1.getFitnessFunction().softClone();
         for(DatasetType dataType : DatasetType.values()){
             // Compute the (training/test) semantics of generated random tree
@@ -62,19 +63,19 @@ public class GSXBreeder extends Breeder{
     }
 
     @Override
-    public Individual generateIndividual(MersenneTwister rndGenerator) {
+    public Individual generateIndividual(MersenneTwister rndGenerator, ExperimentalData expData) {
         GSGPIndividual p1 = (GSGPIndividual)properties.selectIndividual(originalPopulation, rndGenerator);
         GSGPIndividual p2 = (GSGPIndividual)properties.selectIndividual(originalPopulation, rndGenerator);
         while(p1.equals(p2)) p2 = (GSGPIndividual)properties.selectIndividual(originalPopulation, rndGenerator);
         Node rt = properties.getRandomTree(rndGenerator);
         BigInteger numNodes = p1.getNumNodes().add(p2.getNumNodes()).add(new BigInteger(rt.getNumNodes() + "")).add(BigInteger.ONE);
-        Fitness fitnessFunction = evaluate(p1, p2, rt);
+        Fitness fitnessFunction = evaluate(p1, p2, rt, expData);
         GSGPIndividual offspring = new GSGPIndividual(numNodes, fitnessFunction);
         return offspring;
     }
 
     @Override
     public Breeder softClone(PropertiesManager properties) {
-        return new GSXBreeder(properties, expData, probability);
+        return new GSXBreeder(properties, probability);
     }
 }

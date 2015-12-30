@@ -27,8 +27,8 @@ import edu.gsgp.population.fitness.Fitness;
  */
 public class SimplePopulator extends Populator{
 
-    public SimplePopulator(PropertiesManager properties, ExperimentalData expData) {
-        super(properties, expData);
+    public SimplePopulator(PropertiesManager properties) {
+        super(properties);
     }
     
     /**
@@ -36,7 +36,7 @@ public class SimplePopulator extends Populator{
      * @param newTree The tree to be evaluated
      * @return The fitness of the input tree
      */
-    private Fitness evaluate(Node newTree){
+    private Fitness evaluate(Node newTree, ExperimentalData expData){
         Fitness fitnessFunction = properties.geFitnessFunction();
         for(DatasetType dataType : DatasetType.values()){
             // Compute the (training/test) semantics of generated random tree
@@ -56,17 +56,23 @@ public class SimplePopulator extends Populator{
      * Generate a population of inidividuals created from the initialization tree method
      * given in the parameter file
      * @param rndGenerator Pseudorandom number generator
+     * @param expData Experimental data used to evaluate the inidividual
      * @param size Size of the population to be generated
      * @return The generated popualtion
      */
     @Override
-    public Population populate(MersenneTwister rndGenerator, int size) {
+    public Population populate(MersenneTwister rndGenerator, ExperimentalData expData, int size) {
         Population population = new Population();
         for(int i = 0; i < size; i++){
             Node newTree = properties.getNewIndividualTree(rndGenerator);
-            Fitness fitnessFunction = evaluate(newTree);
+            Fitness fitnessFunction = evaluate(newTree, expData);
             population.add(new GSGPIndividual(newTree, newTree.getNumNodes(), fitnessFunction));
         }
         return population;
+    }
+
+    @Override
+    public Populator softClone() {
+        return new SimplePopulator(properties);
     }
 }

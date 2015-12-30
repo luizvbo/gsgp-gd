@@ -33,8 +33,8 @@ import edu.gsgp.population.fitness.Fitness;
  * @author luiz
  */
 public class SDIPopulator extends Populator{
-    public SDIPopulator(PropertiesManager properties, ExperimentalData expData) {
-        super(properties,  expData);
+    public SDIPopulator(PropertiesManager properties) {
+        super(properties);
     }
     
     /**
@@ -42,7 +42,7 @@ public class SDIPopulator extends Populator{
      * @param ind Individual to be evaluated
      * @return The computed fitness function w.r.t. the evaluated individual
      */
-    private Fitness evaluate(Node newTree){
+    private Fitness evaluate(Node newTree, ExperimentalData expData){
         Fitness fitnessFunction = properties.geFitnessFunction();
         for(DatasetType dataType : DatasetType.values()){
             // Compute the (training/test) semantics of generated random tree
@@ -65,14 +65,14 @@ public class SDIPopulator extends Populator{
      * @return The generated popualtion
      */
     @Override
-    public Population populate(MersenneTwister rndGenerator, int size) {        
+    public Population populate(MersenneTwister rndGenerator, ExperimentalData expData, int size) {        
         Population population = new Population();
-        Terminal[] terminalSet = properties.getTerminalSet();
+        Terminal[] terminalSet = properties.getTerminalSet(rndGenerator);
         // Initialize pop with all the Inputs
         for(Terminal t : terminalSet){
             if(t instanceof Input){
                 Node newTree = t.softClone(rndGenerator);
-                Fitness fitnessFunction = evaluate(newTree);
+                Fitness fitnessFunction = evaluate(newTree, expData);
                 GSGPIndividual newIndividual = new GSGPIndividual(newTree, fitnessFunction);
                 // Add the new inidividual to the list of building blocks
                 population.add(newIndividual);
@@ -93,7 +93,7 @@ public class SDIPopulator extends Populator{
                 func.addNode(newTree, i);
             }
             // Evaluate the new function
-            Fitness fitnessFunction = evaluate(func);
+            Fitness fitnessFunction = evaluate(func, expData);
             // Keep the new function in memory, if this is the first attemp to add
             if(numAttempts == 0){
                 candidateFunc = func;
@@ -148,6 +148,11 @@ public class SDIPopulator extends Populator{
                 return false;
         }
         return true;
+    }
+
+    @Override
+    public Populator softClone() {
+        return new SDIPopulator(properties);
     }
 }
 
