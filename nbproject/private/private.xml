@@ -3,12 +3,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/projetos/GSGP_java_vanneschi/src/edu/gsgp/data/PropertiesManager.java</file>
-            <file>file:/home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/projetos/GSGP_java_vanneschi/src/edu/gsgp/GSGP.java</file>
-            <file>file:/home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/projetos/GSGP_java_vanneschi/src/edu/gsgp/population/pipeline/Pipeline.java</file>
             <file>file:/home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/projetos/GSGP_java_vanneschi/src/edu/gsgp/population/pipeline/StandardPipe.java</file>
-            <file>file:/home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/projetos/GSGP_java_vanneschi/src/edu/gsgp/population/builder/individual/Breeder.java</file>
-            <file>file:/home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/projetos/GSGP_java_vanneschi/src/edu/gsgp/population/builder/individual/GLBreeder.java</file>
+            <file>file:/home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/projetos/GSGP_java_vanneschi/src/edu/gsgp/Experimenter.java</file>
             <file>file:/home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/projetos/GSGP_java_vanneschi/src/edu/gsgp/population/pipeline/SpreaderPipe.java</file>
         </group>
     </open-files>

@@ -57,7 +57,7 @@ public class GLBreeder extends Breeder{
         int numUpperBounds = 0;
         Dataset trainingData = expData.getDataset(DatasetType.TRAINING);
         // Compute the restrictions regarding alpha to put the inidividual in the correct position
-        for(int i = 0; i < numIndGreaterTarget.length; i++){
+        for(int i = 0; i < trainingData.size(); i++){
             double pSem = p.getTrainingSemantics()[i];
             double tSem = trainingData.get(i).output;
             if(pSem != 0){
