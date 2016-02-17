@@ -20,6 +20,10 @@ public class StandardPipe extends Pipeline{
         // Update the breeder with the current population before generating a new one
         for(Breeder breeder : breederArray) ((Breeder)breeder).setup(originalPop, expData);     
         
+        // ======================= ADDED FOR GECCO PAPER =======================
+//        stats.storeDristInfo(originalPop);
+        // =====================================================================
+        
         // Generate the new population from the original one
         Population newPopulation = new Population();
         for(int i = 0; i < size; i++){

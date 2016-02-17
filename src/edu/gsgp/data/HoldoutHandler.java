@@ -71,6 +71,7 @@ public class HoldoutHandler implements DataProducer{
         currentExperiment = 0;
     }
     
+    
     /**
      * Gets a training/test set based on holdout validation. A percentage of data
      * is used for test and remaining for training.
@@ -122,15 +123,15 @@ public class HoldoutHandler implements DataProducer{
     }
 
     @Override
-    public void setDataset(String dataPath) throws Exception{
-        if(!useFiles){
-            Dataset data = DataReader.readInputDataFile(dataPath);
-            this.dataset = data;
-            numInputs = data.getInputNumber();
-        }
-        else{
-            getFromFile(dataPath);
-        }
+    public void setDataset(String trainingPath, String testPath) throws Exception{
+//        if(!useFiles){
+//            Dataset data = DataReader.readInputDataFile(dataPath);
+//            this.dataset = data;
+//            numInputs = data.getInputNumber();
+//        }
+//        else{
+            getFromFile(trainingPath, testPath);
+//        }
     }
 
     @Override
@@ -152,24 +153,41 @@ public class HoldoutHandler implements DataProducer{
      * @throws Exception Error while reading the dataset within a file.
      * @throws SSRException Error in the file path/pattern.
      */
-    private void getFromFile(String dataPath) throws Exception{
-        int lastFileSeparator = dataPath.lastIndexOf(File.separator);
-        String filePattern = dataPath.substring(lastFileSeparator + 1);
-        String folderName = dataPath.substring(0, lastFileSeparator);
-        String[] aux = filePattern.split("#");
-        if(aux.length != 2)
+    private void getFromFile(String trainingPath, String testPath) throws Exception{
+        int lastFileSeparator = trainingPath.lastIndexOf(File.separator);
+        String filePattern = trainingPath.substring(lastFileSeparator + 1);
+        String trainingFolder = trainingPath.substring(0, lastFileSeparator);
+        String[] trainingRepeatedName = filePattern.split("#");
+        
+        String testFolder = trainingFolder;
+        String[] testRepeatedName = trainingRepeatedName;
+        
+        String trainingInfix = "train-";
+        String testInfix = "test-";
+        
+        if(trainingRepeatedName.length != 2)
             throw new Exception("The file pattern must have one and only one # symbol as fold index.");
         ArrayList<File> trainFiles = new ArrayList<File>();
         ArrayList<File> testFiles = new ArrayList<File>();
         int index = 0;
-        File newTrain = new File(folderName + File.separator + aux[0] + "train-" + index + aux[1]);
-        File newTest = new File(folderName + File.separator + aux[0] + "test-" + index + aux[1]);
+        
+        if(testPath != null){
+            lastFileSeparator = testPath.lastIndexOf(File.separator);
+            filePattern = testPath.substring(lastFileSeparator + 1);
+            testFolder = testPath.substring(0, lastFileSeparator);
+            testRepeatedName = filePattern.split("#");
+            trainingInfix = "";
+            testInfix = "";
+        }
+        
+        File newTrain = new File(trainingFolder + File.separator + trainingRepeatedName[0] + trainingInfix + index + trainingRepeatedName[1]);
+        File newTest = new File(testFolder + File.separator + testRepeatedName[0] + testInfix + index + testRepeatedName[1]);
         while(newTrain.isFile() && newTest.isFile()){
             trainFiles.add(newTrain);
             testFiles.add(newTest);
             index++;
-            newTrain = new File(folderName + File.separator + aux[0] + "train-" + index + aux[1]);
-            newTest = new File(folderName + File.separator + aux[0] + "test-" + index + aux[1]);
+            newTrain = new File(trainingFolder + File.separator + trainingRepeatedName[0] + trainingInfix + index + trainingRepeatedName[1]);
+            newTest = new File(testFolder + File.separator + testRepeatedName[0] + testInfix + index + testRepeatedName[1]);
         }
         if(trainFiles.isEmpty() || testFiles.isEmpty()) 
             throw new Exception("No files found for this file pattern/path: \"" + newTrain.getAbsolutePath() + "\" and \"" + newTest.getAbsolutePath() +  "\"\nUsing HOLDOUT.\n");

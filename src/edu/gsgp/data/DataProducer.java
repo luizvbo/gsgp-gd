@@ -23,10 +23,11 @@ public interface DataProducer {
     
     /**
      * Sets a dataset path
-     * @param dataPath Path for the dataset used
+     * @param trainingPath Path for the (training) dataset used
+     * @param testPath Path for the (test) dataset used
      * @throws java.lang.Exception Exception caused when reading dataset file(s)
      */
-    public void setDataset(String dataPath) throws Exception;
+    public void setDataset(String trainingPath, String testPath) throws Exception;
     
     /**
      * Sets the random number generator

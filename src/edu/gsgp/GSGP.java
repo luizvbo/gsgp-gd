@@ -10,7 +10,6 @@ import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.population.Population;
 import edu.gsgp.population.Individual;
 import edu.gsgp.data.PropertiesManager;
-import edu.gsgp.population.builder.individual.Breeder;
 import edu.gsgp.population.builder.individual.PopulationGenerator;
 import edu.gsgp.population.builder.individual.Populator;
 import edu.gsgp.population.pipeline.Pipeline;

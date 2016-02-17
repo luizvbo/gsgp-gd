@@ -48,9 +48,7 @@ public class GLBreeder extends Breeder{
         return effectiveProb;
     }
 
-    @Override
-    public Individual generateIndividual(MersenneTwister rndGenerator, ExperimentalData expData) {
-        GSGPIndividual p = (GSGPIndividual)properties.selectIndividual(originalPopulation, rndGenerator);
+    public Individual generateIndividual(MersenneTwister rndGenerator, ExperimentalData expData, GSGPIndividual p) {
         ArrayList<Bound> bounds = new ArrayList<Bound>();
         // UpperBound: alpha <= ub
         // LowerBound: lb <= alpha
@@ -118,6 +116,13 @@ public class GLBreeder extends Breeder{
         BigInteger numNodes = p.getNumNodes().add(new BigInteger(""+2));
         GSGPIndividual offspring = new GSGPIndividual(numNodes, fitnessFunction);
         return offspring;
+    }
+    
+    
+    @Override
+    public Individual generateIndividual(MersenneTwister rndGenerator, ExperimentalData expData) {
+        GSGPIndividual p = (GSGPIndividual)properties.selectIndividual(originalPopulation, rndGenerator);
+        return generateIndividual(rndGenerator, expData, p);
     }
     
     private Fitness evaluate(GSGPIndividual ind, double alpha, ExperimentalData expData){

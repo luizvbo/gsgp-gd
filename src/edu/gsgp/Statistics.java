@@ -19,11 +19,11 @@ import edu.gsgp.population.Individual;
  */
 public class Statistics {
     public enum StatsType{
+        INITIAL_SEMANTICS("initialSemantics.csv"),
         BEST_OF_GEN_SIZE("individualSize.csv"), 
-        BEST_OF_GEN_TS_FIT("tsFitness.csv"), 
-        BEST_OF_GEN_TR_FIT("trFitness.csv"), 
         SEMANTICS("outputs.csv"),
-        INITIAL_SEMANTICS("initialSemantics.csv");
+        BEST_OF_GEN_TS_FIT("tsFitness.csv"), 
+        BEST_OF_GEN_TR_FIT("trFitness.csv");
         
         private final String filePath;
 
@@ -47,6 +47,12 @@ public class Statistics {
     
     private double[][] initialSemantics;
     
+    // ========================= ADDED FOR GECCO PAPER =========================
+//    private ArrayList<int[]> trGeTarget;
+//    private ArrayList<int[]> tsGeTarget;
+    // =========================================================================
+    
+    
     protected int currentGeneration;
     
     public Statistics(int numGenerations, ExperimentalData expData) {
@@ -55,18 +61,43 @@ public class Statistics {
         bestOfGenTrFitness = new String[numGenerations+1];
         currentGeneration = 0;
         this.expData = expData;
+        
+        // ======================= ADDED FOR GECCO PAPER =======================
+//        trGeTarget = new ArrayList<>();
+//        tsGeTarget = new ArrayList<>();
+        // =====================================================================
     }
+    
+    // ========================= ADDED FOR GECCO PAPER =========================
+//    public void storeDristInfo(Population pop){
+//        
+//        if(currentGeneration > 0 && (currentGeneration-1) % 10 == 0){
+//        
+//            int[] tsGE = new int[expData.getDataset(Utils.DatasetType.TEST).size()];
+//            int[] trGE = new int[expData.getDataset(Utils.DatasetType.TRAINING).size()];
+//            for(Individual ind : pop){
+//                double[] tsSem = ind.getTestSemantics();
+//                double[] trSem = ind.getTrainingSemantics();
+//                for(int i = 0; i < tsSem.length; i++){
+//                    if(tsSem[i] >= expData.getDataset(Utils.DatasetType.TEST).getOutputs()[i])
+//                        tsGE[i]++;
+//                }
+//                for(int i = 0; i < trSem.length; i++){
+//                    if(trSem[i] >= expData.getDataset(Utils.DatasetType.TRAINING).getOutputs()[i])
+//                        trGE[i]++;
+//                }
+//            }
+//
+//            tsGeTarget.add(tsGE);
+//            trGeTarget.add(trGE);
+//            
+//        }
+//    }
+    // =========================================================================
     
     public void addGenerationStatistic(Population pop){        
         Individual bestOfGen = pop.getBestIndividual();
-        
-//        long[] sizes = new long[pop.size()];
-//        int count = 0;
-//        for(Individual ind : pop.getIndividuals()){
-//            sizes[count++] = Long.parseLong(ind.getNumNodesAsString());
-//        }        
-//        bestOfGenSize[currentGeneration] = Utils.getMedian(sizes)+"";
-        
+       
         bestOfGenSize[currentGeneration] = bestOfGen.getNumNodesAsString();
         bestOfGenTrFitness[currentGeneration] = bestOfGen.getTrainingFitnessAsString();
         bestOfGenTsFitness[currentGeneration] = bestOfGen.getTestFitnessAsString();
@@ -131,14 +162,34 @@ public class Statistics {
     
     private String getSemanticsAsString() {
         StringBuffer str = new StringBuffer();
+        // ======================= ADDED FOR GECCO PAPER =======================
+//        for(int[] trGE : trGeTarget){
+//            for(int i = 0; i < trGE.length; i++){
+//                str.append(trGE[i] + ",");
+//            }
+//        
+//        }
+        // =====================================================================
+        
         for(int i = 0; i < bestTrainingSemantics.length; i++){
             str.append(bestTrainingSemantics[i] + ",");
         }
+        
         String sep = "";
+        // ======================= ADDED FOR GECCO PAPER =======================
+//        for(int[] tsGE : tsGeTarget){
+//            for(int i = 0; i < tsGE.length; i++){
+//                str.append(sep + tsGE[i]);
+//                sep = ",";
+//            }
+//        }
+        // =====================================================================
+            
         for(int i = 0; i < bestTestSemantics.length; i++){
             str.append(sep + bestTestSemantics[i]);
             sep = ",";
         }
+        
         return str.toString();
     }
 }

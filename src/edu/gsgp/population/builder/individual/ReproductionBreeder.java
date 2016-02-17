@@ -23,7 +23,7 @@ public class ReproductionBreeder extends Breeder {
 //        super(properties, expData, probability);
 //    }
     
-    public ReproductionBreeder(PropertiesManager properties, double probability) {
+    public ReproductionBreeder(PropertiesManager properties, Double probability) {
         super(properties, probability);
     }
 

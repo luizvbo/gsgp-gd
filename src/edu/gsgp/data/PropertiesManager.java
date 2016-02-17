@@ -141,6 +141,7 @@ public class PropertiesManager {
     public enum ParameterList {
         PARENT_FILE("parent", "Path to the parent parameter file. The child parameters overwrite the parent", false),
         PATH_DATA_FILE("experiment.data", "Path for the training/test files. See experiment.sampling option for more details", true),
+        PATH_TEST_FILE("experiment.data.test", "Path for the test files. See experiment.sampling option for more details", false),
         PATH_OUTPUT_DIR("experiment.output.dir", "Output directory", false),
         SEED("experiment.seed", "Seed (long int) used by the pseudo-random number generator", false),
         FILE_PREFIX("experiment.file.prefix", "Identifier prefix for files", false),
@@ -156,10 +157,15 @@ public class PropertiesManager {
                                                 + "\n# files in the form /pathToFile/repeatedName#repeatedName, where # indicates "
                                                 + "\n# where the fold index is placed (a number from 0 to k-1). E.g. /home/iris-#.dat,"
                                                 + "\n# with 3 folds in the path will look for iris-0.dat, iris-1.dat and iris-2.dat"
-                                                + "\n# - If holdout, Use paths to the files in the form /pathToFile/repeatedName#repeatedName,"
-                                                + "\n# where # is composed by the pattern (train|test)-i with i=0,1,...,n-1, where n is"
-                                                + "\n# the number of experiment files. E.g. /home/iris-#.dat, with 4 files (2x(train+test))"
-                                                + "\n# in the path will look for iris-train-0.dat, iris-test-0.dat, iris-train-1.dat and iris-test-1.dat", true),
+                                                + "\n# - If holdout, we have two cases: "
+                                                + "\n#   1) Use paths to the files in the form /pathToFile/repeatedName#repeatedName,"
+                                                + "\n#      where # is composed by the pattern (train|test)-i with i=0,1,...,n-1, where n is"
+                                                + "\n#      the number of experiment files. E.g. /home/iris-#.dat, with 4 files (2x(train+test))"
+                                                + "\n#      in the path will look for iris-train-0.dat, iris-test-0.dat, iris-train-1.dat and iris-test-1.dat"
+                                                + "\n#   2) Use the path in 'experiment.data' to read the training files in the format "
+                                                + "\n#      /pathToFile/repeatedName#repeatedName and the path in 'experiment.data.test'"
+                                                + "\n#      to read the test data, replacing # by i=0,1,...,n-1. This option is used when"
+                                                + "\n#      'experiment.data.test' is provided", true),
         
         MAX_TREE_DEPTH("tree.build.max.depth", "Max depth allowed when building trees", false),
         MIN_TREE_DEPTH("tree.min.depth", "Min depth allowed when building trees", false),
@@ -304,7 +310,7 @@ public class PropertiesManager {
             default:
                 throw new Exception("Experiment design must be crossvalidation or holdout.");
         }
-        dataProducer.setDataset(getStringProperty(ParameterList.PATH_DATA_FILE, true));
+        dataProducer.setDataset(getStringProperty(ParameterList.PATH_DATA_FILE, true), getStringProperty(ParameterList.PATH_TEST_FILE, true));
         return dataProducer;
     }
     

@@ -32,7 +32,7 @@ public class CrossvalidationHandler implements DataProducer{
     private Dataset dataset;
     
     /** Boolean to indicates if we should sample or read the folds from files **/
-    private boolean useFiles = false;
+//    private boolean useFiles = false;
     
     private int numInputs;
 
@@ -42,7 +42,7 @@ public class CrossvalidationHandler implements DataProducer{
     }
     
     public CrossvalidationHandler(){
-        useFiles = true;
+//        useFiles = true;
         currentFold = 0;
     }
     
@@ -59,9 +59,9 @@ public class CrossvalidationHandler implements DataProducer{
      */
     @Override
     public ExperimentalData getExperimentDataset(){
-        if(currentFold == 0 && !useFiles){
-            resampleFolds();
-        }
+//        if(currentFold == 0 && !useFiles){
+//            resampleFolds();
+//        }
         ExperimentalData data = new ExperimentalData();
         for(int i = 0; i < numFolds; i++){
             if(i == currentFold)
@@ -76,15 +76,15 @@ public class CrossvalidationHandler implements DataProducer{
     }
 
     @Override
-    public void setDataset(String dataPath) throws Exception{
-        if(!useFiles){
-            Dataset data = DataReader.readInputDataFile(dataPath);
-            this.dataset = data;
-            numInputs = data.getInputNumber();
-        }
-        else{
-            getFoldsFromFile(dataPath);
-        }
+    public void setDataset(String trainingPath, String testPath) throws Exception{
+//        if(!useFiles){
+//            Dataset data = DataReader.readInputDataFile(dataPath);
+//            this.dataset = data;
+//            numInputs = data.getInputNumber();
+//        }
+//        else{
+            getFoldsFromFile(trainingPath);
+//        }
     }
 
     @Override
