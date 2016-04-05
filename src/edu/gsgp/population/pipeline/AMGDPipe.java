@@ -10,23 +10,23 @@ import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.population.GSGPIndividual;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.Population;
-import edu.gsgp.population.builder.individual.Breeder;
-import edu.gsgp.population.builder.individual.GLBreeder;
+import edu.gsgp.population.operator.AMGDBreeder;
+import edu.gsgp.population.operator.Breeder;
 
 /**
  *
  * @author luiz
  */
-public class SpreaderPipe extends Pipeline{    
+public class AMGDPipe extends Pipeline{    
     private int currentGen;
 
-    public SpreaderPipe() {
+    public AMGDPipe() {
         currentGen = 0;
     }
     
     @Override
     public Population evolvePopulation(Population originalPop, ExperimentalData expData, int size) {
-        GLBreeder spreader = new GLBreeder(properties, 0.0);
+        AMGDBreeder spreader = new AMGDBreeder(properties, 0.0);
         spreader.setup(originalPop, expData, currentGen++);
         Population newPopulation = new Population();
         for(int i = 0; i < originalPop.size(); i++){
@@ -38,7 +38,7 @@ public class SpreaderPipe extends Pipeline{
         }
         
         // ======================= ADDED FOR GECCO PAPER =======================
-//        stats.storeDristInfo(originalPop);
+//        stats.storeDistInfo(originalPop);
         // =====================================================================
         
         // Update the breeder with the current population before generating a new one
@@ -68,6 +68,6 @@ public class SpreaderPipe extends Pipeline{
 
     @Override
     public Pipeline softClone() {
-        return new SpreaderPipe();
+        return new AMGDPipe();
     }
 }

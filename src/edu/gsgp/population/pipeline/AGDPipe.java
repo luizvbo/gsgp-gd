@@ -7,25 +7,44 @@
 package edu.gsgp.population.pipeline;
 
 import edu.gsgp.data.ExperimentalData;
+import edu.gsgp.population.GSGPIndividual;
+import edu.gsgp.population.Individual;
 import edu.gsgp.population.Population;
+import edu.gsgp.population.operator.AGDBreeder;
 import edu.gsgp.population.operator.Breeder;
 
 /**
  *
  * @author luiz
  */
-public class StandardPipe extends Pipeline{    
+public class AGDPipe extends Pipeline{    
+    private int currentGen;
+
+    public AGDPipe() {
+        currentGen = 0;
+    }
+    
     @Override
     public Population evolvePopulation(Population originalPop, ExperimentalData expData, int size) {
+        AGDBreeder spreader = new AGDBreeder(properties, 0.0);
+        spreader.setup(originalPop, expData, currentGen++);
+        Population newPopulation = new Population();
+        for(int i = 0; i < originalPop.size(); i++){
+            double floatDice = rndGenerator.nextDouble();
+            if(floatDice < spreader.getEffectiveProb()){
+                GSGPIndividual ind = (GSGPIndividual)originalPop.get(i);
+                originalPop.set(i, spreader.generateIndividual(rndGenerator, expData, (GSGPIndividual)ind));
+            }
+        }
+        
+        // ======================= ADDED FOR GECCO PAPER =======================
+//        stats.storeDistInfo(originalPop);
+        // =====================================================================
+        
         // Update the breeder with the current population before generating a new one
         for(Breeder breeder : breederArray) ((Breeder)breeder).setup(originalPop, expData);     
         
-        // ======================= ADDED FOR GECCO PAPER =======================
-//        stats.storeDristInfo(originalPop);
-        // =====================================================================
-        
         // Generate the new population from the original one
-        Population newPopulation = new Population();
         for(int i = 0; i < size; i++){
             double floatDice = rndGenerator.nextDouble();
             double probabilitySum = 0;
@@ -37,13 +56,14 @@ public class StandardPipe extends Pipeline{
                 }
                 probabilitySum += breeder.getProbability();
             }
-            newPopulation.add(selectedBreeder.generateIndividual(rndGenerator, expData));
+            Individual newInd = selectedBreeder.generateIndividual(rndGenerator, expData);
+            newPopulation.add(newInd);
         }        
         return newPopulation;
     }
 
     @Override
     public Pipeline softClone() {
-        return new StandardPipe();
+        return new AGDPipe();
     }
 }

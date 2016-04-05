@@ -11,7 +11,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import edu.gsgp.Statistics.StatsType;
-import edu.gsgp.Utils;
 import java.io.IOException;
 
 /**
@@ -21,37 +20,28 @@ import java.io.IOException;
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
 public class DataWriter {
-    private static void writeResults(String outputPath,
-                                    String outputPrefix, 
-                                    Statistics[] statsArray) throws Exception{
-        File outputDir = getOutputDir(outputPath);
-        outputDir = new File(outputDir.getAbsolutePath()+ File.separator + outputPrefix);
-        outputDir.mkdirs();
-        // Object to write results on file
-        BufferedWriter bw;
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trFitness.csv"));
-        bw.write(getStatisticsFromArray(statsArray, StatsType.BEST_OF_GEN_TR_FIT));
-        bw.close();
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "tsFitness.csv"));
-        bw.write(getStatisticsFromArray(statsArray, StatsType.BEST_OF_GEN_TS_FIT));
-        bw.close();
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "individualSize.csv"));
-        bw.write(getStatisticsFromArray(statsArray, StatsType.BEST_OF_GEN_SIZE));
-        bw.close();
-    }
-    
-     public static void writeResults(String outputPath,
+    public static void writeResults(String outputPath,
                                     String outputPrefix, 
                                     Statistics statistic,
                                     int experimentId) throws Exception{
         StatsType writeableStats[] = {StatsType.BEST_OF_GEN_SIZE, 
                                      StatsType.BEST_OF_GEN_TR_FIT, 
                                      StatsType.BEST_OF_GEN_TS_FIT,
-                                     StatsType.SEMANTICS };
+                                     StatsType.SEMANTICS,
+                                     StatsType.ELAPSED_TIME,
+                                     StatsType.MDD_AVG,
+                                     StatsType.MDD_SD};
         for(StatsType type : writeableStats){
             writeOnFile(outputPath, outputPrefix, 
                     experimentId + "," + statistic.asWritableString(type) + "\n", type);
         }
+    }
+    
+    public static void writeLoadedParameters(PropertiesManager parameters) throws Exception{
+        writeOnFile(parameters.getOutputDir(),
+                   parameters.getFilePrefix(),
+                   parameters.getLoadedParametersString(), 
+                   StatsType.LOADED_PARAMETERS);
     }
         
     public static void writeOutputs(String outputPath,
@@ -91,33 +81,7 @@ public class DataWriter {
         bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + statsType.getPath(), true));
         bw.write(info);
         bw.close();
-    }
-    
-    private static void writeInitialSemantics(String outputPath,
-                                    String outputPrefix, 
-                                    Statistics stats) throws Exception{
-        File outputDir = getOutputDir(outputPath);
-        outputDir = new File(outputDir.getAbsolutePath()+ File.separator + outputPrefix);
-        outputDir.mkdirs();
-        // Object to write results on file
-        BufferedWriter bw;
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "initialSemantics.csv", true));
-        bw.write(stats.asWritableString(Statistics.StatsType.INITIAL_SEMANTICS) + "\n");
-        bw.close();
-    }
-    
-    private static void resetInitialSemantics(String outputPath,
-                                    String outputPrefix) throws Exception{
-        File outputDir = getOutputDir(outputPath);
-        outputDir = new File(outputDir.getAbsolutePath()+ File.separator + outputPrefix);
-        outputDir.mkdirs();
-        // Object to write results on file
-        BufferedWriter bw;
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "initialSemantics.csv"));
-        bw.write("");
-        bw.close();
-    }
-    
+    }    
     
     /**
      * Selects the path to save output data.
@@ -141,20 +105,5 @@ public class DataWriter {
             str.append(stats.asWritableString(type) + "\n");
         }
         return str.toString();
-    }
-
-    private static String getDesiredOutputs(ExperimentalData data) {
-        double outputs[][] = new double[2][];
-        outputs[0] = data.getDataset(Utils.DatasetType.TRAINING).getOutputs();
-        outputs[1] = data.getDataset(Utils.DatasetType.TEST).getOutputs();
-        StringBuilder str = new StringBuilder();
-        String sep = "";
-        for(int i = 0; i < outputs.length; i++){
-            for(int j = 0; j < outputs[i].length; j++){
-                str.append(sep + outputs[i][j]);
-                sep = ",";
-            }
-        }
-        return str.toString() + "\n";
     }
 }

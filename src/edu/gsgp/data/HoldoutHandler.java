@@ -148,7 +148,8 @@ public class HoldoutHandler implements DataProducer{
 
     /**
      * Get a list of partitions test/training from a file pattern for holdout
-     * @param dataPath Full path to the file with the pattern prename#posname.
+     * @param trainingPath Path for the (training) dataset used
+     * @param testPath Path for the (test) dataset used
      * @return The number of inputs of the dataset
      * @throws Exception Error while reading the dataset within a file.
      * @throws SSRException Error in the file path/pattern.

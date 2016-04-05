@@ -18,12 +18,16 @@ import edu.gsgp.population.Individual;
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
 public class Statistics {
+    
     public enum StatsType{
-        INITIAL_SEMANTICS("initialSemantics.csv"),
         BEST_OF_GEN_SIZE("individualSize.csv"), 
         SEMANTICS("outputs.csv"),
         BEST_OF_GEN_TS_FIT("tsFitness.csv"), 
-        BEST_OF_GEN_TR_FIT("trFitness.csv");
+        BEST_OF_GEN_TR_FIT("trFitness.csv"),
+        ELAPSED_TIME("elapsedTime.csv"),
+        LOADED_PARAMETERS("loadedParams.txt"),
+        MDD_AVG("mddAverage.csv"),
+        MDD_SD("mddStdDev.csv");
         
         private final String filePath;
 
@@ -38,27 +42,29 @@ public class Statistics {
     
     protected ExperimentalData expData;
     
+    protected float elapsedTime;
     protected String[] bestOfGenSize;
     protected String[] bestOfGenTsFitness;
     protected String[] bestOfGenTrFitness;
     
+    protected float[] meanMDD;
+    protected float[] sdMDD;
+    
     private double[] bestTrainingSemantics;
     private double[] bestTestSemantics;
-    
-    private double[][] initialSemantics;
-    
+        
+    protected int currentGeneration;
     // ========================= ADDED FOR GECCO PAPER =========================
 //    private ArrayList<int[]> trGeTarget;
 //    private ArrayList<int[]> tsGeTarget;
     // =========================================================================
     
-    
-    protected int currentGeneration;
-    
     public Statistics(int numGenerations, ExperimentalData expData) {
         bestOfGenSize = new String[numGenerations+1];
         bestOfGenTsFitness = new String[numGenerations+1];
         bestOfGenTrFitness = new String[numGenerations+1];
+        meanMDD = new float[numGenerations+1];
+        sdMDD = new float[numGenerations+1];
         currentGeneration = 0;
         this.expData = expData;
         
@@ -95,34 +101,38 @@ public class Statistics {
 //    }
     // =========================================================================
     
+    /**
+     * Update the statistics with information obtained in the end of the generation
+     * @param pop Current population
+     */
     public void addGenerationStatistic(Population pop){        
+        // In order to not contabilize the time elapsed by this method we subtract
+        // the time elapsed
+        long methodTime = System.nanoTime();
+        
         Individual bestOfGen = pop.getBestIndividual();
        
         bestOfGenSize[currentGeneration] = bestOfGen.getNumNodesAsString();
         bestOfGenTrFitness[currentGeneration] = bestOfGen.getTrainingFitnessAsString();
         bestOfGenTsFitness[currentGeneration] = bestOfGen.getTestFitnessAsString();
         
+        computeMDD(pop);
+        
         System.out.println("Best of Gen (RMSE-TR/RMSE-TS/nodes: " + bestOfGenTrFitness[currentGeneration] + 
                            "/" + bestOfGenTsFitness[currentGeneration] + "/" + bestOfGenSize[currentGeneration]);
-                
         currentGeneration++;
+        
+        // Ignore the time elapsed to store the statistics
+        elapsedTime += System.nanoTime() - methodTime;
     }
 
-    private void setInitialSemantics(Population population) {
-        initialSemantics = new double[population.size()][];
-        int i = 0;
-        for(Individual ind : population){
-            initialSemantics[i++] = ind.getTrainingSemantics();
-        }
-    }
-    
-    public void storeBestSemantics(Individual bestIndividual) {
+    public void finishEvolution(Individual bestIndividual) {
+        elapsedTime = System.nanoTime() - elapsedTime;
+        // Convert nanosecs to secs
+        elapsedTime /= 1000000000;
+        
         bestTestSemantics = ((GSGPIndividual)bestIndividual).getTestSemantics();
         bestTrainingSemantics = bestIndividual.getTrainingSemantics();
-    }
-    
-    private void resetInitialSemantics() {
-        initialSemantics = null;
     }
     
     public String asWritableString(StatsType type) {
@@ -131,12 +141,18 @@ public class Statistics {
                 return concatenateArray(bestOfGenSize);
             case BEST_OF_GEN_TR_FIT:
                 return concatenateArray(bestOfGenTrFitness);
-            case INITIAL_SEMANTICS:
-                return concatenateMatrix(initialSemantics);
             case SEMANTICS:
                 return getSemanticsAsString();
-            default:
+            case BEST_OF_GEN_TS_FIT:
                 return concatenateArray(bestOfGenTsFitness);
+            case ELAPSED_TIME:
+                return elapsedTime + "";
+            case MDD_AVG:
+                return concatenateFloatArray(meanMDD);
+            case MDD_SD:
+                return concatenateFloatArray(sdMDD);
+            default:
+                return null;
         }
     }
     
@@ -149,17 +165,15 @@ public class Statistics {
         return str.toString();
     }
     
-    private String concatenateMatrix(double[][] doubleMatrix){
+    private String concatenateFloatArray(float[] floatArray) {
         StringBuilder str = new StringBuilder();
-        for(int i = 0; i < doubleMatrix.length; i++){
-            for(int j = 0; j < doubleMatrix[0].length-1; j++){
-                str.append(doubleMatrix[i][j] + ",");
-            }
-            str.append(doubleMatrix[i][doubleMatrix[0].length-1] + "\n");   
+        for(int i = 0; i < floatArray.length-1; i++){
+            str.append(Utils.format(floatArray[i]) + ",");
         }
+        str.append(Utils.format(floatArray[floatArray.length-1]));        
         return str.toString();
     }
-    
+        
     private String getSemanticsAsString() {
         StringBuffer str = new StringBuffer();
         // ======================= ADDED FOR GECCO PAPER =======================
@@ -192,4 +206,40 @@ public class Statistics {
         
         return str.toString();
     }
+    
+    public void startClock(){
+        elapsedTime = System.nanoTime();
+    }
+    
+    private void computeMDD(Population pop) {
+        // Target vector
+        double[] t = expData.getDataset(Utils.DatasetType.TRAINING).getOutputs();
+        // Store the counting of individuals greater or equal to the target in each dimension
+        float[] ge = new float[t.length];
+        for(Individual ind : pop){
+            for(int i = 0; i < ge.length; i++){
+                if(ind.getTrainingSemantics()[i] >= t[i]){
+                    ge[i]++;
+                }
+            }
+        }
+        float mean = 0;
+        double sd = 0;
+        for(int i = 0; i < ge.length; i++){
+            ge[i] /= pop.size();
+            ge[i] = (float)Math.abs(ge[i]-0.5);
+            mean += ge[i];
+        }
+        mean /= (ge.length);
+        for(int i = 0; i < ge.length; i++){
+            double aux = ge[i] - mean;
+            sd += aux*aux;
+        }
+        sd /= ge.length-1;
+        sd = Math.sqrt(sd);
+        meanMDD[currentGeneration] = mean;
+        sdMDD[currentGeneration] = (float)sd;
+    }
+    
+    
 }

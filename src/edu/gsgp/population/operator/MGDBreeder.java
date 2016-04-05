@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package edu.gsgp.population.builder.individual;
+package edu.gsgp.population.operator;
 
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.Utils.DatasetType;
@@ -21,27 +21,26 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 /**
+ * Multiplicative Geometric Dispersion Operator
  * @author Luiz Otavio Vilas Boas Oliveira
  * http://homepages.dcc.ufmg.br/~luizvbo/ 
  * luiz.vbo@gmail.com
- * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
- * 
- * Geometric Local Search breeder operator. This operator 
+ * Copyright (C) 20016, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
-public class GLBreeder extends Breeder{
+public class MGDBreeder extends Breeder{
     // Store the number of inidividuals greater (and less) than the target in each dimension
-    private int numIndGreaterTarget[];
-    private int numIndLessTarget[];
+    protected int numIndGreaterTarget[];
+    protected int numIndLessTarget[];
     // Probability of applying the operator in standalone
-    private double effectiveProb;
+    protected double effectiveProb;
         
-    public GLBreeder(PropertiesManager properties, Double probability) {
+    public MGDBreeder(PropertiesManager properties, Double probability) {
         super(properties, probability);
     }
     
     @Override
     public Breeder softClone(PropertiesManager properties) {
-        return new GLBreeder(properties, this.probability);
+        return new MGDBreeder(properties, this.probability);
     }
 
     public double getEffectiveProb() {
@@ -182,7 +181,7 @@ public class GLBreeder extends Breeder{
         }
     }
     
-    private class Bound implements Comparable<Bound>{
+    protected class Bound implements Comparable<Bound>{
         double value;
         int type;
         static final int upper = 0;

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package edu.gsgp.population.builder.individual;
+package edu.gsgp.population.populator;
 
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.data.ExperimentalData;

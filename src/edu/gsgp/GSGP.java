@@ -10,8 +10,7 @@ import edu.gsgp.data.ExperimentalData;
 import edu.gsgp.population.Population;
 import edu.gsgp.population.Individual;
 import edu.gsgp.data.PropertiesManager;
-import edu.gsgp.population.builder.individual.PopulationGenerator;
-import edu.gsgp.population.builder.individual.Populator;
+import edu.gsgp.population.populator.Populator;
 import edu.gsgp.population.pipeline.Pipeline;
 
 /**
@@ -34,12 +33,14 @@ public class GSGP {
     }
     
     public void evolve() throws Exception{
-        boolean canStop = false;
+        boolean canStop = false;     
         
         Populator populator = properties.getPopulationInitializer();
-        Population population = populator.populate(rndGenerator, expData, properties.getPopulationSize());
-        
         Pipeline pipe = properties.getPipeline();
+        
+        statistics.startClock();
+        
+        Population population = populator.populate(rndGenerator, expData, properties.getPopulationSize());
         pipe.setup(properties, statistics, expData, rndGenerator);
         
         statistics.addGenerationStatistic(population);
@@ -57,7 +58,7 @@ public class GSGP {
             
             statistics.addGenerationStatistic(population);
         }
-        statistics.storeBestSemantics(population.getBestIndividual());
+        statistics.finishEvolution(population.getBestIndividual());
     }
 
     public Statistics getStatistics() {

@@ -35,19 +35,18 @@ public class Experimenter {
             Experiment experiments[] = new Experiment[parameters.getNumExperiments()];
             int numThreads = Math.min(parameters.getNumThreads(), parameters.getNumExperiments());
             ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-//            DataWriter.resetInitialSemantics(parameters.getOutputDir(), parameters.getFilePrefix());
             
             // Run the algorithm for a defined number of repetitions
             for(int execution = 0; execution < parameters.getNumExperiments(); execution++){
-//                System.out.println("Execution " + (execution+1) + ":");
                 parameters.updateExperimentalData();
                 experiments[execution] = new Experiment(new GSGP(parameters, parameters.getExperimentalData()), execution);
                 executor.execute(experiments[execution]);
             }
             executor.shutdown();
             executor.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-            
-        } catch (Exception ex) {
+            DataWriter.writeLoadedParameters(parameters);
+        } 
+        catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -72,7 +71,6 @@ public class Experimenter {
             try{
                 gsgpInstance.evolve();
                 writeStatistics();
-                
             }
             catch (Exception ex) {
                 ex.printStackTrace();

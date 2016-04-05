@@ -13,6 +13,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import edu.gsgp.nodes.Node;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 /**
  * @author Luiz Otavio Vilas Boas Oliveira
@@ -22,6 +25,7 @@ import edu.gsgp.nodes.Node;
  */
 public class Utils {    
     public enum DatasetType{ TRAINING, TEST };
+    private static final DecimalFormat df = new DecimalFormat("0.00000", new DecimalFormatSymbols(Locale.ENGLISH));
     
     /**
      * Generates an array with a number of folds defined by the user. Each fold
@@ -138,5 +142,14 @@ public class Utils {
             e.printStackTrace();
         }
         return -1;
+    }
+    
+    /**
+     * Generate a String from a double value formated with the default number of decimal places
+     * @param value The double value to be formated
+     * @return The formated String
+     */
+    public static String format(double value){
+        return df.format(value);
     }
 }

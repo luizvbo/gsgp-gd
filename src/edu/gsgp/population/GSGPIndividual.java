@@ -85,12 +85,12 @@ public class GSGPIndividual extends Individual{
 
     @Override
     public String getTrainingFitnessAsString() {
-        return df.format(fitnessFunction.getTrainingFitness());
+        return Utils.format(fitnessFunction.getTrainingFitness());
     }
 
     @Override
     public String getTestFitnessAsString() {
-        return df.format(fitnessFunction.getTestFitness());
+        return Utils.format(fitnessFunction.getTestFitness());
     }
 
     @Override

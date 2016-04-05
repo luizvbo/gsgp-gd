@@ -5,7 +5,7 @@
 */
 
 
-package edu.gsgp.population.builder.tree;
+package edu.gsgp.population.treebuilder;
 
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.nodes.Node;

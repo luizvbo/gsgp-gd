@@ -2,6 +2,8 @@
 parent = 
 # Path for the training/test files. See experiment.sampling option for more details
 experiment.data = 
+# Path for the test files. See experiment.sampling option for more details
+experiment.data.test = 
 # Output directory
 experiment.output.dir = 
 # Seed (long int) used by the pseudo-random number generator
@@ -25,10 +27,15 @@ pop.ind.selector =
 # files in the form /pathToFile/repeatedName#repeatedName, where # indicates 
 # where the fold index is placed (a number from 0 to k-1). E.g. /home/iris-#.dat,
 # with 3 folds in the path will look for iris-0.dat, iris-1.dat and iris-2.dat
-# - If holdout, Use paths to the files in the form /pathToFile/repeatedName#repeatedName,
-# where # is composed by the pattern (train|test)-i with i=0,1,...,n-1, where n is
-# the number of experiment files. E.g. /home/iris-#.dat, with 4 files (2x(train+test))
-# in the path will look for iris-train-0.dat, iris-test-0.dat, iris-train-1.dat and iris-test-1.dat
+# - If holdout, we have two cases: 
+#   1) Use paths to the files in the form /pathToFile/repeatedName#repeatedName,
+#      where # is composed by the pattern (train|test)-i with i=0,1,...,n-1, where n is
+#      the number of experiment files. E.g. /home/iris-#.dat, with 4 files (2x(train+test))
+#      in the path will look for iris-train-0.dat, iris-test-0.dat, iris-train-1.dat and iris-test-1.dat
+#   2) Use the path in 'experiment.data' to read the training files in the format 
+#      /pathToFile/repeatedName#repeatedName and the path in 'experiment.data.test'
+#      to read the test data, replacing # by i=0,1,...,n-1. This option is used when
+#      'experiment.data.test' is provided
 experiment.design = 
 # Max depth allowed when building trees
 tree.build.max.depth = 
@@ -59,5 +66,11 @@ breed.mut.step.sd =
 breed.list = 
 # Population Initializer class. Default: edu.gsgp.population.builder.individual.SimplePopulator
 pop.initializer = 
+# Class responsible for evolve a new population from a previous one
+pop.pipeline = 
 # Number of attemtps before adding an individual in the population
 pop.initializer.attempts = 
+# Probability of applying the spreader operator (in standalone mode)
+breed.spread.prob = 
+# Alpha used to compute the effective probability of applying the spreader
+breed.spread.alpha = 

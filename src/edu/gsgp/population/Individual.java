@@ -21,7 +21,7 @@ import edu.gsgp.population.fitness.Fitness;
  */
 public abstract class Individual implements Comparable<Individual>{
     protected Node tree;    
-    protected static final DecimalFormat df = new DecimalFormat("0.00000", new DecimalFormatSymbols(Locale.ENGLISH));
+    
     protected Fitness fitnessFunction;
 
     public Individual(Node tree, Fitness fitnessFunction) {

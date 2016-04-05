@@ -26,13 +26,13 @@ import edu.gsgp.nodes.Node;
 import edu.gsgp.nodes.functions.Function;
 import edu.gsgp.nodes.terminals.Input;
 import edu.gsgp.nodes.terminals.Terminal;
-import edu.gsgp.population.builder.tree.FullBuilder;
-import edu.gsgp.population.builder.tree.GrowBuilder;
-import edu.gsgp.population.builder.tree.HalfBuilder;
+import edu.gsgp.population.treebuilder.FullBuilder;
+import edu.gsgp.population.treebuilder.GrowBuilder;
+import edu.gsgp.population.treebuilder.HalfBuilder;
 import edu.gsgp.population.Individual;
-import edu.gsgp.population.builder.individual.Breeder;
-import edu.gsgp.population.builder.individual.Populator;
-import edu.gsgp.population.builder.tree.TreeBuilder;
+import edu.gsgp.population.operator.Breeder;
+import edu.gsgp.population.populator.Populator;
+import edu.gsgp.population.treebuilder.TreeBuilder;
 import edu.gsgp.population.fitness.Fitness;
 import edu.gsgp.population.pipeline.Pipeline;
 import edu.gsgp.population.selector.IndividualSelector;
@@ -78,10 +78,7 @@ public class PropertiesManager {
     private double mutationStep;
     private double spreaderInitProb;
     private double spreaderAlpha;
-    
-//    private double mutProb;
-//    private double xoverProb;
-//    private double semSimThres;
+
     private Populator populationInitializer;
     private Pipeline pipeline;
     private Breeder[] breederList;
@@ -98,7 +95,18 @@ public class PropertiesManager {
     private String outputDir;
     private String filePrefix;
     
+    // Used do double check the parameters loaded/used by the experiment
+    private StringBuilder loadedParametersLog;
 
+    public PropertiesManager(String args[]) throws Exception{
+        loadedParametersLog = new StringBuilder();
+        
+        setOptions();
+        parameterLoaded = loadParameterFile(args);
+        if(parameterLoaded)
+            loadParameters();        
+    }
+    
     private void loadParameters() throws Exception{
         dataProducer = getDataProducer();
         mersennePRNG = new MersenneTwister(getLongProperty(ParameterList.SEED, System.currentTimeMillis()));
@@ -123,9 +131,6 @@ public class PropertiesManager {
         spreaderInitProb = getDoubleProperty(ParameterList.SPREADER_PROB, 0.5);
         spreaderAlpha = getDoubleProperty(ParameterList.SPREADER_ALPHA, 2);
         
-//        mutProb = getDoubleProperty(ParameterList.MUT_PROB, 0.5);
-//        xoverProb = getDoubleProperty(ParameterList.XOVER_PROB, 0.5);
-//        semSimThres = getDoubleProperty(ParameterList.SEMANTIC_SIMILARITY_THRESHOLD, 0.1);
         outputDir = getStringProperty(ParameterList.PATH_OUTPUT_DIR, true);
         filePrefix = getStringProperty(ParameterList.FILE_PREFIX, false);
         
@@ -204,12 +209,6 @@ public class PropertiesManager {
         }
     }
 
-    public PropertiesManager(String args[]) throws Exception{
-        setOptions();
-        parameterLoaded = loadParameterFile(args);
-        loadParameters();        
-    }
-
     /**
      * Load the parameters from the CLI and file
      * @param args CLI parameters
@@ -228,13 +227,6 @@ public class PropertiesManager {
                 throw new Exception("The parameter file was not specified.");
             String path = parametersCLI.getOptionValue("p");
             fileParameters = loadProperties(path);
-//            path = path.replaceFirst("^~",System.getProperty("user.home"));
-//            File parameterFile = new File(path);
-//            if(!parameterFile.canRead()) 
-//                throw new FileNotFoundException("Parameter file can not be read: " + parameterFile.getCanonicalPath());
-//            FileInputStream fileInput = new FileInputStream(parameterFile);
-//            fileParameters = new Properties();
-//            fileParameters.load(fileInput);
             return true;
         } 
         catch (MissingOptionException ex){
@@ -326,12 +318,17 @@ public class PropertiesManager {
     private boolean getBooleanProperty(ParameterList key, boolean defaultValue) 
                     throws NumberFormatException, NullPointerException, MissingOptionException{
         try {
-            if (!fileParameters.containsKey(key.name) && key.mandatory) {
+            boolean keyPresent = fileParameters.containsKey(key.name);
+            String strValue = keyPresent ? fileParameters.getProperty(key.name).replaceAll("\\s", "") : null;
+            if (!keyPresent && key.mandatory) {
                 throw new MissingOptionException("The input parameter (" + key.name + ") was not found");
             }
-            else if(!fileParameters.containsKey(key.name) || fileParameters.getProperty(key.name).replaceAll("\\s", "").equals(""))
+            else if(!keyPresent || strValue.equals("")){
+                loadedParametersLog.append(key.name).append("=").append(defaultValue).append(" (DEFAULT)\n");
                 return defaultValue;
-            return Boolean.parseBoolean(fileParameters.getProperty(key.name));
+            }
+            loadedParametersLog.append(key.name).append("=").append(strValue).append("\n");
+            return Boolean.parseBoolean(strValue);
         } catch (NumberFormatException e) {
             throw new NumberFormatException(e.getMessage() + "\nThe input parameter (" + key.name + ") could not be converted to boolean.");
         } catch (NullPointerException e) {
@@ -351,12 +348,17 @@ public class PropertiesManager {
     private int getIntegerProperty(ParameterList key, int defaultValue) 
                     throws NumberFormatException, NullPointerException, MissingOptionException{
         try {
-            if (!fileParameters.containsKey(key.name) && key.mandatory) {
+            boolean keyPresent = fileParameters.containsKey(key.name);
+            String strValue = keyPresent ? fileParameters.getProperty(key.name).replaceAll("\\s", "") : null;
+            if (!keyPresent && key.mandatory) {
                 throw new MissingOptionException("The input parameter (" + key.name + ") was not found");
             }
-            else if(!fileParameters.containsKey(key.name) || fileParameters.getProperty(key.name).replaceAll("\\s", "").equals(""))
+            else if(!keyPresent || strValue.equals("")){
+                loadedParametersLog.append(key.name).append("=").append(defaultValue).append(" (DEFAULT)\n");
                 return defaultValue;
-            return Integer.parseInt(fileParameters.getProperty(key.name));
+            }
+            loadedParametersLog.append(key.name).append("=").append(strValue).append("\n");
+            return Integer.parseInt(strValue);
         } catch (NumberFormatException e) {
             throw new NumberFormatException(e.getMessage() + "\nThe input parameter (" + key.name + ") could not be converted to int.");
         } catch (NullPointerException e) {
@@ -376,12 +378,17 @@ public class PropertiesManager {
     private long getLongProperty(ParameterList key, long defaultValue) 
                     throws NumberFormatException, NullPointerException, MissingOptionException{
         try {
-            if (!fileParameters.containsKey(key.name) && key.mandatory) {
+            boolean keyPresent = fileParameters.containsKey(key.name);
+            String strValue = keyPresent ? fileParameters.getProperty(key.name).replaceAll("\\s", "") : null;
+            if (!keyPresent && key.mandatory) {
                 throw new MissingOptionException("The input parameter (" + key.name + ") was not found");
             }
-            else if(!fileParameters.containsKey(key.name) || fileParameters.getProperty(key.name).replaceAll("\\s", "").equals(""))
+            else if(!keyPresent || strValue.equals("")){
+                loadedParametersLog.append(key.name).append("=").append(defaultValue).append(" (DEFAULT)\n");
                 return defaultValue;
-            return Integer.parseInt(fileParameters.getProperty(key.name));
+            }
+            loadedParametersLog.append(key.name).append("=").append(strValue).append("\n");
+            return Integer.parseInt(strValue);
         } catch (NumberFormatException e) {
             throw new NumberFormatException(e.getMessage() + "\nThe input parameter (" + key.name + ") could not be converted to long.");
         } catch (NullPointerException e) {
@@ -401,12 +408,17 @@ public class PropertiesManager {
     private double getDoubleProperty(ParameterList key, double defaultValue) 
                     throws NumberFormatException, NullPointerException, MissingOptionException{
         try {
-            if (!fileParameters.containsKey(key.name) && key.mandatory) {
+            boolean keyPresent = fileParameters.containsKey(key.name);
+            String strValue = keyPresent ? fileParameters.getProperty(key.name).replaceAll("\\s", "") : null;
+            if (!keyPresent && key.mandatory) {
                 throw new MissingOptionException("The input parameter (" + key.name + ") was not found");
             }
-            else if(!fileParameters.containsKey(key.name))
+            else if(!keyPresent || strValue.equals("")){
+                loadedParametersLog.append(key.name).append("=").append(defaultValue).append(" (DEFAULT)\n");
                 return defaultValue;
-            return Double.parseDouble(fileParameters.getProperty(key.name));
+            }
+            loadedParametersLog.append(key.name).append("=").append(strValue).append("\n");
+            return Double.parseDouble(strValue);
         } catch (NumberFormatException e) {
             throw new NumberFormatException(e.getMessage() + "\nThe input parameter (" + key.name + ") could not be converted to double.");
         } catch (NullPointerException e) {
@@ -426,15 +438,19 @@ public class PropertiesManager {
     private String getStringProperty(ParameterList key, boolean isFile) 
                     throws NumberFormatException, NullPointerException, MissingOptionException{
         try {
-            if (!fileParameters.containsKey(key.name) && key.mandatory) {
+            boolean keyPresent = fileParameters.containsKey(key.name);
+            String strValue = keyPresent ? fileParameters.getProperty(key.name).replaceAll("\\s", "") : null;
+            if (!keyPresent && key.mandatory) {
                 throw new MissingOptionException("Input parameter not found: " + key.name);
             }
-            else if(!fileParameters.containsKey(key.name))
+            else if(!keyPresent){
                 return null;
-            String output = fileParameters.getProperty(key.name);
-            if(isFile)
-                output = output.replaceFirst("^~",System.getProperty("user.home"));
-            return output;
+            }
+            if(isFile){
+                strValue = strValue.replaceFirst("^~",System.getProperty("user.home"));
+            }
+            loadedParametersLog.append(key.name).append("=").append(strValue).append("\n");
+            return strValue;
         } catch (NullPointerException e) {
             throw new NullPointerException(e.getMessage() + "\nThe parameter file was not initialized.");
         }
@@ -801,5 +817,9 @@ public class PropertiesManager {
             copyBreeders[i] = breederList[i].softClone(this);
         }
         return copyBreeders;
+    }
+    
+    public String getLoadedParametersString(){
+        return loadedParametersLog.toString();
     }
 }
