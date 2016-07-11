@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.gsgp.data;
+package edu.gsgp.experiment;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,7 +30,7 @@ import edu.gsgp.population.treebuilder.FullBuilder;
 import edu.gsgp.population.treebuilder.GrowBuilder;
 import edu.gsgp.population.treebuilder.HalfBuilder;
 import edu.gsgp.population.Individual;
-import edu.gsgp.population.operator.Breeder;
+import edu.gsgp.population.breeder.Breeder;
 import edu.gsgp.population.populator.Populator;
 import edu.gsgp.population.treebuilder.TreeBuilder;
 import edu.gsgp.population.fitness.Fitness;

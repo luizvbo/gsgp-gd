@@ -8,12 +8,12 @@ package edu.gsgp.population.populator;
 
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.Utils.DatasetType;
-import edu.gsgp.data.Dataset;
-import edu.gsgp.data.ExperimentalData;
-import edu.gsgp.data.Instance;
-import edu.gsgp.data.PropertiesManager;
+import edu.gsgp.experiment.Dataset;
+import edu.gsgp.experiment.ExperimentalData;
+import edu.gsgp.experiment.Instance;
+import edu.gsgp.experiment.PropertiesManager;
 import edu.gsgp.nodes.Node;
-import edu.gsgp.population.GSGPIndividual;
+import edu.gsgp.population.Individual;
 import edu.gsgp.population.Population;
 import edu.gsgp.population.fitness.Fitness;
 
@@ -66,7 +66,7 @@ public class SimplePopulator extends Populator{
         for(int i = 0; i < size; i++){
             Node newTree = properties.getNewIndividualTree(rndGenerator);
             Fitness fitnessFunction = evaluate(newTree, expData);
-            population.add(new GSGPIndividual(newTree, newTree.getNumNodes(), fitnessFunction));
+            population.add(new Individual(newTree, newTree.getNumNodes(), fitnessFunction));
         }
         return population;
     }

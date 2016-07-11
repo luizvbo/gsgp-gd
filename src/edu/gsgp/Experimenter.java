@@ -6,9 +6,9 @@
 
 package edu.gsgp;
 
-import edu.gsgp.data.DataProducer;
-import edu.gsgp.data.DataWriter;
-import edu.gsgp.data.PropertiesManager;
+import edu.gsgp.experiment.DataProducer;
+import edu.gsgp.experiment.DataWriter;
+import edu.gsgp.experiment.PropertiesManager;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;

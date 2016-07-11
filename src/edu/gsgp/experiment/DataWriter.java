@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package edu.gsgp.data;
+package edu.gsgp.experiment;
 
 import edu.gsgp.Statistics;
 import java.io.BufferedWriter;

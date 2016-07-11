@@ -6,10 +6,10 @@
 
 package edu.gsgp;
 
-import edu.gsgp.data.ExperimentalData;
+import edu.gsgp.experiment.ExperimentalData;
 import edu.gsgp.population.Population;
 import edu.gsgp.population.Individual;
-import edu.gsgp.data.PropertiesManager;
+import edu.gsgp.experiment.PropertiesManager;
 import edu.gsgp.population.populator.Populator;
 import edu.gsgp.population.pipeline.Pipeline;
 

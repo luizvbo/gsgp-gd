@@ -6,8 +6,8 @@
 
 package edu.gsgp;
 
-import edu.gsgp.data.ExperimentalData;
-import edu.gsgp.population.GSGPIndividual;
+import edu.gsgp.experiment.ExperimentalData;
+import edu.gsgp.population.Individual;
 import edu.gsgp.population.Population;
 import edu.gsgp.population.Individual;
 
@@ -131,7 +131,7 @@ public class Statistics {
         // Convert nanosecs to secs
         elapsedTime /= 1000000000;
         
-        bestTestSemantics = ((GSGPIndividual)bestIndividual).getTestSemantics();
+        bestTestSemantics = ((Individual)bestIndividual).getTestSemantics();
         bestTrainingSemantics = bestIndividual.getTrainingSemantics();
     }
     

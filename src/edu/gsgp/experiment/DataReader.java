@@ -1,4 +1,4 @@
-package edu.gsgp.data;
+package edu.gsgp.experiment;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -4,11 +4,11 @@
  * and open the template in the editor.
  */
 
-package edu.gsgp.population.operator;
+package edu.gsgp.population.breeder;
 
 import edu.gsgp.MersenneTwister;
-import edu.gsgp.data.ExperimentalData;
-import edu.gsgp.data.PropertiesManager;
+import edu.gsgp.experiment.ExperimentalData;
+import edu.gsgp.experiment.PropertiesManager;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.Population;
 

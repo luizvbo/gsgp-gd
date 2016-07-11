@@ -4,15 +4,15 @@
  * and open the template in the editor.
  */
 
-package edu.gsgp.population.operator;
+package edu.gsgp.population.breeder;
 
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.Utils.DatasetType;
-import edu.gsgp.data.Dataset;
-import edu.gsgp.data.ExperimentalData;
-import edu.gsgp.data.Instance;
-import edu.gsgp.data.PropertiesManager;
-import edu.gsgp.population.GSGPIndividual;
+import edu.gsgp.experiment.Dataset;
+import edu.gsgp.experiment.ExperimentalData;
+import edu.gsgp.experiment.Instance;
+import edu.gsgp.experiment.PropertiesManager;
+import edu.gsgp.population.Individual;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.Population;
 import edu.gsgp.population.fitness.Fitness;
@@ -47,7 +47,7 @@ public class MGDBreeder extends Breeder{
         return effectiveProb;
     }
 
-    public Individual generateIndividual(MersenneTwister rndGenerator, ExperimentalData expData, GSGPIndividual p) {
+    public Individual generateIndividual(MersenneTwister rndGenerator, ExperimentalData expData, Individual p) {
         ArrayList<Bound> bounds = new ArrayList<Bound>();
         // UpperBound: alpha <= ub
         // LowerBound: lb <= alpha
@@ -113,18 +113,18 @@ public class MGDBreeder extends Breeder{
                     (bounds.get(maxCovIndex+1).value - bounds.get(maxCovIndex).value) * rndGenerator.nextDouble();
         Fitness fitnessFunction = evaluate(p, alpha, expData);
         BigInteger numNodes = p.getNumNodes().add(new BigInteger(""+2));
-        GSGPIndividual offspring = new GSGPIndividual(numNodes, fitnessFunction);
+        Individual offspring = new Individual(null, numNodes, fitnessFunction);
         return offspring;
     }
     
     
     @Override
     public Individual generateIndividual(MersenneTwister rndGenerator, ExperimentalData expData) {
-        GSGPIndividual p = (GSGPIndividual)properties.selectIndividual(originalPopulation, rndGenerator);
+        Individual p = (Individual)properties.selectIndividual(originalPopulation, rndGenerator);
         return generateIndividual(rndGenerator, expData, p);
     }
     
-    private Fitness evaluate(GSGPIndividual ind, double alpha, ExperimentalData expData){
+    private Fitness evaluate(Individual ind, double alpha, ExperimentalData expData){
         Fitness fitnessFunction = ind.getFitnessFunction().softClone();
         for(DatasetType dataType : DatasetType.values()){
             // Compute the (training/test) semantics of generated random tree

@@ -3,15 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package edu.gsgp.population.pipeline;
 
-import edu.gsgp.data.ExperimentalData;
-import edu.gsgp.population.GSGPIndividual;
+import edu.gsgp.experiment.ExperimentalData;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.Population;
-import edu.gsgp.population.operator.Breeder;
-import edu.gsgp.population.operator.MGDBreeder;
+import edu.gsgp.population.breeder.Breeder;
+import edu.gsgp.population.breeder.MGDBreeder;
 
 /**
  *
@@ -32,8 +30,8 @@ public class MGDPipe extends Pipeline{
         for(int i = 0; i < originalPop.size(); i++){
             double floatDice = rndGenerator.nextDouble();
             if(floatDice < spreader.getEffectiveProb()){
-                GSGPIndividual ind = (GSGPIndividual)originalPop.get(i);
-                originalPop.set(i, spreader.generateIndividual(rndGenerator, expData, (GSGPIndividual)ind));
+                Individual ind = (Individual)originalPop.get(i);
+                originalPop.set(i, spreader.generateIndividual(rndGenerator, expData, (Individual)ind));
             }
         }
         

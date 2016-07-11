@@ -8,15 +8,15 @@ package edu.gsgp.population.populator;
 
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.Utils.DatasetType;
-import edu.gsgp.data.Dataset;
-import edu.gsgp.data.ExperimentalData;
-import edu.gsgp.data.Instance;
-import edu.gsgp.data.PropertiesManager;
+import edu.gsgp.experiment.Dataset;
+import edu.gsgp.experiment.ExperimentalData;
+import edu.gsgp.experiment.Instance;
+import edu.gsgp.experiment.PropertiesManager;
 import edu.gsgp.nodes.Node;
 import edu.gsgp.nodes.functions.Function;
 import edu.gsgp.nodes.terminals.Input;
 import edu.gsgp.nodes.terminals.Terminal;
-import edu.gsgp.population.GSGPIndividual;
+import edu.gsgp.population.Individual;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.Population;
 import edu.gsgp.population.fitness.Fitness;
@@ -73,7 +73,7 @@ public class SDIPopulator extends Populator{
             if(t instanceof Input){
                 Node newTree = t.softClone(rndGenerator);
                 Fitness fitnessFunction = evaluate(newTree, expData);
-                GSGPIndividual newIndividual = new GSGPIndividual(newTree, fitnessFunction);
+                Individual newIndividual = new Individual(newTree, fitnessFunction);
                 // Add the new inidividual to the list of building blocks
                 population.add(newIndividual);
             }
@@ -114,7 +114,7 @@ public class SDIPopulator extends Populator{
                 }
                 // If there is no inidividual with similar semantics, add in the hash map
                 if(!similarSemantics){
-                    GSGPIndividual newIndividual = new GSGPIndividual(func, fitnessFunction);
+                    Individual newIndividual = new Individual(func, fitnessFunction);
                     // Add the new inidividual to the list of building blocks
                     population.add(newIndividual);
                     // Reset the counter 
@@ -126,7 +126,7 @@ public class SDIPopulator extends Populator{
             // If the maximum number o attempts to generate a different individual was
             // reached, add the original one anyway
             if(numAttempts >= properties.getMaxInitAttempts()){
-                GSGPIndividual newIndividual = new GSGPIndividual(candidateFunc, candidateFuncFitness);
+                Individual newIndividual = new Individual(candidateFunc, candidateFuncFitness);
                 // Add the new inidividual to the list of building blocks
                 population.add(newIndividual);
                 // Reset the counter 

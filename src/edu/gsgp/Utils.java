@@ -6,8 +6,8 @@
 
 package edu.gsgp;
 
-import edu.gsgp.data.Instance;
-import edu.gsgp.data.Dataset;
+import edu.gsgp.experiment.Instance;
+import edu.gsgp.experiment.Dataset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;

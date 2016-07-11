@@ -7,7 +7,7 @@
 package edu.gsgp.population.fitness;
 
 import edu.gsgp.Utils.DatasetType;
-import edu.gsgp.data.ExperimentalData;
+import edu.gsgp.experiment.ExperimentalData;
 
 /**
  * @author Luiz Otavio Vilas Boas Oliveira

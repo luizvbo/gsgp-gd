@@ -4,17 +4,17 @@
  * and open the template in the editor.
  */
 
-package edu.gsgp.population.operator;
+package edu.gsgp.population.breeder;
 
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.Utils;
 import edu.gsgp.Utils.DatasetType;
-import edu.gsgp.data.Dataset;
-import edu.gsgp.data.ExperimentalData;
-import edu.gsgp.data.Instance;
-import edu.gsgp.data.PropertiesManager;
+import edu.gsgp.experiment.Dataset;
+import edu.gsgp.experiment.ExperimentalData;
+import edu.gsgp.experiment.Instance;
+import edu.gsgp.experiment.PropertiesManager;
 import edu.gsgp.nodes.Node;
-import edu.gsgp.population.GSGPIndividual;
+import edu.gsgp.population.Individual;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.fitness.Fitness;
 import java.math.BigInteger;
@@ -31,7 +31,7 @@ public class GSMBreeder extends Breeder{
         super(properties, probability);
     }
     
-    private Fitness evaluate(GSGPIndividual ind, 
+    private Fitness evaluate(Individual ind, 
                              Node randomTree1,
                              Node randomTree2, 
                              ExperimentalData expData){
@@ -59,14 +59,14 @@ public class GSMBreeder extends Breeder{
 
     @Override
     public Individual generateIndividual(MersenneTwister rndGenerator, ExperimentalData expData) {
-        GSGPIndividual p = (GSGPIndividual)properties.selectIndividual(originalPopulation, rndGenerator);
+        Individual p = (Individual)properties.selectIndividual(originalPopulation, rndGenerator);
         Node rt1 = properties.getRandomTree(rndGenerator);
         Node rt2 = properties.getRandomTree(rndGenerator);
         BigInteger numNodes = p.getNumNodes().add(new BigInteger(rt1.getNumNodes()+"")).
                                               add(new BigInteger(rt2.getNumNodes()+"")).
                                               add(BigInteger.ONE);
         Fitness fitnessFunction = evaluate(p, rt1, rt2, expData);
-        GSGPIndividual offspring = new GSGPIndividual(numNodes, fitnessFunction);
+        Individual offspring = new Individual(null, numNodes, fitnessFunction);
         return offspring;
     }
     

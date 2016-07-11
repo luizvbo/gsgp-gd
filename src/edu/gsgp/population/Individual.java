@@ -6,35 +6,43 @@
 
 package edu.gsgp.population;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
-import edu.gsgp.data.ExperimentalData;
+import edu.gsgp.Utils;
+import edu.gsgp.experiment.ExperimentalData;
 import edu.gsgp.nodes.Node;
 import edu.gsgp.population.fitness.Fitness;
+import java.math.BigInteger;
 
 /**
+ * 
  * @author Luiz Otavio Vilas Boas Oliveira
  * http://homepages.dcc.ufmg.br/~luizvbo/ 
  * luiz.vbo@gmail.com
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
-public abstract class Individual implements Comparable<Individual>{
+public class Individual implements Comparable<Individual>{
     protected Node tree;    
-    
     protected Fitness fitnessFunction;
 
-    public Individual(Node tree, Fitness fitnessFunction) {
+    public Individual(Node tree, Fitness fitnessFunction){
         this.tree = tree;
         this.fitnessFunction = fitnessFunction;
-    }   
-    
-    public Individual(Node tree, Fitness fitnessFunction, ExperimentalData data) {
-        this(tree, fitnessFunction);
     }
     
-    public double eval(double[] input){
-        return tree.eval(input);
+    public Individual(Fitness fitnessFunction){
+        this(null, fitnessFunction);
+    }
+    
+    public Individual(Node tree, BigInteger numNodes, Fitness fitnessFunction) {
+        this(tree, fitnessFunction);
+        fitnessFunction.setNumNodes(numNodes);
+    }
+    
+    public Individual(Node tree, int numNodes, Fitness fitnessFunction) {
+        this(tree, new BigInteger(numNodes + ""), fitnessFunction);
+    }
+        
+    public Individual(Node tree, Fitness fitnessFunction, ExperimentalData data) {
+        this(tree, fitnessFunction);
     }
 
     public Node getTree() {
@@ -52,15 +60,6 @@ public abstract class Individual implements Comparable<Individual>{
         return 0;
     }
 
-    public boolean isBestSolution(double minError) {
-        return getFitness() <= minError;
-    }
-
-    @Override
-    public String toString() {
-        return tree.toString(); //To change body of generated methods, choose Tools | Templates.
-    }
-
     public void setTree(Node randomSubtree) {
         this.tree = randomSubtree;
     }
@@ -69,13 +68,65 @@ public abstract class Individual implements Comparable<Individual>{
         return fitnessFunction;
     }
     
-    @Override
-    public abstract Individual clone();
+    public double eval(double[] input){
+        return tree.eval(input);
+    }
+
+    public void setNumNodes(BigInteger numNodes) {
+        fitnessFunction.setNumNodes(numNodes);
+    }
+   
+    public void startNumNodes() {
+        fitnessFunction.setNumNodes(tree.getNumNodes());
+    }
     
-    public abstract double getFitness();
-    public abstract String getNumNodesAsString();
-    public abstract String getTrainingFitnessAsString();
-    public abstract String getTestFitnessAsString();  
-    public abstract double[] getTrainingSemantics();
-    public abstract double[] getTestSemantics();
+    
+    @Override
+    public Individual clone(){
+        if(tree != null)
+            return new Individual(tree.clone(null), fitnessFunction);
+        return new Individual(fitnessFunction);
+    }
+    
+    public boolean isBestSolution(double minError) {
+        return getFitness() <= minError;
+    }
+
+    
+    public String toString() {
+        return tree.toString(); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    public String getNumNodesAsString() {
+        return fitnessFunction.getNumNodes().toString();
+    }
+
+    
+    public String getTrainingFitnessAsString() {
+        return Utils.format(fitnessFunction.getTrainingFitness());
+    }
+
+    
+    public String getTestFitnessAsString() {
+        return Utils.format(fitnessFunction.getTestFitness());
+    }
+    
+    public double getFitness() {
+        double value = fitnessFunction.getComparableValue();
+        if(Double.isInfinite(value) || Double.isNaN(value)) return Double.MAX_VALUE;
+        return value;
+    }
+    
+    public BigInteger getNumNodes() {
+        return fitnessFunction.getNumNodes();
+    }
+    
+    public double[] getTrainingSemantics() {
+        return fitnessFunction.getSemantics(Utils.DatasetType.TRAINING);
+    }
+
+    
+    public double[] getTestSemantics() {
+        return fitnessFunction.getSemantics(Utils.DatasetType.TEST);
+    }    
 }

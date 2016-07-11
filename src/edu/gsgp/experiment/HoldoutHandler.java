@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.gsgp.data;
+package edu.gsgp.experiment;
 
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.Utils;

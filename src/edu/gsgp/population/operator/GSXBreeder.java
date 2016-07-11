@@ -4,17 +4,17 @@
  * and open the template in the editor.
  */
 
-package edu.gsgp.population.operator;
+package edu.gsgp.population.breeder;
 
 import edu.gsgp.MersenneTwister;
 import edu.gsgp.Utils;
 import edu.gsgp.Utils.DatasetType;
-import edu.gsgp.data.Dataset;
-import edu.gsgp.data.ExperimentalData;
-import edu.gsgp.data.Instance;
-import edu.gsgp.data.PropertiesManager;
+import edu.gsgp.experiment.Dataset;
+import edu.gsgp.experiment.ExperimentalData;
+import edu.gsgp.experiment.Instance;
+import edu.gsgp.experiment.PropertiesManager;
 import edu.gsgp.nodes.Node;
-import edu.gsgp.population.GSGPIndividual;
+import edu.gsgp.population.Individual;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.fitness.Fitness;
 import java.math.BigInteger;
@@ -31,8 +31,8 @@ public class GSXBreeder extends Breeder{
         super(properties, probability);
     }
     
-    private Fitness evaluate(GSGPIndividual ind1,
-                            GSGPIndividual ind2, 
+    private Fitness evaluate(Individual ind1,
+                            Individual ind2, 
                             Node randomTree, 
                             ExperimentalData expData){
         Fitness fitnessFunction = ind1.getFitnessFunction().softClone();
@@ -64,13 +64,13 @@ public class GSXBreeder extends Breeder{
 
     @Override
     public Individual generateIndividual(MersenneTwister rndGenerator, ExperimentalData expData) {
-        GSGPIndividual p1 = (GSGPIndividual)properties.selectIndividual(originalPopulation, rndGenerator);
-        GSGPIndividual p2 = (GSGPIndividual)properties.selectIndividual(originalPopulation, rndGenerator);
-        while(p1.equals(p2)) p2 = (GSGPIndividual)properties.selectIndividual(originalPopulation, rndGenerator);
+        Individual p1 = (Individual)properties.selectIndividual(originalPopulation, rndGenerator);
+        Individual p2 = (Individual)properties.selectIndividual(originalPopulation, rndGenerator);
+        while(p1.equals(p2)) p2 = (Individual)properties.selectIndividual(originalPopulation, rndGenerator);
         Node rt = properties.getRandomTree(rndGenerator);
         BigInteger numNodes = p1.getNumNodes().add(p2.getNumNodes()).add(new BigInteger(rt.getNumNodes() + "")).add(BigInteger.ONE);
         Fitness fitnessFunction = evaluate(p1, p2, rt, expData);
-        GSGPIndividual offspring = new GSGPIndividual(numNodes, fitnessFunction);
+        Individual offspring = new Individual(null, numNodes, fitnessFunction);
         return offspring;
     }
 
