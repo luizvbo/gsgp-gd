@@ -7,9 +7,9 @@
 package edu.gsgp.population.breeder;
 
 import edu.gsgp.population.breeder.Breeder;
-import edu.gsgp.MersenneTwister;
-import edu.gsgp.experiment.ExperimentalData;
-import edu.gsgp.experiment.PropertiesManager;
+import edu.gsgp.utils.MersenneTwister;
+import edu.gsgp.experiment.data.ExperimentalData;
+import edu.gsgp.experiment.config.PropertiesManager;
 import edu.gsgp.population.Individual;
 
 /**

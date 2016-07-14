@@ -6,7 +6,7 @@
 
 package edu.gsgp.population.selector;
 
-import edu.gsgp.MersenneTwister;
+import edu.gsgp.utils.MersenneTwister;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.Population;
 

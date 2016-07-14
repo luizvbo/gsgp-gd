@@ -5,7 +5,7 @@
  */
 package edu.gsgp.population.pipeline;
 
-import edu.gsgp.experiment.ExperimentalData;
+import edu.gsgp.experiment.data.ExperimentalData;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.Population;
 import edu.gsgp.population.breeder.Breeder;

@@ -6,10 +6,10 @@
 
 package edu.gsgp.population.pipeline;
 
-import edu.gsgp.MersenneTwister;
-import edu.gsgp.Statistics;
-import edu.gsgp.experiment.ExperimentalData;
-import edu.gsgp.experiment.PropertiesManager;
+import edu.gsgp.utils.MersenneTwister;
+import edu.gsgp.utils.Statistics;
+import edu.gsgp.experiment.data.ExperimentalData;
+import edu.gsgp.experiment.config.PropertiesManager;
 import edu.gsgp.population.Population;
 import edu.gsgp.population.breeder.Breeder;
 

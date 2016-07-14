@@ -6,13 +6,13 @@
 
 package edu.gsgp.population.breeder;
 
-import edu.gsgp.MersenneTwister;
-import edu.gsgp.Utils;
-import edu.gsgp.Utils.DatasetType;
-import edu.gsgp.experiment.Dataset;
-import edu.gsgp.experiment.ExperimentalData;
-import edu.gsgp.experiment.Instance;
-import edu.gsgp.experiment.PropertiesManager;
+import edu.gsgp.utils.MersenneTwister;
+import edu.gsgp.utils.Utils;
+import edu.gsgp.utils.Utils.DatasetType;
+import edu.gsgp.experiment.data.Dataset;
+import edu.gsgp.experiment.data.ExperimentalData;
+import edu.gsgp.experiment.data.Instance;
+import edu.gsgp.experiment.config.PropertiesManager;
 import edu.gsgp.nodes.Node;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.Individual;

@@ -6,7 +6,7 @@
 
 package edu.gsgp.nodes.terminals;
 
-import edu.gsgp.MersenneTwister;
+import edu.gsgp.utils.MersenneTwister;
 import edu.gsgp.nodes.Node;
 
 /**

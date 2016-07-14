@@ -8,7 +8,7 @@ package edu.gsgp.population.selector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import edu.gsgp.MersenneTwister;
+import edu.gsgp.utils.MersenneTwister;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.Population;
 

@@ -6,8 +6,8 @@
 
 package edu.gsgp.population.fitness;
 
-import edu.gsgp.Utils.DatasetType;
-import edu.gsgp.experiment.ExperimentalData;
+import edu.gsgp.utils.Utils.DatasetType;
+import edu.gsgp.experiment.data.ExperimentalData;
 import java.math.BigInteger;
 
 /**

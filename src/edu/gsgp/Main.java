@@ -6,6 +6,8 @@
 
 package edu.gsgp;
 
+import edu.gsgp.experiment.config.Experimenter;
+
 /**
  * @author Luiz Otavio Vilas Boas Oliveira
  * http://homepages.dcc.ufmg.br/~luizvbo/ 
