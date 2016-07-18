@@ -1,5 +1,0 @@
-parent = ~/gsgp-gd/scripts/masterGD.param
-experiment.data = ~/gsgp-gd/dados/wineWhite-#.dat
-experiment.file.prefix = wineWhite-sp0.2alp10
-breed.spread.prob = 0.2
-breed.spread.alpha = 10

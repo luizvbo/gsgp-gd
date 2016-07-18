@@ -1,5 +1,0 @@
-parent = ~/gsgp-gd/scripts/masterGD.param
-experiment.data = ~/gsgp-gd/dados/energyCooling-#.dat
-experiment.file.prefix = energyCooling-sp0.4alp10
-breed.spread.prob = 0.4
-breed.spread.alpha = 10

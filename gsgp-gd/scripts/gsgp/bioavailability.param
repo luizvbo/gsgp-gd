@@ -1,4 +1,0 @@
-parent = ~/gsgp-gd/scripts/masterGSGP.param
-experiment.data = ~/gsgp-gd/dados/bioavailability-#.dat
-experiment.file.prefix = bioavailability-sgp
-

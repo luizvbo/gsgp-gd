@@ -1,6 +1,0 @@
-parent = ~/gsgp-gd/scripts/masterGSGP.param
-experiment.data = ~/gsgp-gd/dados/keijzer-7-#.dat
-experiment.file.prefix = keijzer-7-sgp
-
-
-experiment.design = HOLDOUT

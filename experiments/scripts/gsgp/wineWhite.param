@@ -1,0 +1,4 @@
+parent = ~/experiments/scripts/masterGSGP.param
+experiment.data = ~/experiments/dados/wineWhite-#.dat
+experiment.file.prefix = wineWhite-sgp
+

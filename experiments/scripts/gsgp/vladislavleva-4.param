@@ -1,0 +1,6 @@
+parent = ~/experiments/scripts/masterGSGP.param
+experiment.data = ~/experiments/dados/vladislavleva-4-#.dat
+experiment.file.prefix = vladislavleva-4-sgp
+
+
+experiment.design = HOLDOUT

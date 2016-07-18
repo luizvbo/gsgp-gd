@@ -1,0 +1,5 @@
+parent = ~/experiments/scripts/masterGD.param
+experiment.data = ~/experiments/dados/vladislavleva-4-#.dat
+experiment.file.prefix = vladislavleva-4-sp0.2alp10
+breed.spread.prob = 0.2
+breed.spread.alpha = 10

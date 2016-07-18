@@ -1,0 +1,5 @@
+parent = ~/experiments/scripts/masterGD.param
+experiment.data = ~/experiments/dados/concrete-#.dat
+experiment.file.prefix = concrete-sp0.6alp10
+breed.spread.prob = 0.6
+breed.spread.alpha = 10

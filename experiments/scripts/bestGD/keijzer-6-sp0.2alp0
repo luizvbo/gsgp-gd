@@ -1,0 +1,5 @@
+parent = ~/experiments/scripts/masterGD.param
+experiment.data = ~/experiments/dados/keijzer-6-#.dat
+experiment.file.prefix = keijzer-6-sp0.2alp0
+breed.spread.prob = 0.2
+breed.spread.alpha = 0

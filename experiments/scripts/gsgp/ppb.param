@@ -1,0 +1,4 @@
+parent = ~/experiments/scripts/masterGSGP.param
+experiment.data = ~/experiments/dados/ppb-#.dat
+experiment.file.prefix = ppb-sgp
+

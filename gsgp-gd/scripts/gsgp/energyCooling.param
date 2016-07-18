@@ -1,4 +1,0 @@
-parent = ~/gsgp-gd/scripts/masterGSGP.param
-experiment.data = ~/gsgp-gd/dados/energyCooling-#.dat
-experiment.file.prefix = energyCooling-sgp
-
