@@ -4,9 +4,8 @@
  * and open the template in the editor.
  */
 
-package edu.gsgp.population.breeder;
+package edu.gsgp.population.operator;
 
-import edu.gsgp.population.breeder.Breeder;
 import edu.gsgp.utils.MersenneTwister;
 import edu.gsgp.experiment.data.ExperimentalData;
 import edu.gsgp.experiment.config.PropertiesManager;

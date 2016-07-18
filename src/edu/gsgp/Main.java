@@ -18,7 +18,10 @@ public class Main {
     public static void main(String args[]){
         try{
             long startTime = System.currentTimeMillis();
+            
             Experimenter experiment = new Experimenter(args);
+            experiment.runExperiment();
+            
             System.out.println("Elapsed Time: " + ((System.currentTimeMillis() - startTime)/1000) + " seconds");
         }
         catch(Exception e){

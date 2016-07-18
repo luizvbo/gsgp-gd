@@ -8,7 +8,7 @@ package edu.gsgp.population.pipeline;
 
 import edu.gsgp.experiment.data.ExperimentalData;
 import edu.gsgp.population.Population;
-import edu.gsgp.population.breeder.Breeder;
+import edu.gsgp.population.operator.Breeder;
 
 /**
  *

@@ -34,10 +34,10 @@ import edu.gsgp.population.treebuilder.FullBuilder;
 import edu.gsgp.population.treebuilder.GrowBuilder;
 import edu.gsgp.population.treebuilder.HalfBuilder;
 import edu.gsgp.population.Individual;
-import edu.gsgp.population.breeder.Breeder;
 import edu.gsgp.population.populator.Populator;
 import edu.gsgp.population.treebuilder.TreeBuilder;
 import edu.gsgp.population.fitness.Fitness;
+import edu.gsgp.population.operator.Breeder;
 import edu.gsgp.population.pipeline.Pipeline;
 import edu.gsgp.population.selector.IndividualSelector;
 import edu.gsgp.population.selector.TournamentSelector;
@@ -149,8 +149,8 @@ public class PropertiesManager {
 
     public enum ParameterList {
         PARENT_FILE("parent", "Path to the parent parameter file. The child parameters overwrite the parent", false),
-        PATH_DATA_FILE("experiment.data", "Path for the training/test files. See experiment.sampling option for more details", true),
-        PATH_TEST_FILE("experiment.data.test", "Path for the test files. See experiment.sampling option for more details", false),
+        PATH_DATA_FILE("experiment.data", "Path for the training/test files. See experiment.design option for more details", true),
+        PATH_TEST_FILE("experiment.data.test", "Path for the test files. See experiment.design option for more details", false),
         PATH_OUTPUT_DIR("experiment.output.dir", "Output directory", false),
         SEED("experiment.seed", "Seed (long int) used by the pseudo-random number generator", false),
         FILE_PREFIX("experiment.file.prefix", "Identifier prefix for files", false),
@@ -304,7 +304,7 @@ public class PropertiesManager {
                 dataProducer = new HoldoutHandler();
                 break;
             default:
-                throw new Exception("Experiment design must be crossvalidation or holdout.");
+                throw new Exception("Experiment design (experiment.design) must be \"crossvalidation\" or \"holdout\".");
         }
         dataProducer.setDataset(getStringProperty(ParameterList.PATH_DATA_FILE, true), getStringProperty(ParameterList.PATH_TEST_FILE, true));
         return dataProducer;
@@ -476,7 +476,12 @@ public class PropertiesManager {
             case "rhh":
                 return new HalfBuilder(maxDepth, minDepth, functionSet, terminalSet);
             default:
-                throw new Exception("There is no builder called " + builderType + ".");
+                String msg = isForRandomTrees ? "Error loading the random trees builder. " : "Error loading the individuals' trees builder. ";
+                if(builderType.isEmpty())
+                    msg += "No builder was specified.";
+                else
+                    msg += "There is no builder called " + builderType + ".";
+                throw new Exception(msg);
         }
     }
     
@@ -498,7 +503,12 @@ public class PropertiesManager {
                 breeders.add(newBreeder);
             }
             catch(ClassNotFoundException e){
-                throw new ClassNotFoundException("Error loading the terminal set. Class " + sBreeder + " not found", e);
+                String msg = "Error loading the breeder list. ";
+                if(sBreeder.isEmpty())
+                    msg += "No breeder was specified.";
+                else
+                    msg += "It was not possible to parse the input \"" + sBreeder + "\".";
+                throw new ClassNotFoundException(msg, e);
             }
         }
         return breeders.toArray(new Breeder[breeders.size()]);
@@ -577,7 +587,12 @@ public class PropertiesManager {
             return (Populator)populatorConstructor.newInstance(this);
         } 
         catch (ClassNotFoundException e) {
-            throw new ClassNotFoundException("Error loading the population initializer. Class " + populatorClassname + " not found", e);
+            String msg = "Error loading the population initializer. ";
+            if(populatorClassname.isEmpty())
+                msg += "No population initializer was specified.";
+            else
+                msg += "Class " + populatorClassname + " not found";
+            throw new ClassNotFoundException(msg, e);
         } 
     }
     
@@ -595,7 +610,12 @@ public class PropertiesManager {
             return (Pipeline)populatorConstructor.newInstance();
         } 
         catch (ClassNotFoundException e) {
-            throw new ClassNotFoundException("Error loading the pipeline. Class " + populatorClassname + " not found", e);
+            String msg = "Error loading the pipeline. ";
+            if(populatorClassname.isEmpty())
+                msg += "No pipeline was specified.";
+            else
+                msg += "Class " + populatorClassname + " not found";
+            throw new ClassNotFoundException(msg, e);
         } 
     }
     

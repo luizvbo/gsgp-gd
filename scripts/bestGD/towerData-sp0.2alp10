@@ -1,0 +1,5 @@
+parent = ~/gsgp-gd/scripts/masterGD.param
+experiment.data = ~/gsgp-gd/dados/towerData-#.dat
+experiment.file.prefix = towerData-sp0.2alp10
+breed.spread.prob = 0.2
+breed.spread.alpha = 10

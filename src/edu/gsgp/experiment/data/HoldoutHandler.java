@@ -167,12 +167,12 @@ public class HoldoutHandler implements DataProducer{
         String testInfix = "test-";
         
         if(trainingRepeatedName.length != 2)
-            throw new Exception("The file pattern must have one and only one # symbol as fold index.");
+            throw new Exception("The file pattern must have one # symbol as fold index. See the instructions to use Holdout.");
         ArrayList<File> trainFiles = new ArrayList<File>();
         ArrayList<File> testFiles = new ArrayList<File>();
         int index = 0;
         
-        if(testPath != null){
+        if(testPath != null && !testPath.isEmpty()){
             lastFileSeparator = testPath.lastIndexOf(File.separator);
             filePattern = testPath.substring(lastFileSeparator + 1);
             testFolder = testPath.substring(0, lastFileSeparator);
@@ -182,13 +182,17 @@ public class HoldoutHandler implements DataProducer{
         }
         
         File newTrain = new File(trainingFolder + File.separator + trainingRepeatedName[0] + trainingInfix + index + trainingRepeatedName[1]);
+        newTrain = newTrain.getCanonicalFile();
         File newTest = new File(testFolder + File.separator + testRepeatedName[0] + testInfix + index + testRepeatedName[1]);
+        newTest = newTest.getCanonicalFile();        
         while(newTrain.isFile() && newTest.isFile()){
             trainFiles.add(newTrain);
             testFiles.add(newTest);
             index++;
             newTrain = new File(trainingFolder + File.separator + trainingRepeatedName[0] + trainingInfix + index + trainingRepeatedName[1]);
+            newTrain = newTrain.getCanonicalFile();
             newTest = new File(testFolder + File.separator + testRepeatedName[0] + testInfix + index + testRepeatedName[1]);
+            newTest = newTest.getCanonicalFile();
         }
         if(trainFiles.isEmpty() || testFiles.isEmpty()) 
             throw new Exception("No files found for this file pattern/path: \"" + newTrain.getAbsolutePath() + "\" and \"" + newTest.getAbsolutePath() +  "\"\nUsing HOLDOUT.\n");

@@ -1,0 +1,4 @@
+parent = ~/gsgp-gd/scripts/masterGSGP.param
+experiment.data = ~/gsgp-gd/dados/energyHeating-#.dat
+experiment.file.prefix = energyHeating-sgp
+

@@ -9,7 +9,6 @@ package edu.gsgp.experiment.config;
 import edu.gsgp.GSGP;
 import edu.gsgp.experiment.data.DataProducer;
 import edu.gsgp.experiment.data.DataWriter;
-import edu.gsgp.experiment.config.PropertiesManager;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -25,30 +24,30 @@ public class Experimenter {
     
     protected DataProducer dataProducer;
     
-     public Experimenter(String[] args) throws Exception{
+    public Experimenter(String[] args) throws Exception{
         parameters = new PropertiesManager(args);
-        if(parameters.isParameterLoaded())
-            execute();
     }
     
-    private void execute(){
-        try {
-            Experiment experiments[] = new Experiment[parameters.getNumExperiments()];
-            int numThreads = Math.min(parameters.getNumThreads(), parameters.getNumExperiments());
-            ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-            
-            // Run the algorithm for a defined number of repetitions
-            for(int execution = 0; execution < parameters.getNumExperiments(); execution++){
-                parameters.updateExperimentalData();
-                experiments[execution] = new Experiment(new GSGP(parameters, parameters.getExperimentalData()), execution);
-                executor.execute(experiments[execution]);
+    public void runExperiment(){
+        if(parameters.isParameterLoaded()){
+            try {
+                Experiment experiments[] = new Experiment[parameters.getNumExperiments()];
+                int numThreads = Math.min(parameters.getNumThreads(), parameters.getNumExperiments());
+                ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+
+                // Run the algorithm for a defined number of repetitions
+                for(int execution = 0; execution < parameters.getNumExperiments(); execution++){
+                    parameters.updateExperimentalData();
+                    experiments[execution] = new Experiment(new GSGP(parameters, parameters.getExperimentalData()), execution);
+                    executor.execute(experiments[execution]);
+                }
+                executor.shutdown();
+                executor.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+                DataWriter.writeLoadedParameters(parameters);
+            } 
+            catch (Exception ex) {
+                ex.printStackTrace();
             }
-            executor.shutdown();
-            executor.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-            DataWriter.writeLoadedParameters(parameters);
-        } 
-        catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
     

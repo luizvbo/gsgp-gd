@@ -1,0 +1,4 @@
+parent = ~/gsgp-gd/scripts/masterGSGP.param
+experiment.data = ~/gsgp-gd/dados/airfoil-#.dat
+experiment.file.prefix = airfoil-sgp
+

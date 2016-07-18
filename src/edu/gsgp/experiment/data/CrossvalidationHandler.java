@@ -117,10 +117,12 @@ public class CrossvalidationHandler implements DataProducer{
         ArrayList<File> files = new ArrayList<File>();
         int index = 0;
         File newFold = new File(folderName + File.separator + aux[0] + index + aux[1]);
+        newFold = newFold.getCanonicalFile();
         while(newFold.isFile()){
             files.add(newFold);
             index++;
             newFold = new File(folderName + File.separator + aux[0] + index + aux[1]);
+            newFold = newFold.getCanonicalFile();
         }
         if(files.isEmpty()) 
             throw new Exception("No files found for this file pattern/path: \"" + newFold.getAbsolutePath() + "\"\nUsing CROSSVALIDATION.\n");

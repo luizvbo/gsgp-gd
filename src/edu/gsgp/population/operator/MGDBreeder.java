@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package edu.gsgp.population.breeder;
+package edu.gsgp.population.operator;
 
 import edu.gsgp.utils.MersenneTwister;
 import edu.gsgp.utils.Utils.DatasetType;
@@ -12,7 +12,6 @@ import edu.gsgp.experiment.data.Dataset;
 import edu.gsgp.experiment.data.ExperimentalData;
 import edu.gsgp.experiment.data.Instance;
 import edu.gsgp.experiment.config.PropertiesManager;
-import edu.gsgp.population.Individual;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.Population;
 import edu.gsgp.population.fitness.Fitness;

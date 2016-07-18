@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package edu.gsgp.population.breeder;
+package edu.gsgp.population.operator;
 
 import edu.gsgp.utils.MersenneTwister;
 import edu.gsgp.utils.Utils;
@@ -15,7 +15,6 @@ import edu.gsgp.experiment.data.Instance;
 import edu.gsgp.experiment.config.PropertiesManager;
 import edu.gsgp.nodes.Node;
 import edu.gsgp.population.Individual;
-import edu.gsgp.population.Individual;
 import edu.gsgp.population.fitness.Fitness;
 import java.math.BigInteger;
 
@@ -25,9 +24,9 @@ import java.math.BigInteger;
  * luiz.vbo@gmail.com
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
-public class GSXBreeder extends Breeder{
+public class GSXMBreeder extends Breeder{
 
-    public GSXBreeder(PropertiesManager properties, Double probability) {
+    public GSXMBreeder(PropertiesManager properties, Double probability) {
         super(properties, probability);
     }
     
@@ -76,6 +75,6 @@ public class GSXBreeder extends Breeder{
 
     @Override
     public Breeder softClone(PropertiesManager properties) {
-        return new GSXBreeder(properties, probability);
+        return new GSXMBreeder(properties, probability);
     }
 }

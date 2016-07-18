@@ -1,0 +1,5 @@
+parent = ~/gsgp-gd/scripts/masterGD.param
+experiment.data = ~/gsgp-gd/dados/ppb-#.dat
+experiment.file.prefix = ppb-sp0.2alp5
+breed.spread.prob = 0.2
+breed.spread.alpha = 5
