@@ -1,6 +1,6 @@
 # Test if the median of the config in path1 is greater than path2
 # Return a positive p.value if median(path1) < median(path1) and a negative one otherwise
-staTest = function(p1, p2, sort.1 = T, sort.2 = T, paired = T, test = 'wilcoxon', type='test'){
+statTest = function(p1, p2, sort.1 = T, sort.2 = T, paired = T, test = 'wilcoxon', type='test'){
   # csvFileName = 'tsFitness.csv'
   csvFileName = switch (type,
     test = 'tsFitness.csv',
@@ -35,7 +35,7 @@ staTest = function(p1, p2, sort.1 = T, sort.2 = T, paired = T, test = 'wilcoxon'
 
 # This function is very specific. It list two folders and, following some guidelines, compare the similar 
 # folders (with GSGP results) in which it runs a Wilcoxon test
-staTestBetweenFolders = function(p1, p2, sort.1 = T, sort.2 = T, 
+statTestBetweenFolders = function(p1, p2, sort.1 = T, sort.2 = T, 
                                  paired = T, ds.names, test='wilcoxon', type='test'){
   # Get the dataset folders
   p1.list=list.dirs(p1, recursive = F, full.names = T)
@@ -45,7 +45,7 @@ staTestBetweenFolders = function(p1, p2, sort.1 = T, sort.2 = T,
     p2.ds.path = grep(ds, p2.list, value = T)
     # Test if the dataset is present in both paths
     if(length(p1.ds.path)!=0 & length(p2.ds.path)!=0){
-      staTest(p1.ds.path[1], p2.ds.path[1], sort.1 = sort.1, 
+      statTest(p1.ds.path[1], p2.ds.path[1], sort.1 = sort.1, 
               sort.2 = sort.2, paired = paired, test = test, type = type)
     }
   } 
