@@ -14,6 +14,7 @@ import edu.gsgp.experiment.data.ExperimentalData;
 import edu.gsgp.experiment.data.Instance;
 import edu.gsgp.experiment.config.PropertiesManager;
 import edu.gsgp.nodes.Node;
+import edu.gsgp.normalization.NormalizationStrategy;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.fitness.Fitness;
 import java.math.BigInteger;
@@ -35,6 +36,8 @@ public class GSXMBreeder extends Breeder{
                             Node randomTree, 
                             ExperimentalData expData){
         Fitness fitnessFunction = ind1.getFitnessFunction().softClone();
+        NormalizationStrategy normalizer = this.properties.getNormalizationStrategy();
+        
         for(DatasetType dataType : DatasetType.values()){
             // Compute the (training/test) semantics of generated random tree
             fitnessFunction.resetFitness(dataType, expData);
@@ -50,8 +53,11 @@ public class GSXMBreeder extends Breeder{
                 semInd2 = ind2.getTestSemantics();
             }
             int instanceIndex = 0;
+            
+            normalizer.setup(dataset, randomTree);
+            
             for (Instance instance : dataset) {
-                double rtValue = Utils.sigmoid(randomTree.eval(instance.input));
+                double rtValue = normalizer.normalize(instance);
 //                double estimated = rtValue*ind1.getTrainingSemantics()[instanceIndex] + (1-rtValue)*ind2.getTrainingSemantics()[instanceIndex];
                 double estimated = rtValue*semInd1[instanceIndex] + (1-rtValue)*semInd2[instanceIndex];
                 fitnessFunction.setSemanticsAtIndex(estimated, instance.output, instanceIndex++, dataType);

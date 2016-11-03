@@ -7,14 +7,13 @@
 package edu.gsgp.population.operator;
 
 import edu.gsgp.utils.MersenneTwister;
-import edu.gsgp.utils.Utils;
 import edu.gsgp.utils.Utils.DatasetType;
 import edu.gsgp.experiment.data.Dataset;
 import edu.gsgp.experiment.data.ExperimentalData;
 import edu.gsgp.experiment.data.Instance;
 import edu.gsgp.experiment.config.PropertiesManager;
 import edu.gsgp.nodes.Node;
-import edu.gsgp.population.Individual;
+import edu.gsgp.normalization.NormalizationStrategy;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.fitness.Fitness;
 import java.math.BigInteger;
@@ -36,6 +35,9 @@ public class GSMBreeder extends Breeder{
                              Node randomTree2, 
                              ExperimentalData expData){
         Fitness fitnessFunction = ind.getFitnessFunction().softClone();
+        NormalizationStrategy normalizer1 = properties.getNormalizationStrategy();
+        NormalizationStrategy normalizer2 = properties.getNormalizationStrategy();
+                
         for(DatasetType dataType : DatasetType.values()){
             // Compute the (training/test) semantics of generated random tree
             fitnessFunction.resetFitness(dataType, expData);
@@ -46,9 +48,13 @@ public class GSMBreeder extends Breeder{
             else 
                 semInd =  ind.getTestSemantics();
             int instanceIndex = 0;
+            
+            normalizer1.setup(dataset, randomTree1);
+            normalizer2.setup(dataset, randomTree2);
+            
             for (Instance instance : dataset) {
-                double rtValue = Utils.sigmoid(randomTree1.eval(instance.input));
-                rtValue -= Utils.sigmoid(randomTree2.eval(instance.input));
+                double rtValue = normalizer1.normalize(instance);
+                rtValue -= normalizer2.normalize(instance);
                 double estimated = semInd[instanceIndex] + properties.getMutationStep() * rtValue;
                 fitnessFunction.setSemanticsAtIndex(estimated, instance.output, instanceIndex++, dataType);
             }

@@ -30,6 +30,8 @@ import edu.gsgp.nodes.Node;
 import edu.gsgp.nodes.functions.Function;
 import edu.gsgp.nodes.terminals.Input;
 import edu.gsgp.nodes.terminals.Terminal;
+import edu.gsgp.normalization.NormalizationStrategy;
+import edu.gsgp.normalization.strategies.*;
 import edu.gsgp.population.treebuilder.FullBuilder;
 import edu.gsgp.population.treebuilder.GrowBuilder;
 import edu.gsgp.population.treebuilder.HalfBuilder;
@@ -98,6 +100,8 @@ public class PropertiesManager {
     
     private String outputDir;
     private String filePrefix;
+    private String normalizationStrategyName; 
+           
     
     // Used do double check the parameters loaded/used by the experiment
     private StringBuilder loadedParametersLog;
@@ -143,8 +147,9 @@ public class PropertiesManager {
         pipeline = getPipelineObject();
         populationInitializer = getPopInitObject();
         breederList = getBreederObjects();
+        normalizationStrategyName = getNormalizationStrategyName();
         
-        individualSelector = getIndividualSelector();        
+        individualSelector = getIndividualSelector();
     }
 
     public enum ParameterList {
@@ -197,11 +202,12 @@ public class PropertiesManager {
         POP_INIT_ATTEMPTS("pop.initializer.attempts", "Number of attemtps before adding an individual in the population", false),
         
         SPREADER_PROB("breed.spread.prob", "Probability of applying the spreader operator (in standalone mode)", false),
-        SPREADER_ALPHA("breed.spread.alpha", "Alpha used to compute the effective probability of applying the spreader", false);
+        SPREADER_ALPHA("breed.spread.alpha", "Alpha used to compute the effective probability of applying the spreader", false),
 //        MUT_PROB("breed.mut.prob", "Probability of applying the mutation operator", false),
 //        XOVER_PROB("breed.xover.prob", "Probability of applying the crossover operator", false),
 //        SEMANTIC_SIMILARITY_THRESHOLD("sem.gp.epsilon", "Threshold used to determine if two semantics are similar", false);
-
+        NORM_STRATEGY("normalization.strategy", "Normalization strategy.", true);
+        
         public final String name;
         public final String description;
         public final boolean mandatory;
@@ -843,6 +849,40 @@ public class PropertiesManager {
         return copyBreeders;
     }
     
+    private String getNormalizationStrategyName() throws Exception {
+        String strategy = "";
+        try {
+            strategy = getStringProperty(ParameterList.NORM_STRATEGY, false);
+            return strategy;
+        } catch (Exception e) {
+            String msg = "Error loading the normalization strategy. ";
+            if(strategy.isEmpty())
+                msg += "No normalization strategy was specified.";
+            else
+                msg += "It was not possible to parse the normalization strategy \"" + strategy + "\".";
+            throw new Exception(msg, e);
+        }
+    }
+    
+    public NormalizationStrategy getNormalizationStrategy() {
+        switch(normalizationStrategyName.toLowerCase()) {
+            case "sigmoid":
+                return new SigmoidStrategy();
+            case "minmax":
+                return new MinMaxStrategy();
+            case "percentileminmax":
+                return new PercentileMinMaxStrategy();
+            case "zscoresigmoid":
+                return new SigmoidStrategy(new ZScoreStrategy());
+            case "zscoreminmax":
+                return new MinMaxStrategy(new ZScoreStrategy());
+            case "zscorepercentileminmax":
+                return new PercentileMinMaxStrategy(new ZScoreStrategy());
+            default:
+                return new SigmoidStrategy();
+        }
+    }
+        
     public String getLoadedParametersString(){
         return loadedParametersLog.toString();
     }
