@@ -45,6 +45,8 @@ import edu.gsgp.population.selector.IndividualSelector;
 import edu.gsgp.population.selector.TournamentSelector;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Luiz Otavio Vilas Boas Oliveira
@@ -100,7 +102,8 @@ public class PropertiesManager {
     
     private String outputDir;
     private String filePrefix;
-    private String normalizationStrategyName; 
+    private String normalizationStrategyName;
+    private Double normalizationStrategyArg;
            
     
     // Used do double check the parameters loaded/used by the experiment
@@ -148,6 +151,7 @@ public class PropertiesManager {
         populationInitializer = getPopInitObject();
         breederList = getBreederObjects();
         normalizationStrategyName = getNormalizationStrategyName();
+        normalizationStrategyArg = getNormalizationStrategyArg();
         
         individualSelector = getIndividualSelector();
     }
@@ -864,23 +868,33 @@ public class PropertiesManager {
         }
     }
     
-    public NormalizationStrategy getNormalizationStrategy() {
-        switch(normalizationStrategyName.toLowerCase()) {
-            case "sigmoid":
-                return new SigmoidStrategy();
-            case "minmax":
-                return new MinMaxStrategy();
-            case "percentileminmax":
-                return new PercentileMinMaxStrategy();
-            case "zscoresigmoid":
-                return new SigmoidStrategy(new ZScoreStrategy());
-            case "zscoreminmax":
-                return new MinMaxStrategy(new ZScoreStrategy());
-            case "zscorepercentileminmax":
-                return new PercentileMinMaxStrategy(new ZScoreStrategy());
-            default:
-                return new SigmoidStrategy();
+    private double getNormalizationStrategyArg() {
+        Pattern p = Pattern.compile("percentileminmax-(\\d+)");
+        Matcher m = p.matcher(normalizationStrategyName);
+        
+        if (m.find()) {
+            return Integer.parseInt(m.group(1));
         }
+        
+        return 0.0;
+    }
+    
+    public NormalizationStrategy getNormalizationStrategy() {        
+        if (normalizationStrategyName.toLowerCase().equals("minmax")) {
+            return new MinMaxStrategy();
+        } else if (normalizationStrategyName.toLowerCase().equals("minmax")) {
+            return new MinMaxStrategy();
+        } else if (normalizationStrategyName.toLowerCase().startsWith("percentileminmax")) {
+            return new PercentileMinMaxStrategy(normalizationStrategyArg);
+        } else if (normalizationStrategyName.toLowerCase().equals("zscoresigmoid")) {
+            return new SigmoidStrategy(new ZScoreStrategy());
+        } else if (normalizationStrategyName.toLowerCase().equals("zscoreminmax")) {
+            return new MinMaxStrategy(new ZScoreStrategy());
+        } else if (normalizationStrategyName.toLowerCase().startsWith("zscorepercentileminmax")) {
+            return new PercentileMinMaxStrategy(normalizationStrategyArg, new ZScoreStrategy());
+        }
+
+        return new SigmoidStrategy();
     }
         
     public String getLoadedParametersString(){

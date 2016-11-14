@@ -17,20 +17,24 @@ import java.util.PriorityQueue;
  * @author casadei
  */
 public class PercentileMinMaxStrategy extends MinMaxStrategy {
-    private final static double DISCARTED = 0.1;
+    private final double evaluatedPercentual;
 
-    public PercentileMinMaxStrategy() {
+    public PercentileMinMaxStrategy(double evaluatedPercentual) {
         super();
+        
+        this.evaluatedPercentual = evaluatedPercentual;
     }
 
-    public PercentileMinMaxStrategy(NormalizationStrategy before) {
+    public PercentileMinMaxStrategy(double evaluatedPercentual, NormalizationStrategy before) {
         super(before);
+        
+        this.evaluatedPercentual = evaluatedPercentual;
     }
-    
+        
     @Override
     public void setup(Dataset dataset, Node tree) {
         super.setup(dataset, tree);
-        int capacity = (int) Math.floor(dataset.size() * DISCARTED);
+        int capacity = Math.max(1, (int) Math.floor(dataset.size() * getDiscartedPercentualPerTail()));
         
         PriorityQueue<Double> lowest =  new PriorityQueue<>(capacity, Collections.reverseOrder());
         PriorityQueue<Double> highest=  new PriorityQueue<>(capacity, Collections.reverseOrder());
@@ -42,6 +46,10 @@ public class PercentileMinMaxStrategy extends MinMaxStrategy {
         
         lowest.clear();
         highest.clear();
+    }    
+    
+    private double getDiscartedPercentualPerTail() {
+        return (1 - evaluatedPercentual / 100) / 2.0;
     }    
     
     private void fillPriorityQueues(

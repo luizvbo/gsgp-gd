@@ -54,4 +54,4 @@ breed.list = edu.gsgp.population.operator.GSMBreeder*0.5, edu.gsgp.population.op
 # Alpha used to compute the effective probability of applying the spreader"
 #breed.spread.alpha = 10
 # Normalization Strategy
-normalization.strategy = zscorepercentileminmax
+normalization.strategy = percentileminmax-98;

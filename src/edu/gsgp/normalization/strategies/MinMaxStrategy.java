@@ -35,7 +35,7 @@ public class MinMaxStrategy extends NormalizationStrategy {
             value = tree.eval(instance.input);
             
             min = Math.min(min, value);
-            max = Math.max(min, value);
+            max = Math.max(max, value);
         }
     }
         
