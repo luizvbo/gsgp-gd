@@ -30,3 +30,30 @@ friedman.with.Finner = function(data, alpha=0.05){
   #alpha.finner=1-(1-alpha)^((k-1)/(1:k))
   return(stat)
 }
+
+# ====== Função para gerar uma matrix compatível com o teste de Friedman com post-hoc de Nemenyi =========
+friedman.with.nemenyi = function(originalData){
+  # Carrega o pacote PMCMR
+  library("PMCMR")
+
+  # Os dados devem estar em colunas dataset, alg1, alg2, ..., algn
+  # Os nomes das colunas da matriz deve ser o nome do algoritmo
+  size = dim(originalData)
+  
+  # Groups = different algorithms
+  # Blocks = different datasets
+  newData <- data.frame(matrix(vector(), size[1]*(size[2]-1), 3, dimnames=list(c(), 
+                        c("groups","blocks","values"))), 
+                        stringsAsFactors=F) 
+  
+  algNames = colnames(originalData)[2:size[2]]
+  aux=NULL
+  for(i in 1:length(algNames)) aux = c(aux,rep(algNames[i], size[1]))
+  newData[,1]=aux
+  newData[,2]=rep(as.character(originalData[,1]),size[2]-1)
+  aux=NULL
+  for(i in 2:size[2]) aux = c(aux,originalData[,i])
+  newData[,3]=as.numeric(aux)
+  print(posthoc.friedman.nemenyi.test(y=newData$values, 
+  						groups = newData$groups, blocks = newData$blocks), p.value=0.5)
+}
