@@ -34,5 +34,5 @@ public class SigmoidStrategy extends NormalizationStrategy {
     public double normalize(Instance instance) {        
         return Utils.sigmoid(eval(instance));
     }
-    
+   
 }

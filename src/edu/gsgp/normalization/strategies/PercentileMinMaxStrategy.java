@@ -36,7 +36,7 @@ public class PercentileMinMaxStrategy extends MinMaxStrategy {
         super.setup(dataset, tree);
         int capacity = Math.max(1, (int) Math.floor(dataset.size() * getDiscartedPercentualPerTail()));
         
-        PriorityQueue<Double> lowest =  new PriorityQueue<>(capacity, Collections.reverseOrder());
+        PriorityQueue<Double> lowest =  new PriorityQueue<>(capacity);
         PriorityQueue<Double> highest=  new PriorityQueue<>(capacity, Collections.reverseOrder());
         
         fillPriorityQueues(dataset, lowest, highest, capacity);

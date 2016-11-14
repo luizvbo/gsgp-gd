@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
 #DATASETS     = %w(airfoil concrete yacht vladislavleva-1 vladislavleva-4 keijzer-5)
-DATASETS     = %w(yacht keijzer-7 keijzer-8 airfoil)
+DATASETS     = %w(yacht)
 #STRATEGIES   = %w(sigmoid minmax percentileminmax_x zscoresigmoid zscoreminmax zscorepercentileminmax_x)
-STRATEGIES   = %w(percentileminmax-90)
+STRATEGIES   = %w(minmax)
 #STRATEGIES   = %w(zscorepercentileminmax-90)
 
 MASTER_PATH  = "/Users/casadei/experiments/scripts/masterGSGP.param"

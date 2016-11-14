@@ -37,7 +37,8 @@ public class GSXMBreeder extends Breeder{
                             ExperimentalData expData){
         Fitness fitnessFunction = ind1.getFitnessFunction().softClone();
         NormalizationStrategy normalizer = this.properties.getNormalizationStrategy();
-        
+        normalizer.setup(expData.getDataset(DatasetType.TRAINING), randomTree);
+       
         for(DatasetType dataType : DatasetType.values()){
             // Compute the (training/test) semantics of generated random tree
             fitnessFunction.resetFitness(dataType, expData);
@@ -53,8 +54,6 @@ public class GSXMBreeder extends Breeder{
                 semInd2 = ind2.getTestSemantics();
             }
             int instanceIndex = 0;
-            
-            normalizer.setup(dataset, randomTree);
             
             for (Instance instance : dataset) {
                 double rtValue = normalizer.normalize(instance);

@@ -35,9 +35,13 @@ public class GSMBreeder extends Breeder{
                              Node randomTree2, 
                              ExperimentalData expData){
         Fitness fitnessFunction = ind.getFitnessFunction().softClone();
+        
         NormalizationStrategy normalizer1 = properties.getNormalizationStrategy();
+        normalizer1.setup(expData.getDataset(DatasetType.TRAINING), randomTree1);
+        
         NormalizationStrategy normalizer2 = properties.getNormalizationStrategy();
-                
+        normalizer2.setup(expData.getDataset(DatasetType.TRAINING), randomTree2);
+       
         for(DatasetType dataType : DatasetType.values()){
             // Compute the (training/test) semantics of generated random tree
             fitnessFunction.resetFitness(dataType, expData);
@@ -48,10 +52,7 @@ public class GSMBreeder extends Breeder{
             else 
                 semInd =  ind.getTestSemantics();
             int instanceIndex = 0;
-            
-            normalizer1.setup(dataset, randomTree1);
-            normalizer2.setup(dataset, randomTree2);
-            
+                        
             for (Instance instance : dataset) {
                 double rtValue = normalizer1.normalize(instance);
                 rtValue -= normalizer2.normalize(instance);
