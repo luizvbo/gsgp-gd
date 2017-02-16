@@ -28,5 +28,5 @@ with one of the parameter files inside the folders *bestGD* (for the experiments
 The parameter files inside the directory *experiments/scripts* presents instructions for each parameter (presented as comments started with '**#**')
 
 ## Published papers
-* Luiz O. V. B. Oliveira and Fernando E. B. Otero and Gisele L. Pappa. **A Dispersion Operator for Geometric Semantic Genetic Programming**. Proc. of GECCO'16. 2016 (to appear).
+* Luiz O. V. B. Oliveira and Fernando E. B. Otero and Gisele L. Pappa. **A Dispersion Operator for Geometric Semantic Genetic Programming**. Proc. of the Genetic and Evolutionary Computation Conference 2016, GECCO 2016, pp. 773–780, ACM, Denver, Colorado, USA, 2016, ISBN: 978-1-4503-4206-3, (Received the Best Paper Award in the track "Genetic Programming").
 * Luiz Otavio V. B. Oliveira and Fernando E. B. Otero and Gisele L. Pappa. **A Generic Framework for Building Dispersion Operators in the Semantic Space**. Genetic Programming Theory and Practice XIV. 2016 (to appear).
