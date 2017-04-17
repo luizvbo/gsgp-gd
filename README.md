@@ -18,15 +18,53 @@ This project is a Java implementation of the Geometric Semantic Genetic Programm
 
 The parameter files are adjusted to work from the home directory. Thus, the folder *experiments* has to be copied to your home.
 In order to execute the experiments, run the following command line:
+
 ```
 	java -jar GSGP.jar -p path/to/parameter/file
 ```
+
 with one of the parameter files inside the folders *bestGD* (for the experiments with GSGP+GD) and *gsgp* (for experiments without the GD operator).
 
 ### Parameters
 
 The parameter files inside the directory *experiments/scripts* presents instructions for each parameter (presented as comments started with '**#**')
 
+### Normalization Strategy
+
+The normalization strategy is defined through the property `normalization.strategy` at parameters file (see [Parameters](#parameters)).
+
+The allowed values for the `normalization.strategy` property are the following:
+
+##### Logistic
+
+Example:
+
+```normalization.strategy = sigmoid```
+
+##### Min-Max
+
+Example:
+
+```normalization.strategy = minmax```
+
+##### Min-Max of alpha
+
+To use this strategy you must define the amount of data will be taken into account. Thus, if you'd like to discard the 10% of lowest values and 10% of greatest values, the alpha will be 80. Alpha can be any integer value in the range [1 ,99].
+
+Example:
+
+```normalization.strategy = percentileminmax-80```
+
+##### Logistic z-score
+
+Example: ```normalization.strategy = zscoresigmoid```
+
+***
+
+The definitions and behavior of each of these strategies are described in paper **Strategies for Improving the Distribution of Random Function Outputs in GSGP**. (See [Published papers](#published-papers)).
+
 ## Published papers
 * Luiz O. V. B. Oliveira and Fernando E. B. Otero and Gisele L. Pappa. **A Dispersion Operator for Geometric Semantic Genetic Programming**. Proc. of the Genetic and Evolutionary Computation Conference 2016, GECCO 2016, pp. 773–780, ACM, Denver, Colorado, USA, 2016, ISBN: 978-1-4503-4206-3, (Best Paper Award in Genetic Programming).
 * Luiz Otavio V. B. Oliveira and Fernando E. B. Otero and Gisele L. Pappa. **A Generic Framework for Building Dispersion Operators in the Semantic Space**. Genetic Programming Theory and Practice XIV. 2016 (to appear).
+* Luiz Otavio V. B. Oliveira and Felipe Casadei and Gisele L. Pappa. **Strategies for Improving the Distribution of Random Function Outputs in GSGP**. Proc of the European Conference on Genetic Programming 2017, EuroGP 2017.
+
