@@ -3,10 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Users/casadei/dev/casadei/gsgp-gd/src/edu/gsgp/normalization/strategies/PercentileMinMaxStrategy.java</file>
-            <file>file:/Users/casadei/dev/casadei/gsgp-gd/src/edu/gsgp/experiment/config/PropertiesManager.java</file>
-            <file>file:/Users/casadei/dev/casadei/gsgp-gd/src/edu/gsgp/population/operator/GSMBreeder.java</file>
-            <file>file:/Users/casadei/dev/casadei/gsgp-gd/src/edu/gsgp/population/operator/GSXMBreeder.java</file>
+            <file>file:/home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/projetos/GSGP-GD/src/edu/gsgp/population/operator/GSXMBreeder.java</file>
+            <file>file:/home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/projetos/GSGP-GD/src/edu/gsgp/population/operator/GSXEBreeder.java</file>
+            <file>file:/home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/projetos/GSGP-GD/src/edu/gsgp/population/Individual.java</file>
+            <file>file:/home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/projetos/GSGP-GD/src/edu/gsgp/population/operator/Breeder.java</file>
+            <file>file:/home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/projetos/GSGP-GD/src/edu/gsgp/population/fitness/Fitness.java</file>
         </group>
     </open-files>
 </project-private>

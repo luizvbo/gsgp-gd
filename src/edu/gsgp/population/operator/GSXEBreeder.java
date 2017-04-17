@@ -7,14 +7,11 @@
 package edu.gsgp.population.operator;
 
 import edu.gsgp.utils.MersenneTwister;
-import edu.gsgp.utils.Utils;
 import edu.gsgp.utils.Utils.DatasetType;
 import edu.gsgp.experiment.data.Dataset;
 import edu.gsgp.experiment.data.ExperimentalData;
 import edu.gsgp.experiment.data.Instance;
 import edu.gsgp.experiment.config.PropertiesManager;
-import edu.gsgp.nodes.Node;
-import edu.gsgp.normalization.NormalizationStrategy;
 import edu.gsgp.population.Individual;
 import edu.gsgp.population.fitness.Fitness;
 import java.math.BigInteger;
@@ -25,20 +22,17 @@ import java.math.BigInteger;
  * luiz.vbo@gmail.com
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
-public class GSXMBreeder extends Breeder{
+public class GSXEBreeder extends Breeder{
 
-    public GSXMBreeder(PropertiesManager properties, Double probability) {
+    public GSXEBreeder(PropertiesManager properties, Double probability) {
         super(properties, probability);
     }
     
     private Fitness evaluate(Individual ind1,
-                            Individual ind2, 
-                            Node randomTree, 
+                             Individual ind2, 
+                            double r, 
                             ExperimentalData expData){
         Fitness fitnessFunction = ind1.getFitnessFunction().softClone();
-        NormalizationStrategy normalizer = this.properties.getNormalizationStrategy();
-        normalizer.setup(expData.getDataset(DatasetType.TRAINING), randomTree);
-       
         for(DatasetType dataType : DatasetType.values()){
             // Compute the (training/test) semantics of generated random tree
             fitnessFunction.resetFitness(dataType, expData);
@@ -54,11 +48,9 @@ public class GSXMBreeder extends Breeder{
                 semInd2 = ind2.getTestSemantics();
             }
             int instanceIndex = 0;
-            
+            double oneMinusR = 1-r;
             for (Instance instance : dataset) {
-                double rtValue = normalizer.normalize(instance);
-//                double estimated = rtValue*ind1.getTrainingSemantics()[instanceIndex] + (1-rtValue)*ind2.getTrainingSemantics()[instanceIndex];
-                double estimated = rtValue*semInd1[instanceIndex] + (1-rtValue)*semInd2[instanceIndex];
+                double estimated = r*semInd1[instanceIndex] + oneMinusR*semInd2[instanceIndex];
                 fitnessFunction.setSemanticsAtIndex(estimated, instance.output, instanceIndex++, dataType);
             }
             fitnessFunction.computeFitness(dataType);
@@ -71,16 +63,18 @@ public class GSXMBreeder extends Breeder{
         Individual p1 = (Individual)properties.selectIndividual(originalPopulation, rndGenerator);
         Individual p2 = (Individual)properties.selectIndividual(originalPopulation, rndGenerator);
         while(p1.equals(p2)) p2 = (Individual)properties.selectIndividual(originalPopulation, rndGenerator);
-        Node rt = properties.getRandomTree(rndGenerator);
+        double r = rndGenerator.nextDouble();
         
-        BigInteger numNodes = p1.getNumNodes().add(p2.getNumNodes()).add(new BigInteger(rt.getNumNodes() + "")).add(BigInteger.ONE);
-        Fitness fitnessFunction = evaluate(p1, p2, rt, expData);
+        BigInteger numNodes = p1.getNumNodes().add(p2.getNumNodes()).add(BigInteger.ONE);
+//        BigInteger numNodes = BigInteger.ONE;
+        
+        Fitness fitnessFunction = evaluate(p1, p2, r, expData);
         Individual offspring = new Individual(null, numNodes, fitnessFunction);
         return offspring;
     }
 
     @Override
     public Breeder softClone(PropertiesManager properties) {
-        return new GSXMBreeder(properties, probability);
+        return new GSXEBreeder(properties, probability);
     }
 }
