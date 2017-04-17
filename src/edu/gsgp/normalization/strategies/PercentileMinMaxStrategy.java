@@ -9,8 +9,9 @@ import edu.gsgp.experiment.data.Dataset;
 import edu.gsgp.experiment.data.Instance;
 import edu.gsgp.nodes.Node;
 import edu.gsgp.normalization.NormalizationStrategy;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.PriorityQueue;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**
  *
@@ -36,8 +37,14 @@ public class PercentileMinMaxStrategy extends MinMaxStrategy {
         super.setup(dataset, tree);
         int capacity = Math.max(1, (int) Math.floor(dataset.size() * getDiscartedPercentualPerTail()));
         
-        PriorityQueue<Double> lowest =  new PriorityQueue<>(capacity);
-        PriorityQueue<Double> highest=  new PriorityQueue<>(capacity, Collections.reverseOrder());
+        PriorityQueue<Double> lowest  = new PriorityQueue<>(capacity, new Comparator<Double>() {
+            public int compare(Double lhs, Double rhs) {
+                if (lhs > rhs) return +1;
+                if (lhs.equals(rhs)) return 0;
+                return -1;
+            }
+        });
+        PriorityQueue<Double> highest = new PriorityQueue<>(capacity);
         
         fillPriorityQueues(dataset, lowest, highest, capacity);
         
@@ -59,7 +66,7 @@ public class PercentileMinMaxStrategy extends MinMaxStrategy {
             int capacity
     ) { 
         double value;
-       
+
         for (Instance instance : dataset) {
             value = eval(instance);
             
@@ -69,7 +76,7 @@ public class PercentileMinMaxStrategy extends MinMaxStrategy {
                 lowest.poll();
                 lowest.add(value);
             }
-            
+
             if (highest.size() < capacity)
                 highest.add(value);
             else if (highest.peek() < value) {
@@ -77,6 +84,5 @@ public class PercentileMinMaxStrategy extends MinMaxStrategy {
                 highest.add(value);          
             }
         }
-        
     }
 }

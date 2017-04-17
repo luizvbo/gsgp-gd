@@ -882,8 +882,6 @@ public class PropertiesManager {
     public NormalizationStrategy getNormalizationStrategy() {        
         if (normalizationStrategyName.toLowerCase().equals("minmax")) {
             return new MinMaxStrategy();
-        } else if (normalizationStrategyName.toLowerCase().equals("minmax")) {
-            return new MinMaxStrategy();
         } else if (normalizationStrategyName.toLowerCase().startsWith("percentileminmax")) {
             return new PercentileMinMaxStrategy(normalizationStrategyArg);
         } else if (normalizationStrategyName.toLowerCase().equals("zscoresigmoid")) {

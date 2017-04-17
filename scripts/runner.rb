@@ -1,14 +1,12 @@
 #!/usr/bin/env ruby
-
-#DATASETS     = %w(airfoil concrete yacht vladislavleva-1 vladislavleva-4 keijzer-5)
-DATASETS     = %w(yacht)
-#STRATEGIES   = %w(sigmoid minmax percentileminmax_x zscoresigmoid zscoreminmax zscorepercentileminmax_x)
-STRATEGIES   = %w(minmax)
-#STRATEGIES   = %w(zscorepercentileminmax-90)
+#DATASETS     = %w(airfoil concrete yacht vladislavleva-1 keijzer-5 keijzer-7 keijzer-8)
+DATASETS     = %w(wineRed)
+#STRATEGIES   = %w(sigmoid minmax percentileminmax-x zscoresigmoid zscoreminmax zscorepercentileminmax-x)
+STRATEGIES   = %w(sigmoid minmax percentileminmax-98 percentileminmax-95 percentileminmax-90 percentileminmax-80 zscoresigmoid zscoreminmax zscorepercentileminmax-98 zscorepercentileminmax-95 zscorepercentileminmax-90 zscorepercentileminmax-80)
 
 MASTER_PATH  = "/Users/casadei/experiments/scripts/masterGSGP.param"
 PARAMS_PATH  = "/Users/casadei/experiments/scripts/gsgp"
-BIN_PATH     = "~/gsgp-gd/dist/GSGP.jar"
+BIN_PATH     = "/Users/casadei/dev/casadei/gsgp-gd/dist/GSGP.jar"
 
 def change_strategy(strategy)
   lines = File.readlines(MASTER_PATH)
@@ -46,4 +44,6 @@ STRATEGIES.each do |strategy|
   print_and_flush "*** Move data to /tmp/norm-#{strategy} folder"
   %x(mkdir /tmp/norm-#{strategy})
   %x(mv /tmp/*-sgp /tmp/norm-#{strategy})
+  %x{mkdir ~/results}
+  %x{mv /tmp/norm-* ~/results}
 end
