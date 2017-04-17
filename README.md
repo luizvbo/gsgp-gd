@@ -31,29 +31,21 @@ The parameter files inside the directory *experiments/scripts* presents instruct
 
 ### Normalization Strategy
 
-The normalization strategy is defined through the property `normalization.strategy` at parameters file (see [Parameters](#parameters)).
-
-The allowed values for the `normalization.strategy` property are the following:
+The normalization strategy is defined through the property `normalization.strategy` at parameters file (see [Parameters](#parameters)). The allowed values for the `normalization.strategy` property are the following:
 
 ##### Logistic
 
-Example:
-
-```normalization.strategy = sigmoid```
+Example: ```normalization.strategy = sigmoid```
 
 ##### Min-Max
 
-Example:
-
-```normalization.strategy = minmax```
+Example: ```normalization.strategy = minmax```
 
 ##### Min-Max of alpha
 
 To use this strategy you must define the amount of data will be taken into account. Thus, if you'd like to discard the 10% of lowest values and 10% of greatest values, the alpha will be 80. Alpha can be any integer value in the range [1 ,99].
 
-Example:
-
-```normalization.strategy = percentileminmax-80```
+Example: ```normalization.strategy = percentileminmax-80```
 
 ##### Logistic z-score
 
