@@ -1,0 +1,3 @@
+parent = ~/experiments/scripts/masterGSGP.param
+experiment.data = ~/experiments/dados/yacht-#.dat
+experiment.file.prefix = yacht-sgp

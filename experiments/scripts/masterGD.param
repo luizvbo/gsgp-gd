@@ -14,7 +14,7 @@ tree.build.builder.random.tree = GROW
 pop.ind.selector = TOURNAMENT
 # Type of experiment (cross-validation or holdout):
 # - If crossvalidation, uses splited data from a list of files. Use paths to the
-# files in the form /pathToFile/repeatedName#repeatedName, where # indicates 
+# files in the form /pathToFile/repeatedName#repeatedName, where # indicates
 # where the fold index is placed (a number from 0 to k-1). E.g. /home/iris-#.dat,
 # with 3 folds in the path will look for iris-0.dat, iris-1.dat and iris-2.dat
 # - If holdout, Use paths to the files in the form /pathToFile/repeatedName#repeatedName,
@@ -45,7 +45,7 @@ pop.fitness = edu.gsgp.population.fitness.FitnessRMSE
 # Population Initializer class. Default: edu.gsgp.population.builder.individual.SimplePopulator
 pop.initializer = edu.gsgp.population.populator.SimplePopulator
 # List of breeders classes used during the evolution. The list items must be comma separated and the propability
-# must follow the breeder class separated by a *. E.g.: 
+# must follow the breeder class separated by a *. E.g.:
 # edu.gsgp.population.builder.individual.BreederA*0.1, edu.gsgp.population.builder.individual.BreederB*0.9
 breed.list = edu.gsgp.population.operator.GSMBreeder*0.5, edu.gsgp.population.operator.GSXMBreeder*0.5
 #, edu.gsgp.population.builder.individual.GLBreeder*0.05
